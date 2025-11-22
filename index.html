@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="tr" data-device="desktop">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<title>MEMET ÇINAR | THE LEGACY VIP</title>
+
+<link rel="icon" type="image/svg+xml" href="icon-memet-cinar-music.svg" />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&family=Cinzel:wght@400;700;900&family=Orbitron:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.cdnfonts.com/css/digital-dismay?styles=116363" rel="stylesheet">
+
+<style>
+@import url('https://fonts.cdnfonts.com/css/digital-dismay?styles=116363');
+
+:root{
+  --gold:#FFD700;--neon-blue:#00F0FF;--neon-red:#FF003C;--bg:#050505;
+  --glass:rgba(15,15,15,0.9);--glass-border:rgba(255,255,255,0.08);--glass-shadow:0 10px 40px rgba(0,0,0,0.8);
+  --smooth:cubic-bezier(.2,.9,.2,1);--radius:16px;--muted:#999;
+  --vh:1vh;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:calc(var(--vh)*100);width:100%;overflow:hidden;}
+body{
+  font-family:'Rajdhani',sans-serif;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(0,240,255,0.18), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(255,215,0,0.08), transparent 55%),
+    linear-gradient(135deg,#02030a,#050505);
+  color:#fff;position:relative;
+}
+
+/* BG FX */
+.bg-fx{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(255,215,0,0.06), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(0,240,255,0.06), transparent 25%);
+  animation:bgPulse 10s ease-in-out infinite alternate;}
+.scanlines{position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,0) 50%,rgba(0,0,0,0.2) 50%,rgba(0,0,0,0.2));
+  background-size:100% 4px;mix-blend-mode:soft-light;opacity:.5;}
+@keyframes bgPulse{0%{opacity:.5;transform:scale(1);}100%{opacity:1;transform:scale(1.03);}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:10px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.3)}
+
+/* TOP HUD */
+.hud-top{
+  position:fixed;top:0;left:0;right:0;height:70px;padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;z-index:1000;
+  background:rgba(5,5,5,0.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid rgba(255,215,0,0.18);box-shadow:0 10px 40px rgba(0,0,0,0.8);
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-logo-full svg{height:60px;width:auto;display:block;}
+.top-status{font-size:.8rem;color:var(--neon-blue);display:flex;flex-direction:column;align-items:flex-end;}
+.top-status span:nth-child(2){font-size:.7rem;color:var(--muted);}
+
+/* NAV */
+.nav-dock{
+  position:fixed;z-index:900;background:rgba(10,10,10,0.96);
+  backdrop-filter:blur(18px);border:1px solid var(--glass-border);
+  box-shadow:0 0 25px rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;
+}
+@media(min-width:769px){
+  .nav-dock{top:50%;left:20px;transform:translateY(-50%);flex-direction:column;padding:18px 10px;border-radius:24px;gap:12px;}
+  .viewport{position:fixed;top:70px;left:90px;right:0;bottom:90px;overflow-y:auto;padding:28px 30px 40px;}
+}
+@media(max-width:768px){
+  .nav-dock{bottom:0;left:0;right:0;height:76px;flex-direction:row;justify-content:space-around;border-top:1px solid var(--gold);border-radius:18px 18px 0 0;padding-bottom:env(safe-area-inset-bottom);}
+  .viewport{position:fixed;top:70px;left:0;right:0;bottom:150px;overflow-y:auto;padding:15px;}
+}
+.nav-item{
+  width:46px;height:46px;border-radius:16px;display:grid;place-items:center;font-size:1.25rem;
+  color:#777;cursor:pointer;transition:.25s var(--smooth);position:relative;overflow:hidden;
+}
+.nav-item::before{
+  content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,rgba(255,255,255,0.2),transparent 55%);
+  opacity:0;transition:.25s;
+}
+.nav-item:hover::before,.nav-item.active::before{opacity:1;}
+.nav-item:hover,.nav-item.active{
+  color:var(--gold);background:linear-gradient(135deg,rgba(255,215,0,0.18),rgba(0,240,255,0.18));
+  box-shadow:0 0 20px rgba(255,215,0,0.35);transform:translateY(-2px) scale(1.05);
+}
+
+/* SCREENS & CARDS */
+.screen{display:none;animation:fadeIn .35s ease-out;}
+.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;}
+.widget-card{
+  background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--radius);padding:18px 20px;
+  box-shadow:var(--glass-shadow);position:relative;overflow:hidden;transform-origin:center;
+  transition:transform .25s var(--smooth),box-shadow .25s var(--smooth),border-color .25s;
+}
+.widget-card::after{
+  content:'';position:absolute;inset:-40%;background:radial-gradient(circle at 10% 0%,rgba(255,255,255,0.12),transparent 55%);
+  opacity:0;transition:opacity .4s;pointer-events:none;
+}
+.widget-card:hover{transform:translateY(-4px) scale(1.01);box-shadow:0 18px 45px rgba(0,0,0,0.9);border-color:rgba(255,215,0,0.4);}
+.widget-card:hover::after{opacity:1;}
+
+/* CLOCK */
+.led-clock-box{
+  background:#020305;
+  border-radius:18px;
+  padding:14px 26px 16px;
+  display:inline-flex;
+  flex-direction:column;
+  align-items:center;
+  margin-bottom:20px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 0 25px rgba(255,0,0,0.25),
+    0 14px 40px rgba(0,0,0,0.9);
+  position:relative;
+  overflow:hidden;
+}
+.led-clock-box::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 0 0,rgba(255,0,0,0.25),transparent 55%),
+    radial-gradient(circle at 100% 100%,rgba(255,255,255,0.1),transparent 55%);
+  opacity:.6;
+  mix-blend-mode:screen;
+  pointer-events:none;
+}
+.led-time{
+  font-family:'Digital Dismay', sans-serif;
+  font-size:3.4rem;
+  color:#ff4b4b;
+  line-height:1;
+  text-shadow:
+    0 0 6px rgba(255,80,80,0.9),
+    0 0 14px rgba(255,0,0,0.8);
+  letter-spacing:4px;
+}
+.led-date{
+  font-family:'Orbitron',sans-serif;
+  color:#bbb;
+  margin-top:5px;
+  font-size:.85rem;
+  letter-spacing:2px;
+}
+
+/* REALISTIC LED TICKER */
+.news-ticker{
+  position:relative;
+  background:#1a0000;
+  border-radius:14px;
+  padding:4px 16px 6px;
+  margin-bottom:25px;
+  overflow:hidden;
+  box-shadow:
+    0 0 4px rgba(0,0,0,0.9),
+    0 0 18px rgba(255,0,0,0.7);
+  border:1px solid rgba(255,80,80,0.7);
+}
+.news-ticker::before{
+  content:'● LIVE';
+  position:absolute;
+  left:10px;
+  top:7px;
+  font-size:.65rem;
+  padding:2px 8px;
+  border-radius:999px;
+  background:radial-gradient(circle at 30% 0,#ff4b4b,#900);
+  color:#ffecec;
+  font-weight:700;
+  letter-spacing:1px;
+  text-shadow:0 0 4px rgba(0,0,0,0.8);
+}
+.news-inner{
+  margin-left:80px;
+  overflow:hidden;
+}
+.news-content{
+  display:inline-flex;
+  gap:50px;
+  white-space:nowrap;
+  font-family:'VT323',monospace;
+  font-size:1rem;
+  letter-spacing:2px;
+  color:#ffd9a6;
+  text-shadow:
+    0 0 4px rgba(255,200,0,0.8),
+    0 0 10px rgba(255,140,0,0.7);
+  animation:ledTicker 28s linear infinite;
+}
+.news-content span i{margin-right:6px;}
+@keyframes ledTicker{
+  0%{transform:translateX(100%);}
+  100%{transform:translateX(-100%);}
+}
+
+/* WEATHER */
+#weather-box{
+  position:relative;
+  padding:18px 16px 16px;
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 0 0,rgba(0,240,255,0.35),rgba(3,6,18,0.96)),
+    radial-gradient(circle at 100% 100%,rgba(255,215,0,0.25),rgba(0,0,0,0.98));
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 18px 40px rgba(0,0,0,0.9);
+}
+#weather-box::before{
+  content:'';position:absolute;inset:-40%;
+  background:
+    radial-gradient(circle at 50% 0,rgba(255,255,255,0.18),transparent 55%),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255,255,255,0.06) 0,
+      rgba(255,255,255,0.06) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  opacity:.12;mix-blend-mode:screen;pointer-events:none;
+}
+.weather-main{
+  display:flex;align-items:center;justify-content:center;gap:18px;
+  margin:4px 0 16px;
+}
+.weather-orb{
+  width:130px;height:130px;border-radius:50%;position:relative;padding:4px;
+  background:
+    conic-gradient(from 180deg,var(--neon-blue),var(--gold),var(--neon-red),var(--neon-blue));
+  box-shadow:
+    0 0 25px rgba(0,240,255,0.5),
+    0 0 55px rgba(255,215,0,0.4);
+}
+.weather-orb-inner{
+  position:relative;width:100%;height:100%;border-radius:50%;
+  background:radial-gradient(circle at 30% 0,rgba(255,255,255,0.12),rgba(3,8,18,0.96));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+.weather-orb-inner::before{
+  content:'';position:absolute;inset:12%;border-radius:50%;
+  border:1px dashed rgba(255,255,255,0.22);
+  box-shadow:0 0 18px rgba(0,0,0,0.9) inset;
+}
+#w-icon{
+  font-size:2.4rem;margin-bottom:4px;
+  filter:drop-shadow(0 0 10px rgba(255,255,255,0.9));
+  animation:floatW 3.2s ease-in-out infinite;
+}
+#w-temp{
+  font-family:'Digital Dismay',sans-serif;
+  font-size:2.2rem;letter-spacing:2px;
+  text-shadow:0 0 18px rgba(255,255,255,0.7);
+}
+@keyframes floatW{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+
+/* Weather info */
+.weather-main-info{
+  display:flex;flex-direction:column;gap:8px;max-width:180px;
+}
+.weather-location{
+  font-size:.75rem;text-transform:uppercase;letter-spacing:2px;
+  color:rgba(255,255,255,0.7);display:flex;align-items:center;gap:6px;
+}
+.weather-location i{font-size:.8rem;color:var(--neon-blue);}
+#w-desc{font-size:.85rem;color:#e3e8ff;}
+.weather-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.7rem;padding:3px 8px;border-radius:999px;
+  border:1px solid rgba(255,255,255,0.18);
+  background:rgba(0,0,0,0.45);color:#cbd5ff;
+}
+.weather-details{
+  display:flex;justify-content:space-between;margin-top:4px;gap:10px;
+}
+.w-detail{
+  flex:1;background:rgba(0,0,0,0.45);border-radius:12px;
+  padding:8px 10px;border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 8px 20px rgba(0,0,0,0.7);
+}
+.w-val{
+  font-family:'Orbitron';color:var(--neon-blue);font-size:1rem;
+}
+.w-label{
+  font-size:.7rem;color:#9ca3af;
+}
+
+/* Weather state backgrounds */
+#weather-box.w-sunny{
+  background:
+    radial-gradient(circle at 0 0,rgba(255,215,0,0.35),rgba(17,8,0,0.98)),
+    radial-gradient(circle at 100% 100%,rgba(255,140,0,0.25),rgba(0,0,0,1));
+}
+#weather-box.w-cloudy{
+  background:
+    radial-gradient(circle at 0 0,rgba(148,163,184,0.4),rgba(15,23,42,0.98)),
+    radial-gradient(circle at 100% 100%,rgba(51,65,85,0.6),rgba(3,6,12,1));
+}
+#weather-box.w-rainy{
+  background:
+    radial-gradient(circle at 0 0,rgba(56,189,248,0.45),rgba(8,11,26,0.98)),
+    radial-gradient(circle at 100% 100%,rgba(15,23,42,0.9),rgba(0,0,0,1));
+}
+#weather-box.w-snowy{
+  background:
+    radial-gradient(circle at 0 0,rgba(148,197,255,0.55),rgba(15,23,42,0.98)),
+    radial-gradient(circle at 100% 100%,rgba(226,232,240,0.45),rgba(15,23,42,1));
+}
+#weather-box.w-storm{
+  background:
+    radial-gradient(circle at 0 0,rgba(248,250,252,0.2),rgba(15,23,42,1)),
+    radial-gradient(circle at 100% 100%,rgba(55,65,81,0.9),rgba(3,4,10,1));
+}
+@media (max-width:768px){
+  .weather-main{gap:14px;}
+  .weather-orb{width:115px;height:115px;}
+}
+
+/* CALENDAR */
+.calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;text-align:center;}
+.cal-head{font-size:.8rem;color:var(--muted);padding-bottom:8px;}
+.cal-cell{
+  aspect-ratio:1;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:8px;background:rgba(255,255,255,0.03);
+  cursor:pointer;position:relative;font-weight:bold;font-size:.95rem;
+  transition:.2s;overflow:hidden;
+}
+.cal-cell:hover{
+  background:rgba(255,215,0,0.12);
+  border:1px solid var(--gold);
+  transform:translateY(-2px) scale(1.03);
+}
+.cal-cell.empty{background:transparent;cursor:default;}
+.cal-cell.today{
+  border:1px solid var(--neon-blue);
+  box-shadow:0 0 10px rgba(0,240,255,0.4);
+}
+
+/* özel gün animasyonları */
+.cal-cell.snowy{
+  color:#fff;
+  background:radial-gradient(circle at 30% 0%,rgba(255,255,255,0.18),rgba(0,0,0,0.8));
+}
+.cal-cell.snowy::after{
+  content:'❄';
+  position:absolute;
+  font-size:10px;
+  top:-10px;
+  right:4px;
+  animation:snowDrift 3s linear infinite;
+  opacity:0.9;
+}
+@keyframes snowDrift{
+  0%{transform:translate(0,-5px) rotate(0deg);opacity:0;}
+  40%{opacity:1;}
+  100%{transform:translate(-8px,18px) rotate(360deg);opacity:0;}
+}
+.cal-cell.flag{
+  background:radial-gradient(circle at 10% 0%,rgba(227,10,23,0.4),rgba(0,0,0,0.85));
+  border:1px solid #E30A17;
+  box-shadow:0 0 12px rgba(227,10,23,0.6);
+  animation:flagPulse 2.2s ease-in-out infinite;
+}
+.cal-cell.flag::before{
+  content:'🇹🇷';
+  position:absolute;
+  top:4px;
+  right:4px;
+  font-size:11px;
+  animation:flagWave 2s ease-in-out infinite;
+}
+@keyframes flagWave{
+  0%,100%{transform:rotate(-4deg) translateX(0);}
+  50%{transform:rotate(5deg) translateX(1px);}
+}
+@keyframes flagPulse{
+  0%{box-shadow:0 0 6px rgba(227,10,23,0.6);}
+  50%{box-shadow:0 0 16px rgba(227,10,23,1);}
+  100%{box-shadow:0 0 6px rgba(227,10,23,0.6);}
+}
+.cal-cell.newyear{
+  background:radial-gradient(circle at 50% 0%,rgba(255,215,0,0.4),rgba(0,0,0,0.9));
+  border:1px solid rgba(255,215,0,0.8);
+  color:#fff;
+  animation:newyearGlow 2.4s ease-in-out infinite;
+}
+.cal-cell.newyear::before,
+.cal-cell.newyear::after{
+  content:'';
+  position:absolute;
+  width:180%;
+  height:180%;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0.2);
+  border-radius:50%;
+  border:1px dashed rgba(255,255,255,0.35);
+  opacity:0;
+  pointer-events:none;
+}
+.cal-cell.newyear::before{
+  animation:fireworkRing 1.8s ease-out infinite;
+}
+.cal-cell.newyear::after{
+  animation:fireworkRing 1.8s ease-out infinite;
+  animation-delay:.9s;
+}
+.cal-cell.newyear span.confetti-dot{
+  position:absolute;
+  width:4px;
+  height:8px;
+  border-radius:999px;
+  background:var(--gold);
+  top:50%;
+  left:50%;
+  opacity:0;
+  transform:translate(-50%,-50%);
+  animation:confettiBurst 1.8s ease-out infinite;
+}
+.cal-cell.newyear span.c1{background:#FFD700;transform:translate(-50%,-50%) rotate(15deg);}
+.cal-cell.newyear span.c2{background:#00F0FF;transform:translate(-50%,-50%) rotate(75deg);animation-delay:.2s;}
+.cal-cell.newyear span.c3{background:#FF4D7A;transform:translate(-50%,-50%) rotate(135deg);animation-delay:.4s;}
+.cal-cell.newyear span.c4{background:#FFFFFF;transform:translate(-50%,-50%) rotate(210deg);animation-delay:.6s;}
+@keyframes fireworkRing{
+  0%{transform:translate(-50%,-50%) scale(0.2);opacity:0;}
+  35%{opacity:1;}
+  100%{transform:translate(-50%,-50%) scale(1);opacity:0;}
+}
+@keyframes confettiBurst{
+  0%{opacity:0;transform:translate(-50%,-50%) translateY(0) scale(1);}
+  20%{opacity:1;}
+  100%{opacity:0;transform:translate(-50%,-50%) translateY(-26px) scale(1.1);}
+}
+@keyframes newyearGlow{
+  0%{box-shadow:0 0 10px rgba(255,215,0,0.5);}
+  50%{box-shadow:0 0 24px rgba(255,215,0,1);}
+  100%{box-shadow:0 0 10px rgba(255,215,0,0.5);}
+}
+.cal-cell.special{
+  border-color:var(--gold);
+  background:radial-gradient(circle at 50% 0%,rgba(255,105,180,0.25),rgba(0,0,0,0.9));
+  animation:specialPulse 2s ease-in-out infinite;
+}
+.cal-cell.special::before{
+  content:'★';
+  position:absolute;
+  top:2px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:10px;
+  color:var(--gold);
+}
+.cal-cell.special::after{
+  content:'❤';
+  position:absolute;
+  bottom:2px;
+  right:4px;
+  font-size:10px;
+  color:#ff6fa5;
+  animation:heartFloat 2.4s ease-in-out infinite;
+}
+@keyframes specialPulse{
+  0%{transform:translateY(0) scale(1);}
+  50%{transform:translateY(-2px) scale(1.05);}
+  100%{transform:translateY(0) scale(1);}
+}
+@keyframes heartFloat{
+  0%{transform:translateY(0);opacity:.6;}
+  50%{transform:translateY(-3px);opacity:1;}
+  100%{transform:translateY(0);opacity:.6;}
+}
+
+/* SONGS & LYRICS */
+.songs-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;}
+@media(max-width:900px){.songs-layout{grid-template-columns:1fr;}}
+.section-title{font-family:'Orbitron';color:var(--gold);margin-bottom:18px;border-left:4px solid var(--gold);padding-left:15px;text-transform:uppercase;letter-spacing:1px;}
+.song-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:12px;
+}
+.song-row{
+  display:flex;flex-direction:column;gap:8px;
+  padding:10px;background:rgba(255,255,255,0.03);
+  border-radius:14px;border:1px solid transparent;
+  transition:.2s var(--smooth);
+  cursor:pointer;position:relative;overflow:hidden;
+  clip-path:polygon(8% 0,100% 0,100% 78%,92% 100%,0 100%,0 18%);
+}
+.song-row::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle at 0 0,rgba(0,240,255,0.25),transparent 55%);
+  opacity:0;transition:.25s;mix-blend-mode:screen;
+}
+.song-row:hover{
+  border-color:var(--gold);
+  background:rgba(255,215,0,0.06);
+  transform:translateY(-2px);
+}
+.song-row:hover::after{opacity:1;}
+.song-row.active{
+  border-color:var(--neon-blue);
+  background:rgba(0,240,255,0.09);
+}
+.song-row-main{display:flex;align-items:center;gap:12px;}
+.song-title{font-weight:700;font-size:.9rem;}
+.song-artist{font-size:.75rem;color:#aaa;}
+.song-tag{
+  font-size:.7rem;
+  padding:2px 6px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.12);
+  color:var(--muted);
+  background:rgba(0,0,0,0.4);
+}
+.song-inline-lyrics{
+  font-size:.7rem;color:#aaa;
+  background:rgba(0,0,0,0.4);
+  border-radius:8px;
+  padding:6px 8px;
+  border:1px dashed rgba(255,255,255,0.08);
+}
+.song-inline-lyrics span.hint{color:var(--gold);}
+
+#lyrics-panel h3{font-family:'Orbitron';font-size:1rem;margin-bottom:4px;}
+#lyrics-song-title{font-weight:700;font-size:.9rem;margin-bottom:2px;}
+#lyrics-song-artist{font-size:.8rem;color:var(--muted);margin-bottom:6px;}
+#lyrics-meta{font-size:.7rem;color:#777;margin-bottom:4px;}
+#lyrics-tools{display:flex;justify-content:space-between;font-size:.75rem;margin:4px 0;color:#999;gap:10px;flex-wrap:wrap;}
+#lyrics-view{background:rgba(0,0,0,0.45);border-radius:10px;border:1px solid rgba(255,255,255,0.08);padding:10px 12px;font-size:.85rem;line-height:1.5;white-space:pre-line;max-height:180px;overflow-y:auto;margin-bottom:8px;}
+#lyrics-editor{margin-top:4px;}
+#lyrics-input{width:100%;min-height:100px;max-height:220px;resize:vertical;background:#111;border:1px solid #444;color:#fff;border-radius:8px;padding:8px;font-size:.85rem;font-family:inherit;}
+#lyrics-save-btn{margin-top:6px;padding:6px 14px;border-radius:999px;border:none;background:var(--gold);color:#000;font-weight:700;font-size:.8rem;cursor:pointer;}
+#lyrics-login-hint{font-size:.78rem;color:#999;margin-top:6px;}
+
+/* ARTISTS & WRITERS */
+.about-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;}
+@media(max-width:900px){.about-grid{grid-template-columns:1fr;}}
+.about-stat-pill{border-radius:999px;border:1px solid rgba(255,255,255,0.16);padding:4px 10px;font-size:.75rem;display:inline-flex;align-items:center;gap:6px;margin:2px 4px 2px 0;background:rgba(0,0,0,0.4);}
+.about-bar{height:6px;border-radius:999px;background:#111;overflow:hidden;margin-top:6px;}
+.about-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--neon-blue),var(--gold));width:82%;}
+.about-tagline{font-size:.85rem;color:#ccc;margin-bottom:4px;}
+.about-text{font-size:.8rem;color:#aaa;line-height:1.5;}
+
+/* Writers grid */
+.writers-grid{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:14px;
+}
+.writer-card{
+  display:flex;
+  gap:14px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(15,15,20,0.9);
+  border:1px solid rgba(255,255,255,0.08);
+  box-shadow:0 10px 25px rgba(0,0,0,0.7);
+}
+.writer-avatar{
+  width:64px;height:64px;border-radius:50%;
+  border:2px solid #fff;object-fit:cover;
+}
+.writer-main-name{font-size:.95rem;font-weight:700;}
+.writer-role{font-size:.8rem;color:#aaa;}
+.writer-badges{margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;font-size:.65rem;}
+.writer-badge{
+  padding:2px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.18);
+  background:rgba(0,0,0,0.6);
+}
+.writer-badge.gold{
+  background:linear-gradient(90deg,#ffd700,#ff8c00);
+  color:#000;border-color:rgba(255,215,0,0.8);font-weight:700;
+}
+.writer-badge.ok{background:#555;color:#fff;}
+.writer-badge.collab{background:#0f172a;color:#e5e7eb;border-color:rgba(148,163,184,0.8);}
+.writer-works{margin-top:4px;font-size:.75rem;color:#ccc;}
+
+/* CHAT / LONCA AI */
+.chat-box{
+  height:300px;overflow-y:auto;background:rgba(0,0,0,0.35);
+  border-radius:10px;padding:15px;margin-bottom:10px;border:1px solid #222;
+  display:flex;flex-direction:column;
+}
+.msg{
+  padding:8px 12px;border-radius:15px;margin-bottom:8px;max-width:80%;font-size:.9rem;position:relative;
+}
+.msg.in{background:#222;color:#ddd;align-self:flex-start;border-bottom-left-radius:2px;}
+.msg.out{background:var(--gold);color:#000;margin-left:auto;border-bottom-right-radius:2px;font-weight:600;}
+.msg.ai-msg{background:#111;color:#e5e7eb;border:1px solid rgba(148,163,184,0.4);}
+.msg-copy-btn{
+  position:absolute;
+  right:6px;
+  bottom:4px;
+  font-size:.65rem;
+  padding:2px 6px;
+  border-radius:999px;
+  border:none;
+  background:rgba(15,23,42,0.85);
+  color:#e5e7eb;
+  cursor:pointer;
+}
+.msg-copy-btn:hover{background:rgba(30,64,175,0.95);}
+.center-flex{display:flex;align-items:center;justify-content:center;height:100%;text-align:center;flex-direction:column;}
+
+/* PLAYER BAR */
+.player-bar{position:fixed;bottom:0;left:0;right:0;height:90px;background:radial-gradient(circle at 0 0,rgba(0,240,255,0.22),transparent 55%),rgba(10,10,10,0.96);border-top:1px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:1100;box-shadow:0 -5px 30px rgba(0,0,0,0.85);}
+@media(max-width:768px){.player-bar{bottom:76px;height:80px;padding:10px;}.p-extra{display:none;}.p-info{max-width:140px;}}
+.p-left{display:flex;align-items:center;gap:15px;}
+.p-art{width:52px;height:52px;border-radius:12px;border:1px solid #333;object-fit:cover;}
+.p-info h4{font-size:.9rem;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.p-info p{font-size:.75rem;color:var(--gold);}
+.p-center{flex:1;display:flex;flex-direction:column;align-items:center;max-width:500px;margin:0 auto;}
+.p-controls{display:flex;gap:18px;align-items:center;margin-bottom:6px;}
+.p-btn{background:none;border:none;color:#ccc;cursor:pointer;font-size:1.1rem;transition:.2s;}
+.p-btn:hover{color:#fff;transform:translateY(-1px);}
+.p-play{width:42px;height:42px;border-radius:50%;background:var(--gold);color:#000;display:grid;place-items:center;font-size:1.2rem;box-shadow:0 0 15px rgba(255,215,0,0.4);border:none;}
+.progress-rail{width:100%;height:4px;background:#333;border-radius:4px;position:relative;cursor:pointer;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--neon-blue),var(--gold));width:0%;border-radius:4px;position:relative;}
+.progress-bar::after{content:'';position:absolute;right:-4px;top:-3px;width:10px;height:10px;background:#fff;border-radius:50%;box-shadow:0 0 5px var(--neon-blue);opacity:0;transition:.2s;}
+.progress-rail:hover .progress-bar::after{opacity:1;}
+.p-extra{color:var(--neon-blue);font-size:1.2rem;}
+
+/* GAME + FULLSCREEN */
+#game-canvas{background:#000;border:2px solid #333;max-width:100%;box-shadow:0 0 18px rgba(0,0,0,0.9);}
+.game-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;width:100%;}
+@media(max-width:900px){.game-grid{grid-template-columns:1fr;}}
+.game-library-card ul{list-style:none;padding-left:0;font-size:.82rem;color:#ccc;}
+.game-library-card li{margin-bottom:8px;}
+.game-badges span{display:inline-flex;align-items:center;gap:5px;border-radius:999px;border:1px solid rgba(255,255,255,0.15);padding:3px 8px;font-size:.7rem;margin-right:6px;margin-top:4px;}
+.game-links a{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;margin-right:10px;margin-top:6px;text-decoration:none;padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.16);}
+.game-links a:hover{background:rgba(255,255,255,0.08);}
+.game-toolbar{
+  position:absolute;
+  top:10px;
+  right:10px;
+  display:flex;
+  gap:6px;
+}
+.game-fs-btn{
+  padding:4px 10px;
+  border-radius:999px;
+  border:none;
+  background:rgba(15,23,42,0.9);
+  color:#e5e7eb;
+  font-size:.7rem;
+  cursor:pointer;
+}
+.game-fs-btn:hover{background:rgba(37,99,235,0.95);}
+.game-main-card{position:relative;}
+body.game-fullscreen .nav-dock{display:none;}
+body.game-fullscreen .viewport{
+  top:70px;
+  left:0;
+  right:0;
+  bottom:90px;
+}
+body.game-fullscreen #game{
+  position:fixed;
+  inset:70px 0 90px 0;
+  background:rgba(0,0,0,0.96);
+  z-index:1500;
+  overflow:auto;
+}
+body.game-fullscreen #game .game-grid{
+  max-width:960px;
+  margin:0 auto;
+}
+
+/* ANIME GIRL */
+.anime-floating{
+  position:fixed;
+  right:20px;
+  bottom:110px;
+  width:150px;
+  z-index:1200;
+  cursor:pointer;
+}
+@media(max-width:768px){
+  .anime-floating{
+    right:10px;
+    bottom:150px;
+    width:110px;
+  }
+}
+.anime-floating.hidden-mobile{display:none;}
+.anime-floating-inner{position:relative;}
+.anime-floating-img{
+  width:100%;
+  display:block;
+  border-radius:16px;
+  box-shadow:0 0 20px rgba(255,134,200,0.7);
+  border:1px solid rgba(255,255,255,0.18);
+}
+.anime-hearts-container{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+.anime-heart{
+  position:absolute;
+  font-size:1.2rem;
+  color:#ff86c8;
+  animation:heartRise 1s ease-out forwards;
+  text-shadow:0 0 6px rgba(255,134,200,0.9);
+}
+@keyframes heartRise{
+  0%{transform:translate(-50%,0) scale(0.4);opacity:0;}
+  40%{opacity:1;}
+  100%{transform:translate(-50%,-50px) scale(1.1);opacity:0;}
+}
+.anime-float-speech{
+  margin-top:6px;
+  font-size:.75rem;
+  color:#f5f5f5;
+  background:rgba(0,0,0,0.75);
+  border-radius:999px;
+  padding:4px 10px;
+  box-shadow:0 0 10px rgba(0,0,0,0.7);
+  border:1px solid rgba(255,255,255,0.12);
+  text-align:center;
+  font-family:'Orbitron',sans-serif;
+}
+
+/* Anime toggle button */
+.anime-toggle-btn{
+  position:fixed;
+  right:10px;
+  bottom:90px;
+  z-index:1201;
+  padding:6px 12px;
+  border-radius:999px;
+  border:none;
+  background:rgba(15,23,42,0.95);
+  color:#e5e7eb;
+  font-size:.75rem;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  box-shadow:0 0 12px rgba(0,0,0,0.8);
+  cursor:pointer;
+}
+@media(max-width:768px){
+  .anime-toggle-btn{
+    bottom:85px;
+  }
+}
+
+/* SYSTEM MODAL */
+#sys-modal{display:none;}
+</style>
+</head>
+<body>
+
+<div class="bg-fx"></div>
+<div class="scanlines"></div>
+
+<!-- SYSTEM MODAL -->
+<div id="sys-modal" style="position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.8); align-items:center; justify-content:center;">
+  <div style="background:#111; border:1px solid var(--neon-blue); padding:30px; border-radius:15px; text-align:center; max-width:90%; width:400px; box-shadow:0 0 30px rgba(0,240,255,0.2);">
+    <h3 style="color:var(--neon-blue); font-family:'Orbitron'; margin-bottom:15px">SİSTEM MESAJI</h3>
+    <p id="sys-msg" style="color:#ccc; margin-bottom:20px"></p>
+    <button onclick="document.getElementById('sys-modal').style.display='none'" style="background:var(--neon-blue); border:none; padding:10px 30px; border-radius:20px; font-weight:bold; cursor:pointer;">TAMAM</button>
+  </div>
+</div>
+
+<!-- TOP HEADER -->
+<header class="hud-top">
+  <div class="brand brand-logo-full">
+    <!-- Logo SVG -->
+    <svg viewBox="0 0 640 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#FFF6D0"/>
+          <stop offset="40%" stop-color="#FFD700"/>
+          <stop offset="100%" stop-color="#FF8C00"/>
+        </linearGradient>
+        <linearGradient id="neonBlueGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#00F0FF"/>
+          <stop offset="100%" stop-color="#4DF5FF"/>
+        </linearGradient>
+        <linearGradient id="neonPinkGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#FF4D7A"/>
+          <stop offset="100%" stop-color="#FF9BC4"/>
+        </linearGradient>
+        <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="8" result="blur"/>
+          <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0  0 0 0 0 0.75  0 0 0 0 1  0 0 0 0.75 0"/>
+        </filter>
+        <filter id="noiseLogo" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="1" numOctaves="1" stitchTiles="noStitch"/>
+          <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.16 0"/>
+          <feBlend in="SourceGraphic" mode="overlay"/>
+        </filter>
+      </defs>
+      <g filter="url(#softGlow)">
+        <rect x="12" y="20" width="616" height="140" rx="32" ry="32" fill="#05060C" stroke="rgba(255,255,255,0.08)" stroke-width="1.5"/>
+      </g>
+      <g transform="translate(38,40)">
+        <circle cx="48" cy="50" r="44" fill="#050711" stroke="url(#neonBlueGrad)" stroke-width="3"/>
+        <circle cx="48" cy="50" r="34" fill="rgba(5,8,18,0.95)" stroke="url(#goldGrad)" stroke-width="2"/>
+        <path d="M30 30 L36 22 L48 30 L60 22 L66 30 L63 40 H33 Z" fill="url(#goldGrad)"/>
+        <circle cx="36" cy="22" r="2" fill="#FFF9E5"/>
+        <circle cx="48" cy="20" r="2.4" fill="#FFFFFF"/>
+        <circle cx="60" cy="22" r="2" fill="#FFF9E5"/>
+        <path d="M38 40 L38 60" stroke="url(#neonBlueGrad)" stroke-width="2" stroke-linecap="round"/>
+        <ellipse cx="34" cy="60" rx="6" ry="4.5" fill="url(#neonBlueGrad)"/>
+        <path d="M52 38 L52 56" stroke="url(#neonPinkGrad)" stroke-width="2" stroke-linecap="round"/>
+        <ellipse cx="48" cy="56" rx="5.5" ry="4" fill="url(#neonPinkGrad)"/>
+        <rect x="32" y="66" width="4" height="8" fill="#00F0FF"/>
+        <rect x="40" y="64" width="4" height="10" fill="#FFD700"/>
+        <rect x="48" y="62" width="4" height="12" fill="#00F0FF"/>
+        <rect x="56" y="64" width="4" height="10" fill="#FF4D7A"/>
+        <rect x="64" y="66" width="4" height="8" fill="#00F0FF"/>
+      </g>
+      <g transform="translate(150,54)" filter="url(#noiseLogo)">
+        <text x="0" y="0" font-family="Cinzel, 'Times New Roman', serif" font-size="38" font-weight="900" letter-spacing="6" fill="url(#goldGrad)">MEMET ÇINAR</text>
+        <path d="M2 10 C 40 22, 80 0, 140 14 S 230 26, 280 8" fill="none" stroke="url(#neonBlueGrad)" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
+        <text x="3" y="40" font-family="Orbitron, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="3" fill="#AEB8FF">MUSIC · ARTIST · OFFICIAL</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="top-status">
+    <span id="device-label"><i class="fas fa-user"></i> Misafir Modu · Oturum Yok</span>
+    <span>Şarkı sözleri bu cihazda saklanır</span>
+  </div>
+</header>
+
+<!-- NAVIGATION -->
+<nav class="nav-dock">
+  <div class="nav-item active" data-tab="home" onclick="switchTab('home', this)"><i class="fas fa-home"></i></div>
+  <div class="nav-item" data-tab="songs" onclick="switchTab('songs', this)"><i class="fas fa-music"></i></div>
+  <div class="nav-item" data-tab="artists" onclick="switchTab('artists', this)"><i class="fas fa-users"></i></div>
+  <div class="nav-item" data-tab="chat" onclick="switchTab('chat', this)"><i class="fas fa-comments"></i></div>
+  <div class="nav-item" data-tab="game" onclick="switchTab('game', this)"><i class="fas fa-gamepad"></i></div>
+  <div class="nav-item" data-tab="contact" onclick="switchTab('contact', this)"><i class="fas fa-paper-plane"></i></div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="viewport">
+  <!-- HOME -->
+  <section id="home" class="screen active">
+    <div style="text-align:center;">
+      <div class="led-clock-box">
+        <div class="led-time" id="clock">00:00:00</div>
+        <div class="led-date" id="date">...</div>
+      </div>
+    </div>
+
+    <!-- LED TABELA NEWS -->
+    <div class="news-ticker">
+      <div class="news-inner">
+        <div class="news-content">
+          <span><i class="fas fa-bolt"></i> MEMET ÇINAR YENİ SINGLE'LAR İLE DÖNÜYOR!</span>
+          <span><i class="fas fa-star"></i> MALATYA ÖZEL GAMER SAHNE ŞOVU YAKINDA.</span>
+          <span><i class="fas fa-music"></i> 'YILDIZLAR' TÜM DİJİTAL PLATFORMLARDA YAYINDA.</span>
+          <span><i class="fas fa-check-circle"></i> LEGACY v3.0 · LOKAL ŞARKI SÖZLERİ EDİTÖRÜ AKTİF.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="widget-card">
+        <div class="calendar-header">
+          <button class="p-btn" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+          <h3 id="cal-title" style="font-family:'Orbitron'; color:var(--gold)"></h3>
+          <button class="p-btn" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="cal-grid" style="margin-bottom:5px;">
+          <div class="cal-head">Pt</div><div class="cal-head">Sa</div><div class="cal-head">Ça</div><div class="cal-head">Pe</div><div class="cal-head">Cu</div><div class="cal-head">Ct</div><div class="cal-head">Pz</div>
+        </div>
+        <div id="cal-body" class="cal-grid"></div>
+      </div>
+
+      <div class="widget-card">
+        <h3 style="font-family:'Orbitron'; color:var(--neon-blue); border-bottom:1px solid #333; padding-bottom:10px; margin-bottom:10px;">HAVA DURUMU · MALATYA</h3>
+        <div id="weather-box">
+          <div class="weather-main">
+            <div class="weather-orb">
+              <div class="weather-orb-inner">
+                <i id="w-icon" class="fas fa-sun"></i>
+                <div id="w-temp">--°</div>
+              </div>
+            </div>
+            <div class="weather-main-info">
+              <div class="weather-location">
+                <i class="fas fa-location-dot"></i>
+                <span>MALATYA · TR</span>
+              </div>
+              <div id="w-desc">Yükleniyor...</div>
+              <span class="weather-badge">
+                <i class="fas fa-circle"></i> GERÇEK ZAMANLI VERİ
+              </span>
+            </div>
+          </div>
+          <div class="weather-details">
+            <div class="w-detail">
+              <div class="w-val" id="w-wind">--</div>
+              <div class="w-label">RÜZGAR (km/s)</div>
+            </div>
+            <div class="w-detail">
+              <div class="w-val" id="w-hum">--</div>
+              <div class="w-label">NEM (%)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SONGS + LYRICS -->
+  <section id="songs" class="screen">
+    <h2 class="section-title">MÜZİK KÜTÜPHANESİ</h2>
+    <div class="songs-layout">
+      <div class="widget-card">
+        <div class="song-list" id="song-container"></div>
+      </div>
+      <div class="widget-card" id="lyrics-panel">
+        <h3>ŞARKI SÖZLERİ (YEREL EDİTÖR)</h3>
+        <div id="lyrics-song-title">Henüz şarkı seçilmedi</div>
+        <div id="lyrics-song-artist" class="song-artist">Listeden bir şarkı seç.</div>
+        <div id="lyrics-meta">Durum: Şarkı seçilmedi.</div>
+        <div id="lyrics-tools">
+          <span id="lyrics-autosave">Otomatik kayıt: beklemede</span>
+          <span id="lyrics-stats">0 karakter · 0 satır</span>
+        </div>
+        <div id="lyrics-view">
+          Burada seçilen şarkının sözleri görünecek. Resmî şarkı sözleri telif nedeniyle otomatik eklenmiyor;
+          kendi yorumunu ve söz taslağını buraya kaydedebilirsin.
+        </div>
+        <div id="lyrics-editor">
+          <textarea id="lyrics-input" placeholder="Şarkı sözlerini buraya yaz... (Bu cihazda kaydedilir)"></textarea>
+          <button id="lyrics-save-btn" type="button" onclick="saveLyrics(false)">Sözleri Kaydet</button>
+        </div>
+        <p id="lyrics-login-hint">Oturum sistemi yok. Sözler tarayıcıda (localStorage) saklanır.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARTISTS + WRITERS -->
+  <section id="artists" class="screen">
+    <div class="grid-2">
+      <div class="widget-card" style="display:flex; gap:15px; align-items:center;">
+        <img src="https://ui-avatars.com/api/?name=Memet+Çınar&background=111827&color=ffffff&size=256" style="width:80px; height:80px; border-radius:50%; border:2px solid var(--gold);" alt="Memet Çınar">
+        <div>
+          <h3 style="color:var(--gold); margin-bottom:5px">
+            MEMET ÇINAR
+            <i class="fa-solid fa-circle-check" style="color:#1DA1F2;" title="Mavi Tik - Resmi Sanatçı"></i>
+          </h3>
+          <p style="font-size:0.85rem; color:#aaa">Solist · Besteci · Resmi-Sanatçı/Müzisyen · Söz Yazarı</p>
+          <div style="margin-top:6px; display:flex; gap:6px; font-size:.7rem; flex-wrap:wrap;">
+            <span style="background:#1DA1F2; color:#000; padding:2px 6px; border-radius:999px; font-weight:bold;">MAVİ TİK</span>
+            <span style="background:linear-gradient(90deg,#ffd700,#ff8c00); color:#000; padding:2px 6px; border-radius:999px; font-weight:bold;">ALTIN SEVİYE</span>
+            <span style="background:linear-gradient(90deg,#e5e4e2,#ffffff); color:#000; padding:2px 6px; border-radius:999px; font-weight:bold;">PLATİNYUM VIP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget-card" style="display:flex; gap:15px; align-items:center;">
+        <img src="https://ui-avatars.com/api/?name=Bilal+Güvercin&background=111827&color=ffffff&size=256" style="width:80px; height:80px; border-radius:50%; border:2px solid #fff;" alt="Bilal Güvercin">
+        <div>
+          <h3 style="color:#fff; margin-bottom:5px">
+            BİLAL GÜVERCİN
+            <i class="fa-solid fa-circle-check" style="color:#FFD700;" title="Altın Tik - Söz Yazarı"></i>
+          </h3>
+          <p style="font-size:0.85rem; color:#aaa">Söz Yazarı</p>
+          <span style="font-size:0.7rem; background:#555; color:#fff; padding:2px 6px; border-radius:4px;">ONAYLI</span>
+          <div style="margin-top:6px; font-size:.75rem; color:#ccc;">Eser: Bu Bir Rüya</div>
+          <div style="margin-top:8px; font-size:1.1rem;">
+            <a href="https://www.instagram.com/bilalguvercin_official/" target="_blank" rel="noopener" style="margin-right:8px; color:#C13584;"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.youtube.com/channel/UCGxmNCKcU2wbYCK3xvKGVxg" target="_blank" rel="noopener" style="margin-right:8px; color:#FF0000;"><i class="fab fa-youtube"></i></a>
+            <span title="Henüz eklenmedi" style="margin-right:8px; color:#555; cursor:not-allowed;"><i class="fab fa-spotify"></i></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hakkımda -->
+    <div class="widget-card" style="margin-top:20px;">
+      <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:10px;">
+        <i class="fas fa-user-astronaut"></i> HAKKIMDA · MEMET ÇINAR
+      </h3>
+      <div class="about-grid">
+        <div>
+          <p class="about-tagline">“Söz, melodi ve duyguyu oyun evreni gibi birleştiren prodüktör.”</p>
+          <p class="about-text">
+            Malatya çıkışlı bağımsız bir sanatçı olan <strong>Memet Çınar</strong>;
+            duygusal vokalleri, akılda kalıcı melodileri ve dijital çağın ruhuna
+            uygun prodüksiyonlarıyla kendi evrenini kuruyor. Rap, pop ve arabesk
+            dokunuşları modern sound’larla harmanlayarak kendine özgü bir stil
+            oluşturuyor.
+          </p>
+          <p class="about-text" style="margin-top:8px;">
+            Bu panel; şarkılarını, sözlerini ve kendi dünyanı yönetebileceğin özel bir
+            <strong>gamer arayüzü</strong> olarak tasarlandı. Zamanla yeni özellikler,
+            yeni şarkılar ve özel içeriklerle güncellenmeye devam edebilir.
+          </p>
+        </div>
+        <div>
+          <div>
+            <span class="about-stat-pill"><i class="fas fa-star"></i> Level: 27</span>
+            <span class="about-stat-pill"><i class="fas fa-fire"></i> Rank: LEGACY</span>
+            <span class="about-stat-pill"><i class="fas fa-heart"></i> Mood: LO-FI / EMOTIONAL</span>
+          </div>
+          <div style="margin-top:8px;">
+            <span style="font-size:.75rem;color:#aaa;">Sanatçı XP:</span>
+            <div class="about-bar"><div class="about-bar-fill"></div></div>
+          </div>
+          <div style="margin-top:10px;font-size:.8rem;color:#ccc;">
+            <div><i class="fas fa-music"></i> Yayındaki şarkılar: <strong>+25</strong></div>
+            <div><i class="fas fa-headphones"></i> Tarz: Pop / Rap / Duygusal</div>
+            <div><i class="fas fa-location-dot"></i> Konum: Malatya (TR)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SÖZ YAZARLARI – ELKAY 2 ORTAK ÇALIŞMA -->
+    <div class="widget-card" style="margin-top:20px;">
+      <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:10px;">
+        <i class="fas fa-pen-nib"></i> SÖZ YAZARLARI · ELKAY 2 ORTAK ÇALIŞMA
+      </h3>
+      <div class="writers-grid">
+        <div class="writer-card">
+          <img class="writer-avatar" src="https://ui-avatars.com/api/?name=Hazal+Erden&background=111827&color=ffffff&size=256" alt="Hazal Erden">
+          <div>
+            <div class="writer-main-name">
+              Hazal Erden
+              <i class="fa-solid fa-circle-check" style="color:#FFD700;" title="Altın Tik - Söz Yazarı"></i>
+            </div>
+            <div class="writer-role">Söz Yazarı</div>
+            <div class="writer-badges">
+              <span class="writer-badge ok">ONAYLI</span>
+              <span class="writer-badge gold">ALTIN TİK</span>
+              <span class="writer-badge collab">ORTAK ÇALIŞMA</span>
+            </div>
+            <div class="writer-works">Eser: ELKAY 2</div>
+          </div>
+        </div>
+
+        <div class="writer-card">
+          <img class="writer-avatar" src="https://ui-avatars.com/api/?name=Leyla+Loly&background=111827&color=ffffff&size=256" alt="Leyla Loly">
+          <div>
+            <div class="writer-main-name">
+              Leyla Loly
+              <i class="fa-solid fa-circle-check" style="color:#FFD700;" title="Altın Tik - Söz Yazarı"></i>
+            </div>
+            <div class="writer-role">Söz Yazarı</div>
+            <div class="writer-badges">
+              <span class="writer-badge ok">ONAYLI</span>
+              <span class="writer-badge gold">ALTIN TİK</span>
+              <span class="writer-badge collab">ORTAK ÇALIŞMA</span>
+            </div>
+            <div class="writer-works">Eser: ELKAY 2</div>
+          </div>
+        </div>
+
+        <div class="writer-card">
+          <img class="writer-avatar" src="https://ui-avatars.com/api/?name=Nazli+Gül&background=111827&color=ffffff&size=256" alt="Nazli Gül">
+          <div>
+            <div class="writer-main-name">
+              Nazli GÜl
+              <i class="fa-solid fa-circle-check" style="color:#FFD700;" title="Altın Tik - Söz Yazarı"></i>
+            </div>
+            <div class="writer-role">Söz Yazarı</div>
+            <div class="writer-badges">
+              <span class="writer-badge ok">ONAYLI</span>
+              <span class="writer-badge gold">ALTIN TİK</span>
+              <span class="writer-badge collab">ORTAK ÇALIŞMA</span>
+            </div>
+            <div class="writer-works">Eser: ELKAY 2</div>
+          </div>
+        </div>
+
+        <div class="writer-card">
+          <img class="writer-avatar" src="https://ui-avatars.com/api/?name=Retaj+Manaf&background=111827&color=ffffff&size=256" alt="Retaj Manaf">
+          <div>
+            <div class="writer-main-name">
+              Retaj Manaf
+              <i class="fa-solid fa-circle-check" style="color:#FFD700;" title="Altın Tik - Söz Yazarı"></i>
+            </div>
+            <div class="writer-role">Söz Yazarı</div>
+            <div class="writer-badges">
+              <span class="writer-badge ok">ONAYLI</span>
+              <span class="writer-badge gold">ALTIN TİK</span>
+              <span class="writer-badge collab">ORTAK ÇALIŞMA</span>
+            </div>
+            <div class="writer-works">Eser: ELKAY 2</div>
+          </div>
+        </div>
+
+        <div class="writer-card">
+          <img class="writer-avatar" src="https://ui-avatars.com/api/?name=Zeynep+Karaca&background=111827&color=ffffff&size=256" alt="Zeynep Karaca">
+          <div>
+            <div class="writer-main-name">
+              Zeynep Karaca
+              <i class="fa-solid fa-circle-check" style="color:#FFD700;" title="Altın Tik - Söz Yazarı"></i>
+            </div>
+            <div class="writer-role">Söz Yazarı</div>
+            <div class="writer-badges">
+              <span class="writer-badge ok">ONAYLI</span>
+              <span class="writer-badge gold">ALTIN TİK</span>
+              <span class="writer-badge collab">ORTAK ÇALIŞMA</span>
+            </div>
+            <div class="writer-works">Eser: ELKAY 2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAT / LONCA YAPAY ZEKA -->
+  <section id="chat" class="screen">
+    <div class="widget-card" style="height:70vh; display:flex; flex-direction:column;">
+      <h3 style="font-family:'Orbitron'; color:var(--neon-blue); margin-bottom:8px;">LONCA SOHBETİ · İNTERNET DESTEKLİ YAPAY ZEKA</h3>
+      <p style="font-size:.75rem;color:#aaa;margin-bottom:10px;">
+        Bu panel, sunucudaki GPT tabanlı lonca asistanına bağlıdır. Sorular sor, matematik işlemleri yaz (örn: <code>25*4+10</code>),
+        ya da “ELKAY 2 için duygusal şarkı sözü yaz” gibi komutlar ver. Metinleri alttaki kopyala butonuyla alabilirsin.
+      </p>
+      <div id="chat-history" class="chat-box">
+        <div class="msg in ai-msg">
+          Merhaba, ben lonca yapay zekâ asistanıyım. Sunucu üzerinden gerçek zamanlı yanıt üretirim; bana her şeyi sorabilirsin.
+          <button class="msg-copy-btn" onclick="copyStatic(this)">Kopyala</button>
+        </div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:auto;">
+        <input type="text" id="chat-in" placeholder="Mesaj yaz veya işlem gir (örn: 12*8 + 5)..." style="flex:1; background:#222; border:1px solid #444; color:#fff; padding:12px; border-radius:20px; outline:none;">
+        <button onclick="sendMsg()" style="width:50px; height:50px; border-radius:50%; background:var(--gold); border:none; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="game" class="screen">
+    <div class="game-grid">
+      <div class="widget-card center-flex game-main-card" style="flex-direction:column;">
+        <div class="game-toolbar">
+          <button id="btn-game-expand" class="game-fs-btn" type="button">Tam Ekran</button>
+          <button id="btn-game-collapse" class="game-fs-btn" type="button" style="display:none;">Çık</button>
+        </div>
+        <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:10px">NOTA AVCISI</h3>
+        <div style="margin-bottom:10px">Skor: <span id="score" style="color:var(--neon-blue)">0</span></div>
+        <canvas id="game-canvas" width="300" height="300"></canvas>
+        <button onclick="startGame()" style="margin-top:15px; padding:10px 30px; background:var(--neon-blue); border:none; border-radius:20px; font-weight:bold; cursor:pointer;">BAŞLAT</button>
+        <p style="font-size:0.8rem; color:#666; margin-top:10px;">Yön tuşları veya dokunarak yönlendir.</p>
+      </div>
+      <div class="widget-card game-library-card">
+        <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:8px;"><i class="fas fa-gamepad"></i> RETRO OYUN KÜTÜPHANESİ</h3>
+        <p style="font-size:.8rem; color:#aaa; margin-bottom:8px;">Tetris ve Atari tarzı basit oyunlar için hazır bağlantılar. Kendi .apk ve .exe dosyalarını ürettiğinde buradaki linkleri değiştirebilirsin.</p>
+        <ul>
+          <li>
+            <strong>Retro Tetris</strong>
+            <div class="game-badges">
+              <span><i class="fas fa-globe"></i> Tarayıcı</span>
+              <span><i class="fab fa-android"></i> Android APK</span>
+              <span><i class="fab fa-windows"></i> Windows EXE</span>
+            </div>
+            <div class="game-links">
+              <a href="https://tetris.com/play-tetris" target="_blank" rel="noopener"><i class="fas fa-play"></i> Tarayıcıda Oyna</a>
+              <a href="#"><i class="fab fa-android"></i> APK İndir</a>
+              <a href="#"><i class="fab fa-windows"></i> EXE İndir</a>
+            </div>
+          </li>
+          <li>
+            <strong>Space Shooter (Atari Hissi)</strong>
+            <div class="game-badges">
+              <span><i class="fas fa-globe"></i> Tarayıcı</span>
+              <span><i class="fab fa-android"></i> Android APK</span>
+              <span><i class="fab fa-windows"></i> Windows EXE</span>
+            </div>
+            <div class="game-links">
+              <a href="https://www.free80sarcade.com/spaceinvaders.php" target="_blank" rel="noopener"><i class="fas fa-play"></i> Tarayıcıda Oyna</a>
+              <a href="#"><i class="fab fa-android"></i> APK İndir</a>
+              <a href="#"><i class="fab fa-windows"></i> EXE İndir</a>
+            </div>
+          </li>
+          <li>
+            <strong>Classic Pong</strong>
+            <div class="game-badges">
+              <span><i class="fas fa-globe"></i> Tarayıcı</span>
+              <span><i class="fab fa-android"></i> Android APK</span>
+              <span><i class="fab fa-windows"></i> Windows EXE</span>
+            </div>
+            <div class="game-links">
+              <a href="https://ponggame.org/" target="_blank" rel="noopener"><i class="fas fa-play"></i> Tarayıcıda Oyna</a>
+              <a href="#"><i class="fab fa-android"></i> APK İndir</a>
+              <a href="#"><i class="fab fa-windows"></i> EXE İndir</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="screen">
+    <div class="center-flex" style="height:60vh">
+      <img src="https://ui-avatars.com/api/?name=Memet+Çınar&background=111827&color=ffffff&size=256" style="width:120px; height:120px; border-radius:50%; border:4px solid var(--gold); margin-bottom:20px;" alt="Memet Çınar">
+      <h2 style="font-family:'Cinzel'; color:var(--gold)">MEMET ÇINAR</h2>
+      <p style="color:#aaa; margin-bottom:18px">Resmi iletişim kanalları.</p>
+      <div style="display:flex; gap:20px; font-size:2rem; flex-wrap:wrap; justify-content:center;">
+        <a href="#" style="color:#C13584"><i class="fab fa-instagram"></i></a>
+        <a href="#" style="color:#FF0000"><i class="fab fa-youtube"></i></a>
+        <a href="#" style="color:#1DB954"><i class="fab fa-spotify"></i></a>
+        <a href="#" style="color:#fff"><i class="fab fa-tiktok"></i></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ANIME KIZ -->
+<div class="anime-floating" id="anime-companion">
+  <div class="anime-floating-inner">
+    <div class="anime-hearts-container" id="anime-hearts"></div>
+    <img src="https://media.tenor.com/AlApU9C3uXgAAAAj/anime.gif" alt="Anime Companion" class="anime-floating-img">
+  </div>
+  <div class="anime-float-speech" id="anime-quote">"Bugün hangi şarkıyla level atlıyoruz?"</div>
+</div>
+<button class="anime-toggle-btn" id="anime-toggle">Anime Asistanı Gizle</button>
+
+<!-- PLAYER -->
+<footer class="player-bar">
+  <div class="p-left">
+    <img id="track-art" src="" style="display:none;" class="p-art" alt="Kapak">
+    <div id="track-placeholder" class="p-art" style="background:#222; display:grid; place-items:center;"><i class="fas fa-music" style="color:#555"></i></div>
+    <div class="p-info">
+      <h4 id="track-title">Müzik Seçilmedi</h4>
+      <p id="track-artist">Listeden seçin</p>
+    </div>
+  </div>
+  <div class="p-center">
+    <div class="p-controls">
+      <button class="p-btn" onclick="playPrev()"><i class="fas fa-step-backward"></i></button>
+      <button class="p-play" id="play-pause-btn" onclick="togglePlay()"><i class="fas fa-play"></i></button>
+      <button class="p-btn" onclick="playNext()"><i class="fas fa-step-forward"></i></button>
+    </div>
+    <div class="progress-rail" id="prog-rail">
+      <div class="progress-bar" id="prog-bar"></div>
+    </div>
+  </div>
+  <div class="p-extra"><i class="fas fa-volume-up"></i></div>
+</footer>
+
+<!-- Hidden YouTube player -->
+<div id="yt-player" style="position:absolute; top:-9999px;"></div>
+
+<script>
+function loadYouTubeAPI(){
+  const tag=document.createElement('script');
+  tag.src="https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
+}
+</script>
+
+<script>
+let currIdx=0,player=null,isPlaying=false,progInt,calDate=new Date();
+let lyricsTimer=null;
+
+function updateVh(){
+  const vh=window.innerHeight*0.01;
+  document.documentElement.style.setProperty('--vh',vh+'px');
+}
+function detectDevice(){
+  const w=window.innerWidth;
+  let type='Masaüstü',icon='desktop';
+  if(w<600){type='Mobil';icon='mobile-screen-button';}
+  else if(w<1024){type='Tablet';icon='tablet-screen-button';}
+  document.documentElement.setAttribute('data-device',type.toLowerCase());
+  const el=document.getElementById('device-label');
+  if(el){el.innerHTML=`<i class="fa-solid fa-${icon}"></i> Cihaz: ${type}`;}
+}
+
+/* hover sfx */
+let audioCtx=null;
+function ensureAudioCtx(){ if(!audioCtx){ const AC=window.AudioContext||window.webkitAudioContext; if(AC) audioCtx=new AC(); } }
+function playHoverSfx(){
+  ensureAudioCtx(); if(!audioCtx) return;
+  const osc=audioCtx.createOscillator(); const gain=audioCtx.createGain();
+  osc.type="square"; osc.frequency.value=880;
+  gain.gain.setValueAtTime(0.08,audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.15);
+  osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime+0.15);
+}
+
+/* SONG LIST */
+const defaultArtistCover="https://ui-avatars.com/api/?name=Memet+Çınar&background=000000&color=ffffff&size=256";
+
+const songs = [
+  { title: "SONSUZ IŞIK (10 KASIM 193∞)", artist: "Memet Çınar", id: "P3ulDeTz7pA" },
+  { title: "ELKAY ve HAKDAM",             artist: "Memet Çınar", id: "J-j5SGM3lVI" },
+  { title: "GECEYE YAZDIM",               artist: "Memet Çınar", id: "WsR79WlMqNI" },
+  { title: "YILDIZLAR",                   artist: "Memet Çınar", id: "AMDerpIe9QE" },
+  { title: "KİBİR",                       artist: "Memet Çınar", id: "CNdZW-4h2FY" },
+  { title: "BÖYLE İŞTE ELKAY",            artist: "Memet Çınar", id: "EkAtzXOP0p0" },
+  { title: "LEYA",                        artist: "Memet Çınar", id: "8La-12lYhao" },
+  { title: "ELKAY 2",                     artist: "Memet Çınar", id: "-Wrg7mJ__Ek" },
+  { title: "ELKAY GİBİ",                  artist: "Memet Çınar", id: "0QWuDJhDsHQ" },
+  { title: "KORUYUCU AİLE",               artist: "Memet Çınar", id: "2ti6IK3Aix0" },
+  { title: "EĞİLMEZ",                     artist: "Memet Çınar", id: "QTYO4ZE4GvI" },
+  { title: "SEN GİTTİN YA",               artist: "Memet Çınar", id: "BWdb0W2ARmA" },
+  { title: "TATTIM ÖLÜMÜ",                artist: "Memet Çınar", id: "GychhkAbwH4" },
+  { title: "İREMİN ŞARKISI",              artist: "Memet Çınar", id: "CcCs4_OZNOo" },
+  { title: "BU BİR RÜYA",                 artist: "Bilal Güvercin", id: "JlmddA0lefw" },
+  { title: "VAZGEÇMEZ BU KALP",           artist: "Memet Çınar", id: "0xgUyoGm4hY" },
+  { title: "VUR BENİ KALBİMDEN",          artist: "Memet Çınar", id: "gMGz2e9uMcA" },
+  { title: "DÜNYAMIN GÜNEŞİ",             artist: "Memet Çınar", id: "fvt8tI8n_cY" },
+  { title: "YOLUMU KAYBETTİM",            artist: "Memet Çınar", id: "Rs6g6yaacXo" },
+  { title: "BİLE BİLE",                   artist: "Memet Çınar", id: "qED3CgFJ1Fc" },
+  { title: "BİTTİ HİKAYEM",               artist: "Memet Çınar", id: "KMcinbhM7Bw" },
+  { title: "SONSUZA DEK SENİ BEKLEDİM",   artist: "Memet Çınar", id: "ZIGiuOGCmA4" },
+  { title: "ÖZÜR DİLERİM",                artist: "Memet Çınar", id: "mSnp-mPxGus" },
+  { title: "GEL DE BİTSİN BU HASRET",     artist: "Memet Çınar", id: "DDEhRqKm1bE" },
+  { title: "BİR DUBLE DAHA",              artist: "Memet Çınar", id: "8E0G3myGiFk" },
+  { title: "KIRMIZI YAZMA",               artist: "Memet Çınar", id: "NzVEoSWhgl0" },
+  { title: "AYREN",                       artist: "Memet Çınar", id: "pbS4NlHpzxw" },
+  { title: "GÖZLERİ",                     artist: "Memet Çınar", id: "36ykG4zUtL0" },
+  { title: "AŞKIN KÜLLERİ",               artist: "Memet Çınar", id: "F3MAB4cgmEI" }
+];
+
+function showSysMsg(txt){
+  document.getElementById('sys-msg').innerText=txt;
+  document.getElementById('sys-modal').style.display='flex';
+}
+function getSongKey(song){
+  return song.id ? song.id : ('title_'+song.title.toLowerCase().replace(/[^a-z0-9ığüşöç]/gi,'_'));
+}
+
+/* TAB SWITCH */
+function switchTab(id,el){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const screen=document.getElementById(id);
+  if(screen) screen.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+}
+
+/* CLOCK */
+function initClock(){
+  const t=()=>{
+    const d=new Date();
+    const clock=document.getElementById('clock');
+    const date=document.getElementById('date');
+    if(!clock||!date) return;
+    clock.innerText=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    date.innerText=d.toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}).toUpperCase();
+  };
+  setInterval(t,1000); t();
+}
+
+/* CALENDAR */
+const specialDays={
+  "1-1":"newyear",
+  "14-2":"special",
+  "23-4":"flag",
+  "19-5":"flag",
+  "15-7":"flag",
+  "30-8":"flag",
+  "29-10":"flag"
+};
+function changeMonth(dir){calDate.setMonth(calDate.getMonth()+dir);initCalendar();}
+function initCalendar(){
+  const y=calDate.getFullYear(),m=calDate.getMonth();
+  const names=["OCAK","ŞUBAT","MART","NİSAN","MAYIS","HAZİRAN","TEMMUZ","AĞUSTOS","EYLÜL","EKİM","KASIM","ARALIK"];
+  const title=document.getElementById('cal-title');
+  const body=document.getElementById('cal-body');
+  if(!title||!body) return;
+  title.innerText=`${names[m]} ${y}`;
+  const first=new Date(y,m,1).getDay();
+  const days=new Date(y,m+1,0).getDate();
+  body.innerHTML='';
+  let start=first===0?6:first-1;
+  for(let i=0;i<start;i++) body.innerHTML+='<div class="cal-cell empty"></div>';
+  const today=new Date();
+  for(let d=1;d<=days;d++){
+    const key=`${d}-${m+1}`;
+    let cls="cal-cell";
+    if(d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear())cls+=" today";
+    if(specialDays[key])cls+=" "+specialDays[key];
+    let inner=d;
+    if(specialDays[key]==='newyear'){
+      inner=`${d}<span class="confetti-dot c1"></span><span class="confetti-dot c2"></span><span class="confetti-dot c3"></span><span class="confetti-dot c4"></span>`;
+    }
+    body.innerHTML+=`<div class="${cls}">${inner}</div>`;
+  }
+}
+
+/* WEATHER */
+async function initWeather(){
+  const lat=38.35,lon=38.31;
+  try{
+    const res=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=relativehumidity_2m`);
+    const data=await res.json();
+    if(data.current_weather){
+      const w=data.current_weather;
+      const tEl=document.getElementById('w-temp');
+      const wEl=document.getElementById('w-wind');
+      const hEl=document.getElementById('w-hum');
+      const iEl=document.getElementById('w-icon');
+      const dEl=document.getElementById('w-desc');
+      const box=document.getElementById('weather-box');
+      if(!tEl||!wEl||!hEl||!iEl||!dEl||!box) return;
+
+      tEl.innerText=Math.round(w.temperature)+"°";
+      wEl.innerText=w.windspeed;
+      const hour=new Date().getHours();
+      hEl.innerText=(data.hourly&&data.hourly.relativehumidity_2m&&data.hourly.relativehumidity_2m[hour])??"--";
+
+      const code=w.weathercode;
+      let icon="fa-sun",color="orange",desc="Açık",stateClass="w-sunny";
+      if(code===0){icon="fa-sun";color="#ffd760";desc="Açık";stateClass="w-sunny";}
+      else if(code===1||code===2){icon="fa-cloud-sun";color="#fffae0";desc="Parçalı bulutlu";stateClass="w-cloudy";}
+      else if(code===3){icon="fa-cloud";color="#d0d7e2";desc="Kapalı";stateClass="w-cloudy";}
+      else if(code>=45&&code<=48){icon="fa-smog";color="#9ba3b0";desc="Sisli";stateClass="w-cloudy";}
+      else if(code>=51&&code<=67){icon="fa-cloud-rain";color="#00F0FF";desc="Yağmurlu";stateClass="w-rainy";}
+      else if(code>=71&&code<=77){icon="fa-snowflake";color="#ffffff";desc="Karlı";stateClass="w-snowy";}
+      else if(code>=80&&code<=82){icon="fa-cloud-showers-heavy";color="#6be0ff";desc="Sağanak";stateClass="w-rainy";}
+      else if(code>=95){icon="fa-bolt";color="#ffd760";desc="Gök gürültülü";stateClass="w-storm";}
+      iEl.className=`fas ${icon}`;
+      iEl.style.color=color;
+      dEl.innerText=desc+" · Gerçek zamanlı veri";
+      box.classList.remove('w-sunny','w-cloudy','w-rainy','w-snowy','w-storm');
+      box.classList.add(stateClass);
+    }
+  }catch(e){
+    console.log('Weather error',e);
+    const dEl=document.getElementById('w-desc');
+    if(dEl) dEl.innerText="Veri alınamadı";
+  }
+}
+
+/* SONG LIST RENDER */
+function renderSongs(){
+  const c=document.getElementById('song-container'); if(!c) return;
+  c.innerHTML='';
+  songs.forEach((s,i)=>{
+    const imgSrc=s.id?`https://img.youtube.com/vi/${s.id}/hqdefault.jpg`:defaultArtistCover;
+    const key=getSongKey(s);
+    const row=document.createElement('div');
+    row.className='song-row';
+    row.innerHTML=
+      `<div class="song-row-main">
+         <img src="${imgSrc}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;" alt="${s.title}">
+         <div style="flex:1;">
+           <div class="song-title">${s.title}</div>
+           <div class="song-artist">${s.artist}</div>
+         </div>
+         <div class="song-tag">YT</div>
+       </div>
+       <div class="song-inline-lyrics" data-song-key="${key}"><span class="hint">Söz durumu:</span> Henüz yerel kayıt yok.</div>`;
+    row.onclick=()=>playSong(i);
+    row.addEventListener('mouseenter',()=>playHoverSfx());
+    c.appendChild(row);
+  });
+  refreshInlineLyricsBadges();
+}
+
+/* YOUTUBE API */
+function onYouTubeIframeAPIReady(){
+  if(typeof YT==='undefined'||!document.getElementById('yt-player')) return;
+  player=new YT.Player('yt-player',{
+    height:'0',width:'0',videoId:songs[0].id,
+    events:{'onStateChange':onPlayerStateChange}
+  });
+}
+function onPlayerStateChange(e){
+  if(!e||typeof YT==='undefined') return;
+  if(e.data===YT.PlayerState.PLAYING){
+    isPlaying=true;
+    const btn=document.getElementById('play-pause-btn');
+    if(btn) btn.innerHTML='<i class="fas fa-pause"></i>';
+    startProgress();
+  }else{
+    isPlaying=false;
+    const btn=document.getElementById('play-pause-btn');
+    if(btn) btn.innerHTML='<i class="fas fa-play"></i>';
+    stopProgress();
+  }
+}
+
+/* LYRICS PANEL */
+function updateLyricsPanel(song){
+  const tEl=document.getElementById('lyrics-song-title');
+  const aEl=document.getElementById('lyrics-song-artist');
+  const meta=document.getElementById('lyrics-meta');
+  const view=document.getElementById('lyrics-view');
+  const inp=document.getElementById('lyrics-input');
+  if(!tEl||!aEl||!meta||!view||!inp) return;
+  tEl.innerText=song.title;
+  aEl.innerText=song.artist;
+  const key=getSongKey(song);
+  const stored=localStorage.getItem('lyrics_'+key);
+  if(stored){
+    view.innerText=stored;
+    inp.value=stored;
+    meta.innerText="Bu şarkı için bu cihazda kayıtlı sözler var.";
+  }else{
+    const msg="Bu şarkı için henüz yerel söz eklenmemiş. Resmî sözler telif nedeniyle otomatik eklenmiyor, kendi taslağını yazabilirsin.";
+    view.innerText=msg;
+    inp.value="";
+    meta.innerText="Henüz yerel kayıt yok.";
+  }
+  updateLyricsStats();
+}
+function saveLyrics(auto){
+  const s=songs[currIdx];
+  if(!s) return;
+  const key=getSongKey(s);
+  const inp=document.getElementById('lyrics-input');
+  const view=document.getElementById('lyrics-view');
+  const meta=document.getElementById('lyrics-meta');
+  const autoLabel=document.getElementById('lyrics-autosave');
+  if(!inp||!view||!meta) return;
+  const text=inp.value.trim();
+  if(!text){
+    localStorage.removeItem('lyrics_'+key);
+    view.innerText="Metin temizlendi. İstersen yeniden yazabilirsin.";
+    meta.innerText="Bu şarkı için kayıtlı söz yok.";
+  }else{
+    try{
+      localStorage.setItem('lyrics_'+key,text);
+      view.innerText=text;
+      meta.innerText= auto ? "Otomatik kaydedildi." : "Bu şarkının sözleri bu cihazda kaydedildi.";
+    }catch(e){
+      showSysMsg("Tarayıcı depolamasına yazarken hata oluştu.");
+    }
+  }
+  if(auto && autoLabel){
+    const d=new Date();
+    autoLabel.innerText=`Otomatik kayıt: ${d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+  }
+  refreshInlineLyricsBadges();
+  updateLyricsStats();
+}
+function refreshInlineLyricsBadges(){
+  document.querySelectorAll('.song-inline-lyrics').forEach(div=>{
+    const key=div.getAttribute('data-song-key');
+    const has=localStorage.getItem('lyrics_'+key);
+    if(has){
+      div.innerHTML='<span class="hint">Söz durumu:</span> Bu şarkı için yerel söz kaydedildi.';
+    }else{
+      div.innerHTML='<span class="hint">Söz durumu:</span> Henüz yerel kayıt yok.';
+    }
+  });
+}
+function updateLyricsStats(){
+  const inp=document.getElementById('lyrics-input');
+  const stats=document.getElementById('lyrics-stats');
+  if(!inp||!stats) return;
+  const text=inp.value;
+  const chars=text.length;
+  const lines=text ? text.split(/\n/).length : 0;
+  stats.innerText=`${chars} karakter · ${lines} satır`;
+}
+function initLyricsAutosave(){
+  const inp=document.getElementById('lyrics-input');
+  if(!inp) return;
+  inp.addEventListener('input',()=>{
+    updateLyricsStats();
+    if(lyricsTimer) clearTimeout(lyricsTimer);
+    lyricsTimer=setTimeout(()=>saveLyrics(true),900);
+  });
+}
+
+/* PLAYER CONTROLS */
+function playSong(idx){
+  currIdx=idx;
+  const s=songs[idx];
+  const title=document.getElementById('track-title');
+  const artist=document.getElementById('track-artist');
+  const art=document.getElementById('track-art');
+  const ph=document.getElementById('track-placeholder');
+  if(title) title.innerText=s.title;
+  if(artist) artist.innerText=s.artist;
+  const imgSrc=s.id?`https://img.youtube.com/vi/${s.id}/hqdefault.jpg`:defaultArtistCover;
+  if(art&&ph){
+    if(imgSrc){art.src=imgSrc;art.style.display='block';ph.style.display='none';}
+    else{art.style.display='none';ph.style.display='grid';}
+  }
+  updateLyricsPanel(s);
+  if(!s.id){
+    showSysMsg("Bu şarkının YouTube ID'si henüz eklenmemiş.");
+  }else if(player&&player.loadVideoById){
+    player.loadVideoById(s.id);
+  }
+  const rows=document.querySelectorAll('.song-row');
+  rows.forEach((r,i2)=>r.classList.toggle('active',i2===idx));
+}
+function togglePlay(){
+  if(!player||!player.playVideo||!player.pauseVideo) return;
+  isPlaying?player.pauseVideo():player.playVideo();
+}
+function playNext(){playSong((currIdx+1)%songs.length);}
+function playPrev(){playSong((currIdx-1+songs.length)%songs.length);}
+function startProgress(){
+  clearInterval(progInt);
+  const bar=document.getElementById('prog-bar'); if(!bar) return;
+  progInt=setInterval(()=>{
+    if(player&&player.getCurrentTime&&player.getDuration){
+      const d=player.getDuration(),c=player.getCurrentTime();
+      if(d>0) bar.style.width=(c/d)*100+"%";
+    }
+  },500);
+}
+function stopProgress(){clearInterval(progInt);}
+const progRail=document.getElementById('prog-rail');
+if(progRail){
+  progRail.onclick=e=>{
+    if(!player||!player.seekTo||!player.getDuration) return;
+    const r=e.currentTarget.getBoundingClientRect();
+    const p=(e.clientX-r.left)/r.width;
+    player.seekTo(player.getDuration()*p,true);
+  };
+}
+
+/* LONCA AI – LOKAL + VERCEL OTOMATİK BAĞLANTI */
+
+// localhost / 127.0.0.1 / file:// ise lokal backend (server.js),
+// diğer tüm hostlarda Vercel API kullanılır.
+const isLocalEnv =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1" ||
+  window.location.protocol === "file:";
+
+/* LONCA AI – BACKEND URL AYARI
+   - Vercel’de çalışırken  : https://memet-cinar-official-tpeh.vercel.app/api/lonca-ai
+   - Lokal Node server.js  : http://localhost:3000/lonca-ai
+*/
+const API_URL =
+  window.location.hostname === "memet-cinar-official-tpeh.vercel.app"
+    ? "https://memet-cinar-official-tpeh.vercel.app/api/lonca-ai"
+    : "http://localhost:3000/lonca-ai";
+
+
+const API_PATH = isLocalEnv ? "/lonca-ai" : "/api/lonca-ai";
+
+function copyStatic(btn){
+  const parent=btn.parentElement;
+  if(!parent) return;
+  const text=parent.innerText.replace('Kopyala','').trim();
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>{
+      btn.textContent='Kopyalandı';
+      setTimeout(()=>btn.textContent='Kopyala',1000);
+    });
+  }
+}
+function appendUserMessage(text){
+  const box=document.getElementById('chat-history');
+  if(!box) return;
+  const div=document.createElement('div');
+  div.className='msg out';
+  div.textContent=text;
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+}
+function appendAiMessage(text){
+  const box=document.getElementById('chat-history');
+  if(!box) return;
+  const div=document.createElement('div');
+  div.className='msg in ai-msg';
+  const span=document.createElement('span');
+  span.textContent=text;
+  const btn=document.createElement('button');
+  btn.className='msg-copy-btn';
+  btn.textContent='Kopyala';
+  btn.addEventListener('click',()=>{
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(text).then(()=>{
+        btn.textContent='Kopyalandı';
+        setTimeout(()=>btn.textContent='Kopyala',1000);
+      });
+    }
+  });
+  div.appendChild(span);
+  div.appendChild(btn);
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+}
+
+/* Sunucuya istek atan fonksiyon */
+async function loncaAiRequest(promptText){
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({message:promptText})
+    });
+    if(!res.ok){
+      throw new Error("HTTP "+res.status);
+    }
+    const data=await res.json();
+    if(data && data.answer){
+      return data.answer;
+    }
+    return "Sunucudan boş yanıt geldi.";
+  }catch(err){
+    console.error('Lonca AI hata:',err);
+    return isLocalEnv
+      ? "Lonca yapay zekâ sunucusuna bağlanırken bir hata oluştu. 'node server.js' ile backend'in çalıştığından ve OPENAI_API_KEY ayarlı olduğundan emin ol."
+      : "Lonca yapay zekâ sunucusuna bağlanırken bir hata oluştu. Vercel üzerindeki /api/lonca-ai fonksiyonunu kontrol et.";
+  }
+}
+
+async function sendMsg(){
+  const inp=document.getElementById('chat-in');
+  const box=document.getElementById('chat-history');
+  if(!inp||!box) return;
+  const txt=inp.value.trim();
+  if(!txt) return;
+
+  // Kullanıcı mesajını ekle
+  appendUserMessage(txt);
+  inp.value='';
+  box.scrollTop=box.scrollHeight;
+
+  // Yükleniyor balonu
+  const loadingDiv=document.createElement('div');
+  loadingDiv.className='msg in ai-msg';
+  loadingDiv.textContent='Yükleniyor...';
+  box.appendChild(loadingDiv);
+  box.scrollTop=box.scrollHeight;
+
+  // Backend'e isteği at
+  const ans=await loncaAiRequest(txt);
+
+  // Yükleniyor'u kaldır ve cevabı ekle
+  box.removeChild(loadingDiv);
+  appendAiMessage(ans);
+}
+
+/* GAME – snake style */
+let gameInt,snake=[],food={},dx=0,dy=0,score=0;
+const cvs=document.getElementById('game-canvas');
+const ctx=cvs?cvs.getContext('2d'):null;
+const boxSize=20;
+
+function startGame(){
+  if(!ctx||!cvs) return;
+  clearInterval(gameInt);
+  snake=[{x:100,y:100}];
+  score=0;
+  const sEl=document.getElementById('score');
+  if(sEl) sEl.innerText=0;
+  dx=boxSize;dy=0;
+  createFood();
+  gameInt=setInterval(gameLoop,150);
+}
+function createFood(){
+  if(!cvs) return;
+  food={
+    x:Math.floor(Math.random()*(cvs.width/boxSize))*boxSize,
+    y:Math.floor(Math.random()*(cvs.height/boxSize))*boxSize
+  };
+}
+function gameLoop(){
+  if(!ctx||!cvs) return;
+  ctx.fillStyle='#000';
+  ctx.fillRect(0,0,cvs.width,cvs.height);
+  ctx.fillStyle='#FFD700';
+  ctx.font='20px Arial';
+  ctx.fillText('♪',food.x+4,food.y+18);
+  snake.forEach((h,i)=>{
+    ctx.fillStyle=i===0?'#00F0FF':'#fff';
+    ctx.fillRect(h.x,h.y,boxSize-2,boxSize-2);
+  });
+  const head={x:snake[0].x+dx,y:snake[0].y+dy};
+  if(head.x<0)head.x=cvs.width-boxSize;
+  if(head.x>=cvs.width)head.x=0;
+  if(head.y<0)head.y=cvs.height-boxSize;
+  if(head.y>=cvs.height)head.y=0;
+  if(snake.some((s,idx)=>idx!==0&&s.x===head.x&&s.y===head.y)){
+    clearInterval(gameInt);
+    alert('Oyun Bitti! Skor: '+score);
+    return;
+  }
+  snake.unshift(head);
+  if(head.x===food.x&&head.y===food.y){
+    score+=10;
+    const sEl=document.getElementById('score');
+    if(sEl) sEl.innerText=score;
+    createFood();
+  }else{
+    snake.pop();
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowUp'&&dy===0){dx=0;dy=-boxSize;}
+  if(e.key==='ArrowDown'&&dy===0){dx=0;dy=boxSize;}
+  if(e.key==='ArrowLeft'&&dx===0){dx=-boxSize;dy=0;}
+  if(e.key==='ArrowRight'&&dx===0){dx=boxSize;dy=0;}
+});
+let touchStartX=0,touchStartY=0;
+if(cvs){
+  cvs.addEventListener('touchstart',e=>{
+    touchStartX=e.touches[0].clientX;
+    touchStartY=e.touches[0].clientY;
+    e.preventDefault();
+  },{passive:false});
+  cvs.addEventListener('touchmove',e=>{e.preventDefault();},{passive:false});
+  cvs.addEventListener('touchend',e=>{
+    const ex=e.changedTouches[0].clientX;
+    const ey=e.changedTouches[0].clientY;
+    const dx2=ex-touchStartX,dy2=ey-touchStartY;
+    if(Math.abs(dx2)<20&&Math.abs(dy2)<20) return;
+    if(Math.abs(dx2)>Math.abs(dy2)){
+      if(dx2>0&&dx===0){dx=boxSize;dy=0;}
+      else if(dx2<0&&dx===0){dx=-boxSize;dy=0;}
+    }else{
+      if(dy2>0&&dy===0){dx=0;dy=boxSize;}
+      else if(dy2<0&&dy===0){dx=0;dy=-boxSize;}
+    }
+  },{passive:false});
+}
+
+/* GAME fullscreen buttons */
+function initGameFullscreenButtons(){
+  const btnExpand=document.getElementById('btn-game-expand');
+  const btnCollapse=document.getElementById('btn-game-collapse');
+  if(!btnExpand||!btnCollapse) return;
+  btnExpand.addEventListener('click',()=>{
+    document.body.classList.add('game-fullscreen');
+    btnExpand.style.display='none';
+    btnCollapse.style.display='inline-block';
+  });
+  btnCollapse.addEventListener('click',()=>{
+    document.body.classList.remove('game-fullscreen');
+    btnExpand.style.display='inline-block';
+    btnCollapse.style.display='none';
+  });
+}
+
+/* ANIME AI COMPANION */
+function initAnimeCompanion(){
+  const area=document.getElementById('anime-companion');
+  const hearts=document.getElementById('anime-hearts');
+  const quoteEl=document.getElementById('anime-quote');
+  const toggle=document.getElementById('anime-toggle');
+  if(!area||!hearts||!quoteEl||!toggle) return;
+  const quotes=[
+    '"Bugün hangi şarkıyla level atlıyoruz?"',
+    '"Combo: Oyun + lo-fi + gece modu!"',
+    '"Bir sonraki satırı sen yaz, ben dinlerim."',
+    '"Lonca asistanına bir şey sor, ben de izleyeyim!"'
+  ];
+  let qIndex=0;
+  area.addEventListener('click',e=>{
+    const rect=area.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    const y=e.clientY-rect.top;
+    const heart=document.createElement('span');
+    heart.className='anime-heart';
+    heart.style.left=x+'px';
+    heart.style.top=y+'px';
+    heart.innerText='❤';
+    hearts.appendChild(heart);
+    setTimeout(()=>heart.remove(),1000);
+    qIndex=(qIndex+1)%quotes.length;
+    quoteEl.innerText=quotes[qIndex];
+
+    const chatNav=document.querySelector('.nav-item[data-tab="chat"]');
+    switchTab('chat',chatNav);
+    const inp=document.getElementById('chat-in');
+    if(inp){
+      inp.focus();
+      inp.placeholder='Anime Asistan: Bana istediğini sor :)';
+    }
+  });
+
+  toggle.addEventListener('click',()=>{
+    area.classList.toggle('hidden-mobile');
+    toggle.textContent=area.classList.contains('hidden-mobile') ? 'Anime Asistanı Göster' : 'Anime Asistanı Gizle';
+  });
+}
+
+/* ONLOAD */
+window.onload=()=>{
+  updateVh();
+  detectDevice();
+  initClock();
+  initCalendar();
+  initWeather();
+  renderSongs();
+  initLyricsAutosave();
+  initAnimeCompanion();
+  initGameFullscreenButtons();
+  loadYouTubeAPI();
+  document.querySelectorAll('.nav-item, .widget-card').forEach(el=>el.addEventListener('mouseenter',()=>playHoverSfx()));
+
+  // Enter ile lonca mesajı gönderme
+  const input=document.getElementById('chat-in');
+  if(input){
+    input.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        e.preventDefault();
+        sendMsg();
+      }
+    });
+  }
+};
+window.addEventListener('resize',()=>{updateVh();detectDevice();});
+</script>
+<script src="script.js" ></script>
+</body>
+</html>
