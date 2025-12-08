@@ -680,7 +680,7 @@ body.game-fullscreen #game .game-grid{
 #sys-modal{display:none;}
 
 /* AI MODAL */
-#ai-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2100;align-items:center;justify-content:center;}
+#ai-modal, #apikey-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2100;align-items:center;justify-content:center;}
 .ai-modal-box{background:#111;border:1px solid var(--neon-blue);border-radius:20px;padding:25px;width:90%;max-width:450px;position:relative;box-shadow:0 0 50px rgba(0,240,255,0.15);}
 .ai-modal-close{position:absolute;top:15px;right:20px;color:#aaa;font-size:1.5rem;cursor:pointer;}
 </style>
@@ -696,6 +696,24 @@ body.game-fullscreen #game .game-grid{
     <h3 style="color:var(--neon-blue); font-family:'Orbitron'; margin-bottom:15px">SİSTEM MESAJI</h3>
     <p id="sys-msg" style="color:#ccc; margin-bottom:20px"></p>
     <button onclick="document.getElementById('sys-modal').style.display='none'" style="background:var(--neon-blue); border:none; padding:10px 30px; border-radius:20px; font-weight:bold; cursor:pointer;">TAMAM</button>
+  </div>
+</div>
+
+<!-- API KEY MODAL -->
+<div id="apikey-modal">
+  <div class="ai-modal-box">
+    <div class="ai-modal-close" onclick="document.getElementById('apikey-modal').style.display='none'">&times;</div>
+    <h3 style="color:var(--gold); font-family:'Orbitron'; margin-bottom:10px;">🔑 API ANAHTARI AYARI</h3>
+    <p style="color:#bbb; font-size:0.85rem; margin-bottom:15px;">
+      Uygulama yayınlandığında (hosting/local) otomatik anahtar çalışmaz. Kendi Google Gemini API anahtarınızı girin. (Tarayıcıda saklanır)
+    </p>
+    <input type="text" id="user-api-key-input" placeholder="Google Gemini API Key Yapıştır..." style="width:100%; padding:12px; border-radius:10px; border:1px solid #444; background:#222; color:#fff; margin-bottom:15px; outline:none;">
+    <button onclick="saveUserApiKey()" style="width:100%; padding:12px; background:linear-gradient(90deg, var(--neon-blue), #2563eb); color:#fff; border:none; border-radius:12px; font-weight:bold; cursor:pointer; font-size:1rem;">
+      KAYDET
+    </button>
+    <div style="margin-top:10px; font-size:0.75rem; color:#666; text-align:center;">
+      <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#aaa; text-decoration:underline;">Anahtar Al (Google AI Studio)</a>
+    </div>
   </div>
 </div>
 
@@ -1067,10 +1085,13 @@ body.game-fullscreen #game .game-grid{
   <!-- CHAT / GOOGLE AI -->
   <section id="chat" class="screen">
     <div class="widget-card" style="height:70vh; display:flex; flex-direction:column;">
-      <h3 style="font-family:'Orbitron'; color:var(--neon-blue); margin-bottom:8px;">GOOGLE GEMINI AI · ASİSTAN</h3>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h3 style="font-family:'Orbitron'; color:var(--neon-blue); margin:0;">GOOGLE GEMINI AI · ASİSTAN</h3>
+        <button onclick="document.getElementById('apikey-modal').style.display='flex'" style="background:transparent; border:1px solid #444; color:#aaa; border-radius:50%; width:30px; height:30px; cursor:pointer;" title="API Ayarları"><i class="fas fa-cog"></i></button>
+      </div>
       <p style="font-size:.75rem;color:#aaa;margin-bottom:10px;">
         Bu panel doğrudan Google'ın en yeni yapay zeka modeli Gemini'ye bağlıdır. Sorular sor, matematik işlemleri yaz (örn: <code>25*4+10</code>),
-        ya da “ELKAY 2 için duygusal şarkı sözü yaz” gibi komutlar ver. Artık sunucuya gerek yok!
+        ya da “ELKAY 2 için duygusal şarkı sözü yaz” gibi komutlar ver.
       </p>
       
       <!-- Mood Buttons -->
@@ -1559,8 +1580,36 @@ if(progRail){
 
 const apiKey = ""; // API key is injected by the environment
 
+function getEffectiveApiKey() {
+  // If the environment injected a key (longer than empty), use it
+  if(apiKey && apiKey.length > 5) return apiKey;
+  // Otherwise try localStorage
+  return localStorage.getItem('gemini_user_key') || "";
+}
+
+function saveUserApiKey(){
+  const inp = document.getElementById('user-api-key-input');
+  if(!inp) return;
+  const val = inp.value.trim();
+  if(!val){
+    alert("Lütfen geçerli bir anahtar girin.");
+    return;
+  }
+  localStorage.setItem('gemini_user_key', val);
+  document.getElementById('apikey-modal').style.display='none';
+  alert("API anahtarınız tarayıcıya kaydedildi. Artık AI özelliklerini kullanabilirsiniz.");
+}
+
 async function callGeminiAPI(prompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+  const effectiveKey = getEffectiveApiKey();
+  
+  if(!effectiveKey){
+    // Show Modal if key is missing
+    document.getElementById('apikey-modal').style.display = 'flex';
+    throw new Error("API Anahtarı eksik. Lütfen ayarlardan kendi anahtarınızı girin.");
+  }
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${effectiveKey}`;
   const payload = {
     contents: [{ parts: [{ text: prompt }] }]
   };
@@ -1575,6 +1624,9 @@ async function callGeminiAPI(prompt) {
       });
       
       if (!response.ok) {
+        if (response.status === 400 || response.status === 403) {
+           throw new Error("API Anahtarı Hatası: Anahtar geçersiz veya yetkisiz. Lütfen ayarlardan kontrol edin.");
+        }
         if (response.status === 429 && i < delays.length) {
            await new Promise(r => setTimeout(r, delays[i]));
            continue;
