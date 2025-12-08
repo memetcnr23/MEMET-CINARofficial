@@ -584,7 +584,7 @@ body{
 .writer-badge.collab{background:#0f172a;color:#e5e7eb;border-color:rgba(148,163,184,0.8);}
 .writer-works{margin-top:4px;font-size:.75rem;color:#ccc;}
 
-/* CHAT / LONCA AI */
+/* CHAT / GOOGLE AI */
 .chat-box{
   height:300px;overflow-y:auto;background:rgba(0,0,0,0.35);
   border-radius:10px;padding:15px;margin-bottom:10px;border:1px solid #222;
@@ -673,85 +673,6 @@ body.game-fullscreen #game{
 body.game-fullscreen #game .game-grid{
   max-width:960px;
   margin:0 auto;
-}
-
-/* ANIME GIRL */
-.anime-floating{
-  position:fixed;
-  right:20px;
-  bottom:110px;
-  width:150px;
-  z-index:1200;
-  cursor:pointer;
-}
-@media(max-width:768px){
-  .anime-floating{
-    right:10px;
-    bottom:150px;
-    width:110px;
-  }
-}
-.anime-floating.hidden-mobile{display:none;}
-.anime-floating-inner{position:relative;}
-.anime-floating-img{
-  width:100%;
-  display:block;
-  border-radius:16px;
-  box-shadow:0 0 20px rgba(255,134,200,0.7);
-  border:1px solid rgba(255,255,255,0.18);
-}
-.anime-hearts-container{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-}
-.anime-heart{
-  position:absolute;
-  font-size:1.2rem;
-  color:#ff86c8;
-  animation:heartRise 1s ease-out forwards;
-  text-shadow:0 0 6px rgba(255,134,200,0.9);
-}
-@keyframes heartRise{
-  0%{transform:translate(-50%,0) scale(0.4);opacity:0;}
-  40%{opacity:1;}
-  100%{transform:translate(-50%,-50px) scale(1.1);opacity:0;}
-}
-.anime-float-speech{
-  margin-top:6px;
-  font-size:.75rem;
-  color:#f5f5f5;
-  background:rgba(0,0,0,0.75);
-  border-radius:999px;
-  padding:4px 10px;
-  box-shadow:0 0 10px rgba(0,0,0,0.7);
-  border:1px solid rgba(255,255,255,0.12);
-  text-align:center;
-  font-family:'Orbitron',sans-serif;
-}
-
-/* Anime toggle button */
-.anime-toggle-btn{
-  position:fixed;
-  right:10px;
-  bottom:90px;
-  z-index:1201;
-  padding:6px 12px;
-  border-radius:999px;
-  border:none;
-  background:rgba(15,23,42,0.95);
-  color:#e5e7eb;
-  font-size:.75rem;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  box-shadow:0 0 12px rgba(0,0,0,0.8);
-  cursor:pointer;
-}
-@media(max-width:768px){
-  .anime-toggle-btn{
-    bottom:85px;
-  }
 }
 
 /* SYSTEM MODAL */
@@ -863,7 +784,7 @@ body.game-fullscreen #game .game-grid{
           <span><i class="fas fa-bolt"></i> MEMET ÇINAR YENİ SINGLE'LAR İLE DÖNÜYOR!</span>
           <span><i class="fas fa-star"></i> MALATYA ÖZEL GAMER SAHNE ŞOVU YAKINDA.</span>
           <span><i class="fas fa-music"></i> 'YILDIZLAR' TÜM DİJİTAL PLATFORMLARDA YAYINDA.</span>
-          <span><i class="fas fa-check-circle"></i> LEGACY v3.0 · LOKAL ŞARKI SÖZLERİ EDİTÖRÜ AKTİF.</span>
+          <span><i class="fas fa-check-circle"></i> LEGACY v3.0 · GOOGLE AI ENTEGRASYONU AKTİF.</span>
         </div>
       </div>
     </div>
@@ -1001,13 +922,12 @@ body.game-fullscreen #game .game-grid{
           </p>
           <p class="about-text" style="margin-top:8px;">
             Bu panel; şarkılarını, sözlerini ve kendi dünyanı yönetebileceğin özel bir
-            <strong>gamer arayüzü</strong> olarak tasarlandı. Zamanla yeni özellikler,
-            yeni şarkılar ve özel içeriklerle güncellenmeye devam edebilir.
+            <strong>gamer arayüzü</strong> olarak tasarlandı.
           </p>
         </div>
         <div>
           <div>
-            <span class="about-stat-pill"><i class="fas fa-star"></i> Level: 27</span>
+            <span class="about-stat-pill"><i class="fas fa-star"></i> Level: 28</span>
             <span class="about-stat-pill"><i class="fas fa-fire"></i> Rank: LEGACY</span>
             <span class="about-stat-pill"><i class="fas fa-heart"></i> Mood: LO-FI / EMOTIONAL</span>
           </div>
@@ -1118,22 +1038,22 @@ body.game-fullscreen #game .game-grid{
     </div>
   </section>
 
-  <!-- CHAT / LONCA YAPAY ZEKA -->
+  <!-- CHAT / GOOGLE AI -->
   <section id="chat" class="screen">
     <div class="widget-card" style="height:70vh; display:flex; flex-direction:column;">
-      <h3 style="font-family:'Orbitron'; color:var(--neon-blue); margin-bottom:8px;">LONCA SOHBETİ · İNTERNET DESTEKLİ YAPAY ZEKA</h3>
+      <h3 style="font-family:'Orbitron'; color:var(--neon-blue); margin-bottom:8px;">GOOGLE GEMINI AI · ASİSTAN</h3>
       <p style="font-size:.75rem;color:#aaa;margin-bottom:10px;">
-        Bu panel, sunucudaki GPT tabanlı lonca asistanına bağlıdır. Sorular sor, matematik işlemleri yaz (örn: <code>25*4+10</code>),
-        ya da “ELKAY 2 için duygusal şarkı sözü yaz” gibi komutlar ver. Metinleri alttaki kopyala butonuyla alabilirsin.
+        Bu panel doğrudan Google'ın en yeni yapay zeka modeli Gemini'ye bağlıdır. Sorular sor, matematik işlemleri yaz (örn: <code>25*4+10</code>),
+        ya da “ELKAY 2 için duygusal şarkı sözü yaz” gibi komutlar ver. Artık sunucuya gerek yok!
       </p>
       <div id="chat-history" class="chat-box">
         <div class="msg in ai-msg">
-          Merhaba, ben lonca yapay zekâ asistanıyım. Sunucu üzerinden gerçek zamanlı yanıt üretirim; bana her şeyi sorabilirsin.
+          Merhaba Memet Çınar! Ben Google Gemini destekli asistanınım. Müzik, söz yazarlığı veya herhangi bir konuda sana nasıl yardımcı olabilirim?
           <button class="msg-copy-btn" onclick="copyStatic(this)">Kopyala</button>
         </div>
       </div>
       <div style="display:flex; gap:10px; margin-top:auto;">
-        <input type="text" id="chat-in" placeholder="Mesaj yaz veya işlem gir (örn: 12*8 + 5)..." style="flex:1; background:#222; border:1px solid #444; color:#fff; padding:12px; border-radius:20px; outline:none;">
+        <input type="text" id="chat-in" placeholder="Mesaj yaz veya işlem gir..." style="flex:1; background:#222; border:1px solid #444; color:#fff; padding:12px; border-radius:20px; outline:none;">
         <button onclick="sendMsg()" style="width:50px; height:50px; border-radius:50%; background:var(--gold); border:none; cursor:pointer;"><i class="fas fa-paper-plane"></i></button>
       </div>
     </div>
@@ -1155,45 +1075,33 @@ body.game-fullscreen #game .game-grid{
       </div>
       <div class="widget-card game-library-card">
         <h3 style="font-family:'Orbitron'; color:var(--gold); margin-bottom:8px;"><i class="fas fa-gamepad"></i> RETRO OYUN KÜTÜPHANESİ</h3>
-        <p style="font-size:.8rem; color:#aaa; margin-bottom:8px;">Tetris ve Atari tarzı basit oyunlar için hazır bağlantılar. Kendi .apk ve .exe dosyalarını ürettiğinde buradaki linkleri değiştirebilirsin.</p>
+        <p style="font-size:.8rem; color:#aaa; margin-bottom:8px;">Tetris ve Atari tarzı basit oyunlar için hazır bağlantılar.</p>
         <ul>
           <li>
             <strong>Retro Tetris</strong>
             <div class="game-badges">
               <span><i class="fas fa-globe"></i> Tarayıcı</span>
-              <span><i class="fab fa-android"></i> Android APK</span>
-              <span><i class="fab fa-windows"></i> Windows EXE</span>
             </div>
             <div class="game-links">
               <a href="https://tetris.com/play-tetris" target="_blank" rel="noopener"><i class="fas fa-play"></i> Tarayıcıda Oyna</a>
-              <a href="#"><i class="fab fa-android"></i> APK İndir</a>
-              <a href="#"><i class="fab fa-windows"></i> EXE İndir</a>
             </div>
           </li>
           <li>
-            <strong>Space Shooter (Atari Hissi)</strong>
+            <strong>Space Shooter</strong>
             <div class="game-badges">
               <span><i class="fas fa-globe"></i> Tarayıcı</span>
-              <span><i class="fab fa-android"></i> Android APK</span>
-              <span><i class="fab fa-windows"></i> Windows EXE</span>
             </div>
             <div class="game-links">
               <a href="https://www.free80sarcade.com/spaceinvaders.php" target="_blank" rel="noopener"><i class="fas fa-play"></i> Tarayıcıda Oyna</a>
-              <a href="#"><i class="fab fa-android"></i> APK İndir</a>
-              <a href="#"><i class="fab fa-windows"></i> EXE İndir</a>
             </div>
           </li>
           <li>
             <strong>Classic Pong</strong>
             <div class="game-badges">
               <span><i class="fas fa-globe"></i> Tarayıcı</span>
-              <span><i class="fab fa-android"></i> Android APK</span>
-              <span><i class="fab fa-windows"></i> Windows EXE</span>
             </div>
             <div class="game-links">
               <a href="https://ponggame.org/" target="_blank" rel="noopener"><i class="fas fa-play"></i> Tarayıcıda Oyna</a>
-              <a href="#"><i class="fab fa-android"></i> APK İndir</a>
-              <a href="#"><i class="fab fa-windows"></i> EXE İndir</a>
             </div>
           </li>
         </ul>
@@ -1216,16 +1124,6 @@ body.game-fullscreen #game .game-grid{
     </div>
   </section>
 </main>
-
-<!-- ANIME KIZ -->
-<div class="anime-floating" id="anime-companion">
-  <div class="anime-floating-inner">
-    <div class="anime-hearts-container" id="anime-hearts"></div>
-    <img src="https://media.tenor.com/AlApU9C3uXgAAAAj/anime.gif" alt="Anime Companion" class="anime-floating-img">
-  </div>
-  <div class="anime-float-speech" id="anime-quote">"Bugün hangi şarkıyla level atlıyoruz?"</div>
-</div>
-<button class="anime-toggle-btn" id="anime-toggle">Anime Asistanı Gizle</button>
 
 <!-- PLAYER -->
 <footer class="player-bar">
@@ -1621,26 +1519,46 @@ if(progRail){
   };
 }
 
-/* LONCA AI – LOKAL + VERCEL OTOMATİK BAĞLANTI */
-
-// localhost / 127.0.0.1 / file:// ise lokal backend (server.js),
-// diğer tüm hostlarda Vercel API kullanılır.
-const isLocalEnv =
-  window.location.hostname === "localhost" ||
-  window.location.hostname === "127.0.0.1" ||
-  window.location.protocol === "file:";
-
-/* LONCA AI – BACKEND URL AYARI
-   - Vercel’de çalışırken  : https://memet-cinar-official-tpeh.vercel.app/api/lonca-ai
-   - Lokal Node server.js  : http://localhost:3000/lonca-ai
+/* GOOGLE GEMINI AI INTEGRATION
+   Doğrudan Google API kullanarak çalışır. Vercel backend gerektirmez.
 */
-const API_URL =
-  window.location.hostname === "memet-cinar-official-tpeh.vercel.app"
-    ? "https://memet-cinar-official-tpeh.vercel.app/api/lonca-ai"
-    : "http://localhost:3000/lonca-ai";
 
+const apiKey = ""; // API anahtarı sistem tarafından otomatik sağlanır
 
-const API_PATH = isLocalEnv ? "/lonca-ai" : "/api/lonca-ai";
+async function callGeminiAPI(prompt) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }]
+  };
+
+  // Exponential backoff retries
+  const delays = [1000, 2000, 4000, 8000, 16000];
+  for (let i = 0; i <= delays.length; i++) {
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!response.ok) {
+        if (response.status === 429 && i < delays.length) {
+           await new Promise(r => setTimeout(r, delays[i]));
+           continue;
+        }
+        throw new Error(`API Hatası: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      return text || "Yanıt alınamadı.";
+      
+    } catch (error) {
+      if (i === delays.length) throw error;
+      await new Promise(r => setTimeout(r, delays[i]));
+    }
+  }
+}
 
 function copyStatic(btn){
   const parent=btn.parentElement;
@@ -1686,30 +1604,6 @@ function appendAiMessage(text){
   box.scrollTop=box.scrollHeight;
 }
 
-/* Sunucuya istek atan fonksiyon */
-async function loncaAiRequest(promptText){
-  try{
-    const res = await fetch(API_URL, {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({message:promptText})
-    });
-    if(!res.ok){
-      throw new Error("HTTP "+res.status);
-    }
-    const data=await res.json();
-    if(data && data.answer){
-      return data.answer;
-    }
-    return "Sunucudan boş yanıt geldi.";
-  }catch(err){
-    console.error('Lonca AI hata:',err);
-    return isLocalEnv
-      ? "Lonca yapay zekâ sunucusuna bağlanırken bir hata oluştu. 'node server.js' ile backend'in çalıştığından ve OPENAI_API_KEY ayarlı olduğundan emin ol."
-      : "Lonca yapay zekâ sunucusuna bağlanırken bir hata oluştu. Vercel üzerindeki /api/lonca-ai fonksiyonunu kontrol et.";
-  }
-}
-
 async function sendMsg(){
   const inp=document.getElementById('chat-in');
   const box=document.getElementById('chat-history');
@@ -1725,16 +1619,18 @@ async function sendMsg(){
   // Yükleniyor balonu
   const loadingDiv=document.createElement('div');
   loadingDiv.className='msg in ai-msg';
-  loadingDiv.textContent='Yükleniyor...';
+  loadingDiv.textContent='Google AI yanıtlıyor...';
   box.appendChild(loadingDiv);
   box.scrollTop=box.scrollHeight;
 
-  // Backend'e isteği at
-  const ans=await loncaAiRequest(txt);
-
-  // Yükleniyor'u kaldır ve cevabı ekle
-  box.removeChild(loadingDiv);
-  appendAiMessage(ans);
+  try {
+    const ans = await callGeminiAPI(txt);
+    box.removeChild(loadingDiv);
+    appendAiMessage(ans);
+  } catch (err) {
+    box.removeChild(loadingDiv);
+    appendAiMessage("Bir hata oluştu: " + err.message);
+  }
 }
 
 /* GAME – snake style */
@@ -1838,49 +1734,6 @@ function initGameFullscreenButtons(){
   });
 }
 
-/* ANIME AI COMPANION */
-function initAnimeCompanion(){
-  const area=document.getElementById('anime-companion');
-  const hearts=document.getElementById('anime-hearts');
-  const quoteEl=document.getElementById('anime-quote');
-  const toggle=document.getElementById('anime-toggle');
-  if(!area||!hearts||!quoteEl||!toggle) return;
-  const quotes=[
-    '"Bugün hangi şarkıyla level atlıyoruz?"',
-    '"Combo: Oyun + lo-fi + gece modu!"',
-    '"Bir sonraki satırı sen yaz, ben dinlerim."',
-    '"Lonca asistanına bir şey sor, ben de izleyeyim!"'
-  ];
-  let qIndex=0;
-  area.addEventListener('click',e=>{
-    const rect=area.getBoundingClientRect();
-    const x=e.clientX-rect.left;
-    const y=e.clientY-rect.top;
-    const heart=document.createElement('span');
-    heart.className='anime-heart';
-    heart.style.left=x+'px';
-    heart.style.top=y+'px';
-    heart.innerText='❤';
-    hearts.appendChild(heart);
-    setTimeout(()=>heart.remove(),1000);
-    qIndex=(qIndex+1)%quotes.length;
-    quoteEl.innerText=quotes[qIndex];
-
-    const chatNav=document.querySelector('.nav-item[data-tab="chat"]');
-    switchTab('chat',chatNav);
-    const inp=document.getElementById('chat-in');
-    if(inp){
-      inp.focus();
-      inp.placeholder='Anime Asistan: Bana istediğini sor :)';
-    }
-  });
-
-  toggle.addEventListener('click',()=>{
-    area.classList.toggle('hidden-mobile');
-    toggle.textContent=area.classList.contains('hidden-mobile') ? 'Anime Asistanı Göster' : 'Anime Asistanı Gizle';
-  });
-}
-
 /* ONLOAD */
 window.onload=()=>{
   updateVh();
@@ -1890,7 +1743,6 @@ window.onload=()=>{
   initWeather();
   renderSongs();
   initLyricsAutosave();
-  initAnimeCompanion();
   initGameFullscreenButtons();
   loadYouTubeAPI();
   document.querySelectorAll('.nav-item, .widget-card').forEach(el=>el.addEventListener('mouseenter',()=>playHoverSfx()));
