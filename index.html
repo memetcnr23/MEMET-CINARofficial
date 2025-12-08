@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <title>MEMET ÇINAR | THE LEGACY VIP</title>
 
-<link rel="icon" type="image/svg+xml" href="icon-memet-cinar-music.svg" />
+<!-- Favicon fallback to avoid 404 in preview if file missing -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎵</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;500;700&family=Cinzel:wght@400;700;900&family=Orbitron:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.cdnfonts.com/css/digital-dismay?styles=116363" rel="stylesheet">
@@ -532,7 +533,7 @@ body{
 #lyrics-song-title{font-weight:700;font-size:.9rem;margin-bottom:2px;}
 #lyrics-song-artist{font-size:.8rem;color:var(--muted);margin-bottom:6px;}
 #lyrics-meta{font-size:.7rem;color:#777;margin-bottom:4px;}
-#lyrics-tools{display:flex;justify-content:space-between;font-size:.75rem;margin:4px 0;color:#999;gap:10px;flex-wrap:wrap;}
+#lyrics-tools{display:flex;justify-content:space-between;align-items:center;font-size:.75rem;margin:4px 0;color:#999;gap:10px;flex-wrap:wrap;}
 #lyrics-view{background:rgba(0,0,0,0.45);border-radius:10px;border:1px solid rgba(255,255,255,0.08);padding:10px 12px;font-size:.85rem;line-height:1.5;white-space:pre-line;max-height:180px;overflow-y:auto;margin-bottom:8px;}
 #lyrics-editor{margin-top:4px;}
 #lyrics-input{width:100%;min-height:100px;max-height:220px;resize:vertical;background:#111;border:1px solid #444;color:#fff;border-radius:8px;padding:8px;font-size:.85rem;font-family:inherit;}
@@ -677,6 +678,11 @@ body.game-fullscreen #game .game-grid{
 
 /* SYSTEM MODAL */
 #sys-modal{display:none;}
+
+/* AI MODAL */
+#ai-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2100;align-items:center;justify-content:center;}
+.ai-modal-box{background:#111;border:1px solid var(--neon-blue);border-radius:20px;padding:25px;width:90%;max-width:450px;position:relative;box-shadow:0 0 50px rgba(0,240,255,0.15);}
+.ai-modal-close{position:absolute;top:15px;right:20px;color:#aaa;font-size:1.5rem;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -690,6 +696,21 @@ body.game-fullscreen #game .game-grid{
     <h3 style="color:var(--neon-blue); font-family:'Orbitron'; margin-bottom:15px">SİSTEM MESAJI</h3>
     <p id="sys-msg" style="color:#ccc; margin-bottom:20px"></p>
     <button onclick="document.getElementById('sys-modal').style.display='none'" style="background:var(--neon-blue); border:none; padding:10px 30px; border-radius:20px; font-weight:bold; cursor:pointer;">TAMAM</button>
+  </div>
+</div>
+
+<!-- AI LYRICS MODAL -->
+<div id="ai-modal">
+  <div class="ai-modal-box">
+    <div class="ai-modal-close" onclick="document.getElementById('ai-modal').style.display='none'">&times;</div>
+    <h3 style="color:var(--gold); font-family:'Orbitron'; margin-bottom:10px;">✨ AI SÖZ YAZARI</h3>
+    <p style="color:#bbb; font-size:0.85rem; margin-bottom:15px;">
+      Bir konu, duygu veya tema girin. Gemini AI, Memet Çınar tarzında 4 dizelik özel bir bölüm yazsın.
+    </p>
+    <input type="text" id="ai-lyrics-prompt" placeholder="Örn: Malatya geceleri, imkansız aşk..." style="width:100%; padding:12px; border-radius:10px; border:1px solid #444; background:#222; color:#fff; margin-bottom:15px; outline:none;">
+    <button onclick="generateAiLyrics()" style="width:100%; padding:12px; background:linear-gradient(90deg, var(--gold), #ff8c00); border:none; border-radius:12px; font-weight:bold; cursor:pointer; font-size:1rem;">
+      <i class="fas fa-magic"></i> SÖZLERİ OLUŞTUR
+    </button>
   </div>
 </div>
 
@@ -851,8 +872,13 @@ body.game-fullscreen #game .game-grid{
         <div id="lyrics-song-artist" class="song-artist">Listeden bir şarkı seç.</div>
         <div id="lyrics-meta">Durum: Şarkı seçilmedi.</div>
         <div id="lyrics-tools">
-          <span id="lyrics-autosave">Otomatik kayıt: beklemede</span>
-          <span id="lyrics-stats">0 karakter · 0 satır</span>
+          <div>
+            <span id="lyrics-autosave">Otomatik kayıt: beklemede</span>
+            <span id="lyrics-stats">0 karakter · 0 satır</span>
+          </div>
+          <button class="p-btn" onclick="document.getElementById('ai-modal').style.display='flex'" style="font-size:0.8rem; color:var(--neon-blue); border:1px solid var(--neon-blue); border-radius:12px; padding:4px 10px;">
+            ✨ AI SÖZ YAZARI
+          </button>
         </div>
         <div id="lyrics-view">
           Burada seçilen şarkının sözleri görünecek. Resmî şarkı sözleri telif nedeniyle otomatik eklenmiyor;
@@ -1046,6 +1072,16 @@ body.game-fullscreen #game .game-grid{
         Bu panel doğrudan Google'ın en yeni yapay zeka modeli Gemini'ye bağlıdır. Sorular sor, matematik işlemleri yaz (örn: <code>25*4+10</code>),
         ya da “ELKAY 2 için duygusal şarkı sözü yaz” gibi komutlar ver. Artık sunucuya gerek yok!
       </p>
+      
+      <!-- Mood Buttons -->
+      <div style="display:flex; gap:8px; margin-bottom:10px; overflow-x:auto; padding-bottom:5px;">
+        <button onclick="getMoodRecommendation('Hüzünlü')" style="flex:none; background:#222; border:1px solid #444; color:#fff; padding:6px 12px; border-radius:15px; font-size:.75rem; cursor:pointer;">😔 Hüzünlü</button>
+        <button onclick="getMoodRecommendation('Enerjik')" style="flex:none; background:#222; border:1px solid #444; color:#fff; padding:6px 12px; border-radius:15px; font-size:.75rem; cursor:pointer;">🥳 Enerjik</button>
+        <button onclick="getMoodRecommendation('Aşık')" style="flex:none; background:#222; border:1px solid #444; color:#fff; padding:6px 12px; border-radius:15px; font-size:.75rem; cursor:pointer;">🥰 Aşık</button>
+        <button onclick="getMoodRecommendation('Yorgun')" style="flex:none; background:#222; border:1px solid #444; color:#fff; padding:6px 12px; border-radius:15px; font-size:.75rem; cursor:pointer;">😴 Yorgun</button>
+        <button onclick="getMoodRecommendation('Hırslı')" style="flex:none; background:#222; border:1px solid #444; color:#fff; padding:6px 12px; border-radius:15px; font-size:.75rem; cursor:pointer;">😤 Hırslı</button>
+      </div>
+
       <div id="chat-history" class="chat-box">
         <div class="msg in ai-msg">
           Merhaba Memet Çınar! Ben Google Gemini destekli asistanınım. Müzik, söz yazarlığı veya herhangi bir konuda sana nasıl yardımcı olabilirim?
@@ -1519,11 +1555,9 @@ if(progRail){
   };
 }
 
-/* GOOGLE GEMINI AI INTEGRATION
-   Doğrudan Google API kullanarak çalışır. Vercel backend gerektirmez.
-*/
+/* GOOGLE GEMINI AI INTEGRATION */
 
-const apiKey = ""; // API anahtarı sistem tarafından otomatik sağlanır
+const apiKey = ""; // API key is injected by the environment
 
 async function callGeminiAPI(prompt) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
@@ -1531,7 +1565,6 @@ async function callGeminiAPI(prompt) {
     contents: [{ parts: [{ text: prompt }] }]
   };
 
-  // Exponential backoff retries
   const delays = [1000, 2000, 4000, 8000, 16000];
   for (let i = 0; i <= delays.length; i++) {
     try {
@@ -1557,6 +1590,103 @@ async function callGeminiAPI(prompt) {
       if (i === delays.length) throw error;
       await new Promise(r => setTimeout(r, delays[i]));
     }
+  }
+}
+
+/* Feature 1: AI Lyrics Generator */
+async function generateAiLyrics() {
+  const input = document.getElementById('ai-lyrics-prompt');
+  const promptText = input.value.trim();
+  if (!promptText) {
+    alert("Lütfen bir konu veya duygu girin.");
+    return;
+  }
+  
+  // Close modal and show loading state in editor
+  document.getElementById('ai-modal').style.display='none';
+  const editor = document.getElementById('lyrics-input');
+  const originalVal = editor.value;
+  editor.value += "\n\n✨ AI yazıyor... Lütfen bekleyin...";
+  
+  const systemPrompt = `
+    Sen ünlü sanatçı Memet Çınar'ın yardımcı yapay zeka asistanısın.
+    Görevin: Kullanıcının verdiği konuya uygun, Memet Çınar'ın tarzında (duygusal, arabesk, pop, rap karışımı) 4 dizelik (bir kıta) şarkı sözü yazmak.
+    Konu: "${promptText}"
+    Dil: Türkçe.
+    Sadece sözleri yaz, başka açıklama yapma.
+  `;
+
+  try {
+    const lyrics = await callGeminiAPI(systemPrompt);
+    editor.value = originalVal + "\n\n✨ [AI ÜRETİMİ]:\n" + lyrics + "\n-------------------";
+    updateLyricsStats();
+    saveLyrics(false);
+  } catch (err) {
+    editor.value = originalVal + "\n\n⚠️ AI Hatası: " + err.message;
+  }
+}
+
+/* Feature 2: Mood DJ */
+async function getMoodRecommendation(mood) {
+  // Show in chat
+  switchTab('chat');
+  const box = document.getElementById('chat-history');
+  
+  // User msg
+  const userDiv = document.createElement('div');
+  userDiv.className = 'msg out';
+  userDiv.textContent = `Modum: ${mood}. Hangi şarkıyı dinlemeliyim?`;
+  box.appendChild(userDiv);
+  box.scrollTop = box.scrollHeight;
+  
+  // Loading msg
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'msg in ai-msg';
+  loadingDiv.textContent = '✨ DJ Gemini şarkı seçiyor...';
+  box.appendChild(loadingDiv);
+  box.scrollTop = box.scrollHeight;
+
+  const songTitles = songs.map(s => s.title).join(", ");
+  const systemPrompt = `
+    Sen bir DJ ve Memet Çınar hayranısın.
+    Kullanıcının modu: "${mood}".
+    Mevcut şarkı listesi: ${songTitles}.
+    Görevin: Bu listeden bu moda EN UYGUN tek bir şarkıyı seç.
+    Yanıt formatı: "Sana önerim: [Şarkı Adı]. Çünkü [1 cümlelik kısa, samimi neden]."
+    Lütfen şarkı adını tam olarak listedeki gibi yaz.
+  `;
+
+  try {
+    const recommendation = await callGeminiAPI(systemPrompt);
+    box.removeChild(loadingDiv);
+    
+    // Create AI response bubble
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'msg in ai-msg';
+    aiDiv.textContent = recommendation;
+    
+    // Parse song name to add play button
+    const songMatch = songs.find(s => recommendation.includes(s.title));
+    if (songMatch) {
+      const playBtn = document.createElement('button');
+      playBtn.className = 'msg-copy-btn';
+      playBtn.style.position = 'relative';
+      playBtn.style.marginTop = '8px';
+      playBtn.style.width = '100%';
+      playBtn.innerHTML = '<i class="fas fa-play"></i> Hemen Çal';
+      playBtn.onclick = () => {
+        const idx = songs.indexOf(songMatch);
+        if (idx !== -1) playSong(idx);
+      };
+      aiDiv.appendChild(playBtn);
+    }
+    
+    box.appendChild(aiDiv);
+    box.scrollTop = box.scrollHeight;
+    
+  } catch (err) {
+    box.removeChild(loadingDiv);
+    appendAiMessage("Bir hata oluştu: " + err.message);
   }
 }
 
