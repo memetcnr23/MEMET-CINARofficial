@@ -103,7 +103,7 @@ export default function BroadcastApp() {
       if (disposed || !window.YT || player.current) return;
       player.current = new window.YT.Player("cnr-player-frame", {
         videoId: clips[0].id,
-        playerVars: { autoplay: 0, controls: 0, rel: 0, playsinline: 1, modestbranding: 1 },
+        playerVars: { autoplay: 0, controls: 0, disablekb: 1, modestbranding: 1, rel: 0, showinfo: 0, playsinline: 1 },
         events: {
           onReady: () => { ready.current = true; player.current?.cueVideoById(clips[0].id); },
           onStateChange: (event) => {
