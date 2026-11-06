@@ -2,7 +2,7 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Activity, Bell, CalendarDays, ChevronRight, Disc3, Guitar, Headphones, HeartCrack, Home, Layers, Menu, Mic2, MonitorPlay, Music2, Newspaper, Pause, Play, Radio, Search, Settings2, Share2, SkipBack, SkipForward, Star, Volume2, VolumeX, X, Camera } from "lucide-react";
+import { Activity, Bell, CalendarDays, ChevronRight, Disc3, Guitar, Headphones, HeartCrack, Heart, Home, Layers, Menu, Mic2, MonitorPlay, Music2, Newspaper, Pause, Play, Radio, Search, Settings2, Share2, Signal, SkipBack, SkipForward, Star, Volume2, VolumeX, X, Camera } from "lucide-react";
 
 type Clip = { id: string; title: string; artist: string; category: string };
 type YTPlayer = {
