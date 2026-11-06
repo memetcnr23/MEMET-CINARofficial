@@ -1,12 +1,13 @@
-import "server-only";
-import { createClient } from "@supabase/supabase-js";
-
-export function getSupabaseServerClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+export function getSupabaseRestConfig() {
+  const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, "");
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) return null;
+  if (!baseUrl || !anonKey) return null;
 
-  return createClient(url, anonKey, {
-    auth: { autoRefreshToken: false, persistSession: false }
-  });
+  return {
+    baseUrl: `${baseUrl}/rest/v1`,
+    headers: {
+      apikey: anonKey,
+      Authorization: `Bearer ${anonKey}`
+    }
+  };
 }

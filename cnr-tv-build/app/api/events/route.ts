@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase-server";
+import { getSupabaseRestConfig } from "@/lib/supabase-server";
 
 const allowedEvents = new Set(["play", "pause", "ended"]);
 
 export async function POST(request: NextRequest) {
-  const supabase = getSupabaseServerClient();
-  if (!supabase) return NextResponse.json({ error: "Database is not configured." }, { status: 503 });
+  const config = getSupabaseRestConfig();
+  if (!config) return NextResponse.json({ error: "Database is not configured." }, { status: 503 });
 
   let body: { videoId?: unknown; eventType?: unknown };
   try { body = await request.json(); }
@@ -17,10 +17,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid playback event." }, { status: 400 });
   }
 
-  const { error } = await supabase.from("playback_events").insert({
-    youtube_video_id: videoId,
-    event_type: eventType
-  });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ ok: true }, { status: 201 });
+  try {
+    const response = await fetch(`${config.baseUrl}/playback_events`, {
+      method: "POST",
+      headers: {
+        ...config.headers,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal"
+      },
+      body: JSON.stringify({ youtube_video_id: videoId, event_type: eventType }),
+      cache: "no-store"
+    });
+    if (!response.ok) return NextResponse.json({ error: await response.text() }, { status: 502 });
+    return NextResponse.json({ ok: true }, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "Supabase service is unavailable." }, { status: 502 });
+  }
 }
