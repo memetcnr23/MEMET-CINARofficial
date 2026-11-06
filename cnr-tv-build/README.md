@@ -28,7 +28,7 @@ The playlist is sample YouTube video content. A true continuous 24/7 linear chan
 
 ## Supabase database
 
-This app supports a persistent Supabase PostgreSQL database for the clip catalogue, daily broadcast schedule and playback analytics. Apply `supabase/migrations/202611060001_cnr_tv_schema.sql` in the Supabase SQL Editor, then set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in the Vercel project (Preview first, then Production when ready). The browser never receives a service-role key. Until those two variables are configured and the migration is applied, the UI intentionally falls back to the sample catalogue and displays **DEMO MODU**.
+This app supports a persistent Supabase PostgreSQL database for the clip catalogue, daily broadcast schedule and playback analytics. Apply `supabase/migrations/202611060001_cnr_tv_schema.sql` in the Supabase SQL Editor, then set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (the legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` is also accepted)` in the Vercel project (Preview first, then Production when ready). The browser never receives a service-role key. Until those two variables are configured and the migration is applied, the UI intentionally falls back to the sample catalogue and displays **DEMO MODU**.
 
 ## Player behavior
 
