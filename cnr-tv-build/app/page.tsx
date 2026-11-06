@@ -2,9 +2,10 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Activity, Bell, CalendarDays, ChevronRight, Disc3, Guitar, Headphones, HeartCrack, Heart, Home, Layers, Menu, Mic2, MonitorPlay, Music2, Newspaper, Pause, Play, Radio, Search, Settings2, Share2, Signal, SkipBack, SkipForward, Star, Volume2, VolumeX, X, Camera } from "lucide-react";
+import { Activity, Bell, CalendarDays, ChevronRight, Disc3, Guitar, Headphones, HeartCrack, Heart, Home, Layers, Menu, Mic2, MonitorPlay, Music2, Newspaper, Pause, Play, Radio, Search, Settings2, Share2, Signal, SkipBack, SkipForward, Star, Volume2, VolumeX, X, Camera, Expand, Minimize2 } from "lucide-react";
 
 type Clip = { id: string; title: string; artist: string; category: string };
+type ScheduleItem = [string, string, string, number];
 type YTPlayer = {
   cueVideoById: (id: string) => void; loadVideoById: (id: string) => void;
   playVideo: () => void; pauseVideo: () => void; mute: () => void; unMute: () => void;
@@ -32,14 +33,14 @@ const categories = [
   { name: "Akustik", icon: Guitar }, { name: "Yeni Çıkanlar", icon: Star },
   { name: "Top 20", icon: Activity }
 ];
-const schedule = [
+const schedule: ScheduleItem[] = [
   ["Şimdi", "CNR Station Deck", "Müzik Kuşağı", 0],
   ["14:00", "Türkçe Pop Hits", "En Sevilen Klipler", 0],
   ["16:00", "CNR Top 20", "Haftanın Listesi", 2],
   ["18:00", "Yeni Çıkanlar", "Klip Prömiyerleri", 1],
   ["20:00", "Efkar Gecesi", "Duygusal Şarkılar", 3],
   ["22:00", "Akustik Sahne", "Canlı Performanslar", 4]
-] as const;
+];
 const logo = "https://cnr-muzik-tv.vercel.app/cnr-logo.webp";
 const thumb = (id: string, quality = "hqdefault") => "https://i.ytimg.com/vi/" + id + "/" + quality + ".jpg";
 const timeText = (seconds: number) => {
@@ -49,6 +50,7 @@ const timeText = (seconds: number) => {
 
 export default function BroadcastApp() {
   const player = useRef<YTPlayer | null>(null);
+  const playerStageRef = useRef<HTMLDivElement | null>(null);
   const activeIndex = useRef(0);
   const ready = useRef(false);
   const [index, setIndex] = useState(0);
@@ -65,7 +67,12 @@ export default function BroadcastApp() {
   const [notice, setNotice] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(false);
-  const current = clips[index];
+  const [catalog, setCatalog] = useState<Clip[]>(clips);
+  const activeClips = catalog;
+  const [programSchedule, setProgramSchedule] = useState<ScheduleItem[]>(schedule);
+  const [catalogStatus, setCatalogStatus] = useState<"connecting" | "connected" | "demo">("connecting");
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const current = activeClips[index] || activeClips[0];
 
   const notify = useCallback((message: string) => {
     setNotice(message);
@@ -76,19 +83,52 @@ export default function BroadcastApp() {
     setLowerVisible(true);
     window.setTimeout(() => setLowerVisible(false), 7600);
   }, []);
+
+  const logPlaybackEvent = useCallback((eventType: "play" | "pause" | "ended") => {
+    const videoId = activeClips[activeIndex.current]?.id;
+    if (!videoId) return;
+    void fetch("/api/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ videoId, eventType }) }).catch(() => undefined);
+  }, [activeClips]);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/catalog", { cache: "no-store" })
+      .then((response) => { if (!response.ok) throw new Error("Database is not connected"); return response.json(); })
+      .then((data: { clips?: Clip[]; schedule?: ScheduleItem[] }) => {
+        if (cancelled) return;
+        if (Array.isArray(data.clips) && data.clips.length) setCatalog(data.clips);
+        if (Array.isArray(data.schedule) && data.schedule.length) setProgramSchedule(data.schedule);
+        setCatalogStatus("connected");
+      })
+      .catch(() => { if (!cancelled) setCatalogStatus("demo"); });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    const syncFullscreen = () => setIsFullscreen(document.fullscreenElement === playerStageRef.current);
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
+  }, []);
+
+  useEffect(() => {
+    if (!ready.current || !activeClips.length) return;
+    activeIndex.current = 0;
+    setIndex(0);
+    player.current?.cueVideoById(activeClips[0].id);
+  }, [activeClips]);
   const selectClip = useCallback((nextIndex: number, start = false) => {
-    const safe = (nextIndex + clips.length) % clips.length;
+    const safe = (nextIndex + activeClips.length) % activeClips.length;
     activeIndex.current = safe;
     setIndex(safe);
     if (player.current && ready.current) {
-      if (start) player.current.loadVideoById(clips[safe].id);
+      if (start) player.current.loadVideoById(activeClips[safe].id);
       else {
-        player.current.cueVideoById(clips[safe].id);
+        player.current.cueVideoById(activeClips[safe].id);
         setPlaying(false);
         setLowerVisible(false);
       }
     }
-  }, []);
+  }, [activeClips]);
   const playPause = useCallback(() => {
     if (!player.current || !ready.current) { notify("Oynatıcı hazırlanıyor. Birkaç saniye sonra tekrar deneyin."); return; }
     if (playing) player.current.pauseVideo();
@@ -102,16 +142,17 @@ export default function BroadcastApp() {
     const init = () => {
       if (disposed || !window.YT || player.current) return;
       player.current = new window.YT.Player("cnr-player-frame", {
-        videoId: clips[0].id,
-        playerVars: { autoplay: 0, controls: 0, disablekb: 1, modestbranding: 1, rel: 0, showinfo: 0, playsinline: 1 },
+        videoId: activeClips[0].id,
+        playerVars: { autoplay: 0, controls: 0, disablekb: 1, modestbranding: 1, rel: 0, showinfo: 0, playsinline: 1, fs: 0 },
         events: {
-          onReady: () => { ready.current = true; player.current?.cueVideoById(clips[0].id); },
+          onReady: () => { ready.current = true; player.current?.cueVideoById(activeClips[0].id); },
           onStateChange: (event) => {
             const state = window.YT?.PlayerState;
             if (!state) return;
-            if (event.data === state.PLAYING) { setPlaying(true); lowerThird(); setDuration(player.current?.getDuration() || 0); }
-            else if (event.data === state.PAUSED || event.data === state.CUED) { setPlaying(false); setLowerVisible(false); }
-            else if (event.data === state.ENDED) { setPlaying(false); setLowerVisible(false); selectClip(activeIndex.current + 1, true); }
+            if (event.data === state.PLAYING) { setPlaying(true); lowerThird(); logPlaybackEvent("play"); setDuration(player.current?.getDuration() || 0); }
+            else if (event.data === state.PAUSED) { setPlaying(false); setLowerVisible(false); logPlaybackEvent("pause"); }
+            else if (event.data === state.CUED) { setPlaying(false); setLowerVisible(false); }
+            else if (event.data === state.ENDED) { setPlaying(false); setLowerVisible(false); logPlaybackEvent("ended"); selectClip(activeIndex.current + 1, true); }
           },
           onError: () => { setPlaying(false); setLowerVisible(false); notify("Bu video gömülü oynatıma kapalı. YouTube'da aç bağlantısını kullanabilirsiniz."); }
         }
@@ -142,7 +183,7 @@ export default function BroadcastApp() {
   }, []);
   useEffect(() => { try { setFavorites(JSON.parse(localStorage.getItem("cnr-favorites") || "[]")); } catch { setFavorites([]); } }, []);
 
-  const filtered = useMemo(() => clips.filter((clip) => {
+  const filtered = useMemo(() => activeClips.filter((clip) => {
     const categoryMatch = category === "Tümü" || category === "Top 20" || category === "Yeni Çıkanlar" || clip.category === category;
     const q = query.trim().toLocaleLowerCase("tr-TR");
     return categoryMatch && (!q || (clip.title + " " + clip.artist + " " + clip.category).toLocaleLowerCase("tr-TR").includes(q));
@@ -174,7 +215,15 @@ export default function BroadcastApp() {
     ["Ana Sayfa", Home, "home"], ["Canlı Yayın", Radio, "live"], ["Programlar", Layers, "programs"],
     ["Müzik Listeleri", Music2, "lists"], ["Sanatçılar", Activity, "artists"], ["Haberler", Newspaper, "news"], ["Videolar", MonitorPlay, "videos"]
   ] as const;
-  const toggleFullscreen = () => { const frame = player.current?.getIframe(); if (frame?.requestFullscreen) void frame.requestFullscreen().catch(() => notify("Tam ekran açılamadı.")); };
+  const toggleFullscreen = async () => {
+    const stage = playerStageRef.current;
+    if (!stage) return;
+    try {
+      if (document.fullscreenElement) await document.exitFullscreen();
+      else if (stage.requestFullscreen) await stage.requestFullscreen();
+      else notify("Bu tarayıcı tam ekran modunu desteklemiyor.");
+    } catch { notify("Tam ekran açılamadı. Tarayıcı iznini kontrol edin."); }
+  };
 
   return <main className="broadcast-shell" id="top">
     <header className="channel-header">
@@ -190,7 +239,7 @@ export default function BroadcastApp() {
       <section className="main-column">
         <section className="live-layout" id="live-player">
           <div className="player-card">
-            <div className="player-stage">
+            <div className="player-stage" ref={playerStageRef}>
               <div id="cnr-player-frame" className="youtube-frame" />
               <div className="player-brand"><span className="live-badge"><i /> CANLI YAYIN</span><Image src={logo} alt="CNR Müzik TV" width={135} height={45} unoptimized /></div>
               {!playing && <div className="player-cover"><div className="cover-bars"><i /><i /><i /><i /><i /><i /><i /></div><b>CNR MÜZİK TV</b><span>TÜRKİYE'NİN MÜZİK TELEVİZYONU</span><button onClick={playPause}><Play fill="currentColor" size={16} /> YAYINI BAŞLAT</button></div>}
@@ -206,24 +255,24 @@ export default function BroadcastApp() {
                 <input className="seek" type="range" min="0" max="100" step="0.1" value={progress} onChange={(e) => { const p = Number(e.target.value); setProgress(p); if (duration) player.current?.seekTo(p / 100 * duration, true); }} />
                 <span className="elapsed">{timeText(progress / 100 * duration)}</span>
                 <button className="hd" onClick={() => player.current?.setPlaybackQuality("hd1080")}>HD</button>
-                <button onClick={toggleFullscreen} aria-label="Tam ekran"><MonitorPlay /></button>
+                <button onClick={toggleFullscreen} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"}>{isFullscreen ? <Minimize2 /> : <Expand />}</button>
                 <button onClick={() => notify("Kalite ve altyazı ayarları YouTube tarafından desteklenir.")} aria-label="Ayarlar"><Settings2 /></button>
               </div>
             </div>
             <div className="player-caption"><div><b>{current.artist} — {current.title}</b><small>{playing ? "Şimdi Yayında" : "Oynatılmaya Hazır"}</small></div><div className="player-actions"><button onClick={previous}><SkipBack /></button><button onClick={next}><SkipForward /></button><button onClick={toggleFavorite} className={favorites.includes(current.id) ? "favorited" : ""}><Heart /></button><button onClick={share}><Share2 /></button></div></div>
           </div>
           <aside className="schedule-card" id="schedule">
-            <div className="section-title"><h2><CalendarDays size={18} /> YAYIN AKIŞI</h2><button onClick={() => setExpanded(!expanded)}>{expanded ? "Daha Az" : "Tüm Program"} <ChevronRight size={14} /></button></div>
-            <div className="schedule-list">{schedule.slice(0, expanded ? 6 : 5).map((row, i) => <button className={"schedule-row " + (i === 0 ? "current" : "")} key={row[0]} onClick={() => selectClip(row[3], true)}><Image src={thumb(clips[row[3]].id, "mqdefault")} alt="" width={68} height={44} unoptimized /><span className="slot-time">{row[0]}</span><span className="slot-info"><b>{row[1]}</b><small>{row[2]}</small></span></button>)}</div>
+            <div className="section-title"><h2><CalendarDays size={18} /> YAYIN AKIŞI <span className={"db-status " + catalogStatus}>{catalogStatus === "connected" ? "DB AKTİF" : catalogStatus === "connecting" ? "DB BAĞLANIYOR" : "DEMO MODU"}</span></h2><button onClick={() => setExpanded(!expanded)}>{expanded ? "Daha Az" : "Tüm Program"} <ChevronRight size={14} /></button></div>
+            <div className="schedule-list">{programSchedule.slice(0, expanded ? 6 : 5).map((row, i) => <button className={"schedule-row " + (i === 0 ? "current" : "")} key={row[0]} onClick={() => selectClip(row[3], true)}><Image src={thumb(activeClips[row[3]].id, "mqdefault")} alt="" width={68} height={44} unoptimized /><span className="slot-time">{row[0]}</span><span className="slot-info"><b>{row[1]}</b><small>{row[2]}</small></span></button>)}</div>
           </aside>
         </section>
 
         <section className="categories" id="categories">{categories.map(({ name, icon: Icon }, i) => <button key={name} className={"category-card cat-" + i + (category === name ? " selected" : "")} onClick={() => setCategory(category === name ? "Tümü" : name)}><Icon size={30} /><b>{name}</b></button>)}<button className={"category-card cat-all" + (category === "Tümü" ? " selected" : "")} onClick={() => setCategory("Tümü")}><Layers size={30} /><b>Tümü</b></button></section>
         <section className="promo-grid"><article className="promo promo-main"><Image src={logo} alt="CNR Müzik TV" width={260} height={88} unoptimized /><b>TÜRKİYE'NİN MÜZİK TELEVİZYONU</b></article><article className="promo promo-studio"><span>✦　CNR MÜZİK　✦</span><b>STÜDYOLARI</b><small>ÖZEL YAYINLAR</small></article><article className="promo promo-mic"><Mic2 size={56} /><b>MÜZİĞİN<br />EKRANDAKİ ADRESİ</b></article></section>
 
-        <section className="content-section" id="videos"><div className="content-title"><span>SEÇKİLİ KLİPLER</span><h2><MonitorPlay size={20} /> {category === "Tümü" ? "ÖNE ÇIKAN KLİPLER" : category.toLocaleUpperCase("tr-TR")}</h2></div><div className="video-grid">{filtered.map((clip) => <button key={clip.id} className={"video-card " + (clip.id === current.id ? "selected" : "")} onClick={() => selectClip(clips.findIndex((v) => v.id === clip.id), true)}><span className="video-thumb"><Image src={thumb(clip.id)} alt={clip.title} width={320} height={180} unoptimized /><i><Play fill="currentColor" /></i><small>HD</small></span><b>{clip.artist}</b><span>{clip.title}</span></button>)}</div></section>
+        <section className="content-section" id="videos"><div className="content-title"><span>SEÇKİLİ KLİPLER</span><h2><MonitorPlay size={20} /> {category === "Tümü" ? "ÖNE ÇIKAN KLİPLER" : category.toLocaleUpperCase("tr-TR")}</h2></div><div className="video-grid">{filtered.map((clip) => <button key={clip.id} className={"video-card " + (clip.id === current.id ? "selected" : "")} onClick={() => selectClip(activeClips.findIndex((v) => v.id === clip.id), true)}><span className="video-thumb"><Image src={thumb(clip.id)} alt={clip.title} width={320} height={180} unoptimized /><i><Play fill="currentColor" /></i><small>HD</small></span><b>{clip.artist}</b><span>{clip.title}</span></button>)}</div></section>
 
-        <section className="content-section" id="artists"><div className="content-title"><span>SAHNE IŞIKLARI</span><h2><Activity size={20} /> SANATÇILAR</h2></div><div className="artist-row">{clips.slice(0, 5).map((clip) => <button key={clip.artist} onClick={() => selectClip(clips.findIndex((v) => v.id === clip.id), true)}><Image src={thumb(clip.id, "mqdefault")} alt="" width={72} height={48} unoptimized /><span><b>{clip.artist}</b><small>{clip.category}</small></span><ChevronRight size={16} /></button>)}</div></section>
+        <section className="content-section" id="artists"><div className="content-title"><span>SAHNE IŞIKLARI</span><h2><Activity size={20} /> SANATÇILAR</h2></div><div className="artist-row">{activeClips.slice(0, 5).map((clip) => <button key={clip.artist} onClick={() => selectClip(activeClips.findIndex((v) => v.id === clip.id), true)}><Image src={thumb(clip.id, "mqdefault")} alt="" width={72} height={48} unoptimized /><span><b>{clip.artist}</b><small>{clip.category}</small></span><ChevronRight size={16} /></button>)}</div></section>
 
         <section className="ticker" id="news"><b><Signal size={15} /> CNR'DEN HABERLER</b><div><span>CNR Müzik TV® ekranlarında yeni klipler, özel programlar ve müzik dünyasından gelişmeler!　•　Müzik hiç durmasın!　•　CNR Müzik Yapım® özel yayınları yakında...</span></div><nav><a href="https://youtube.com/@memetcinar444" target="_blank" rel="noreferrer"><MonitorPlay /></a><a href="https://instagram.com/memetcinarofficial" target="_blank" rel="noreferrer"><Camera /></a><a href="https://open.spotify.com" target="_blank" rel="noreferrer"><Disc3 /></a></nav></section>
         <footer>© 2026 <b>CNR Müzik Yapım®</b> · CNR Müzik TV® · TÜM HAKLARI SAKLIDIR.</footer>
@@ -231,7 +280,7 @@ export default function BroadcastApp() {
     </div>
     <nav className="mobile-dock">{menu.slice(0, 4).map(([label, Icon, id]) => <button key={id} onClick={() => go(id)}><Icon size={19} /><span>{id === "lists" ? "Listeler" : label}</span></button>)}<button onClick={() => notify("CNR Müzik TV resmi kanal.")}><Activity size={19} /><span>Profil</span></button></nav>
 
-    {searchOpen && <div className="search-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) setSearchOpen(false); }}><div className="search-dialog"><div><b><Search size={18} /> CNR'DE ARA</b><button onClick={() => setSearchOpen(false)}><X /></button></div><input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Sanatçı, şarkı veya kategori ara..." /><div className="search-results">{clips.filter((clip) => (clip.title + " " + clip.artist + " " + clip.category).toLocaleLowerCase("tr-TR").includes(query.toLocaleLowerCase("tr-TR"))).map((clip) => <button key={clip.id} onClick={() => { selectClip(clips.findIndex((v) => v.id === clip.id), true); setSearchOpen(false); }}><Image src={thumb(clip.id, "mqdefault")} alt="" width={64} height={42} unoptimized /><span><b>{clip.title}</b><small>{clip.artist}</small></span><ChevronRight /></button>)}</div></div></div>}
+    {searchOpen && <div className="search-backdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) setSearchOpen(false); }}><div className="search-dialog"><div><b><Search size={18} /> CNR'DE ARA</b><button onClick={() => setSearchOpen(false)}><X /></button></div><input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Sanatçı, şarkı veya kategori ara..." /><div className="search-results">{activeClips.filter((clip) => (clip.title + " " + clip.artist + " " + clip.category).toLocaleLowerCase("tr-TR").includes(query.toLocaleLowerCase("tr-TR"))).map((clip) => <button key={clip.id} onClick={() => { selectClip(activeClips.findIndex((v) => v.id === clip.id), true); setSearchOpen(false); }}><Image src={thumb(clip.id, "mqdefault")} alt="" width={64} height={42} unoptimized /><span><b>{clip.title}</b><small>{clip.artist}</small></span><ChevronRight /></button>)}</div></div></div>}
     {notice && <div className="toast" role="status">{notice}</div>}
     <a className="youtube-link" href={"https://www.youtube.com/watch?v=" + current.id} target="_blank" rel="noreferrer">YouTube'da aç <ChevronRight size={13} /></a>
   </main>;
