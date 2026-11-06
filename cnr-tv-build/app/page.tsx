@@ -73,6 +73,8 @@ export default function BroadcastApp() {
   const [catalogStatus, setCatalogStatus] = useState<"connecting" | "connected" | "demo">("connecting");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const current = activeClips[index] || activeClips[0];
+  const activeVideoIdRef = useRef(current.id);
+  activeVideoIdRef.current = current.id;
 
   const notify = useCallback((message: string) => {
     setNotice(message);
@@ -85,10 +87,10 @@ export default function BroadcastApp() {
   }, []);
 
   const logPlaybackEvent = useCallback((eventType: "play" | "pause" | "ended") => {
-    const videoId = activeClips[activeIndex.current]?.id;
+    const videoId = activeVideoIdRef.current;
     if (!videoId) return;
     void fetch("/api/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ videoId, eventType }) }).catch(() => undefined);
-  }, [activeClips]);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,12 +115,14 @@ export default function BroadcastApp() {
   useEffect(() => {
     if (!ready.current || !activeClips.length) return;
     activeIndex.current = 0;
+    activeVideoIdRef.current = activeClips[0].id;
     setIndex(0);
     player.current?.cueVideoById(activeClips[0].id);
   }, [activeClips]);
   const selectClip = useCallback((nextIndex: number, start = false) => {
     const safe = (nextIndex + activeClips.length) % activeClips.length;
     activeIndex.current = safe;
+    activeVideoIdRef.current = activeClips[safe].id;
     setIndex(safe);
     if (player.current && ready.current) {
       if (start) player.current.loadVideoById(activeClips[safe].id);
@@ -142,10 +146,10 @@ export default function BroadcastApp() {
     const init = () => {
       if (disposed || !window.YT || player.current) return;
       player.current = new window.YT.Player("cnr-player-frame", {
-        videoId: activeClips[0].id,
+        videoId: activeVideoIdRef.current,
         playerVars: { autoplay: 0, controls: 0, disablekb: 1, modestbranding: 1, rel: 0, showinfo: 0, playsinline: 1, fs: 0 },
         events: {
-          onReady: () => { ready.current = true; player.current?.cueVideoById(activeClips[0].id); },
+          onReady: () => { ready.current = true; player.current?.cueVideoById(activeVideoIdRef.current); },
           onStateChange: (event) => {
             const state = window.YT?.PlayerState;
             if (!state) return;
@@ -170,7 +174,7 @@ export default function BroadcastApp() {
       }
     }
     return () => { disposed = true; };
-  }, [index, lowerThird, notify, selectClip]);
+  }, [index, activeClips, logPlaybackEvent, lowerThird, notify, selectClip]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {

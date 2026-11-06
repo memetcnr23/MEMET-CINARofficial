@@ -71,3 +71,8 @@ values
   ('yQ9lXHfv9Yg', '18:00', 'Yeni Çıkanlar', 'Klip Prömiyerleri', 4),
   ('rR2wVaZ4Fn4', '20:00', 'Efkar Gecesi', 'Duygusal Şarkılar', 5),
   ('BemdSeSUJmM', '22:00', 'Akustik Sahne', 'Canlı Performanslar', 6);
+
+-- Explicit grants complement the row-level security policies above.
+grant select on public.tv_clips to anon, authenticated;
+grant select on public.broadcast_schedule to anon, authenticated;
+grant insert on public.playback_events to anon, authenticated;
