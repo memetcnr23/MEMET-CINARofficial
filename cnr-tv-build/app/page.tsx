@@ -33,7 +33,7 @@ const schedule: ScheduleItem[] = [
   ["20:00", "Efkar Gecesi", "Duygusal Şarkılar", 3],
   ["22:00", "Akustik Sahne", "Canlı Performanslar", 4]
 ];
-const logo = "https://cnr-muzik-tv.vercel.app/cnr-logo.webp";
+const logo = "/cnr-logo.webp";
 const thumb = (id: string, quality = "hqdefault") => "https://i.ytimg.com/vi/" + id + "/" + quality + ".jpg";
 const timeText = (seconds: number) => {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
@@ -269,25 +269,23 @@ export default function BroadcastApp() {
           <div className="player-card">
             <div className="player-stage" ref={playerStageRef}>
               <div id="cnr-player-frame" className="youtube-frame" />
-            </div>
-            <div className="player-meta-bar">
               <div className="player-brand"><span className="live-badge"><i /> CANLI YAYIN</span><Image src={logo} alt="CNR Müzik TV" width={135} height={45} unoptimized /></div>
-              {!playing && current.id && <button className="start-broadcast" onClick={playPause}><Play fill="currentColor" size={15} /> YAYINI BAŞLAT</button>}
-              {playing && muted && <button className="start-broadcast" onClick={toggleMute}><Volume2 size={15} /> SESİ AÇ</button>}
-            </div>
-            <div className="player-controls">
-              <button onClick={playPause} aria-label={playing ? "Duraklat" : "Oynat"}>{playing ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}</button>
-              <button onClick={toggleMute} aria-label="Sesi aç/kapat">{muted ? <VolumeX /> : <Volume2 />}</button>
-              <input className="seek" type="range" min="0" max="100" step="0.1" value={progress} onChange={(e) => { const p = Number(e.target.value); setProgress(p); if (duration) player.current?.seekTo(p / 100 * duration, true); }} />
-              <span className="elapsed">{timeText(progress / 100 * duration)}</span>
-              <button className="hd" onClick={() => player.current?.setPlaybackQuality("hd1080")}>HD</button>
-              <button onClick={toggleFullscreen} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"}>{isFullscreen ? <Minimize2 /> : <Expand />}</button>
-            </div>
-            <div className={"music-lower-third " + (lowerVisible ? "visible" : "")} key={lowerKey}>
-              <div className="lower-logo"><Image src={logo} alt="" width={132} height={44} unoptimized /></div>
-              <div className="lower-track"><span>ŞİMDİ ÇALIYOR <i /> CNR MÜZİK TV®</span><b>{current.title}</b><small>{current.artist}</small></div>
-              <div className="lower-equalizer">{Array.from({ length: 16 }, (_, i) => <i key={i} style={{ "--h": (8 + (i * 7 % 25)) + "px", "--delay": (i * .035) + "s" } as CSSProperties} />)}</div>
-              <div className="lower-onair"><small>ON AIR</small><b>HD</b></div>
+              {!playing && <div className="player-cover"><div className="cover-bars"><i /><i /><i /><i /><i /><i /><i /></div><b>CNR MÜZİK TV</b><span>TÜRKİYE'NİN MÜZİK TELEVİZYONU</span><button onClick={playPause}><Play fill="currentColor" size={16} /> YAYINI BAŞLAT</button></div>}
+              <div className={"music-lower-third " + (lowerVisible ? "visible" : "")} key={lowerKey}>
+                <div className="lower-logo"><Image src={logo} alt="" width={132} height={44} unoptimized /></div>
+                <div className="lower-track"><span>ŞİMDİ ÇALIYOR <i /> CNR MÜZİK TV®</span><b>{current.title}</b><small>{current.artist}</small></div>
+                <div className="lower-equalizer">{Array.from({ length: 16 }, (_, i) => <i key={i} style={{ "--h": (8 + (i * 7 % 25)) + "px", "--delay": (i * .035) + "s" } as CSSProperties} />)}</div>
+                <div className="lower-onair"><small>ON AIR</small><b>HD</b></div>
+              </div>
+              <div className="player-controls">
+                <button onClick={playPause} aria-label={playing ? "Duraklat" : "Oynat"}>{playing ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}</button>
+                <button onClick={toggleMute} aria-label="Sesi aç/kapat">{muted ? <VolumeX /> : <Volume2 />}</button>
+                <input className="seek" type="range" min="0" max="100" step="0.1" value={progress} onChange={(e) => { const p = Number(e.target.value); setProgress(p); if (duration) player.current?.seekTo(p / 100 * duration, true); }} />
+                <span className="elapsed">{timeText(progress / 100 * duration)}</span>
+                <button className="hd" onClick={() => player.current?.setPlaybackQuality("hd1080")}>HD</button>
+                <button onClick={toggleFullscreen} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"}>{isFullscreen ? <Minimize2 /> : <Expand />}</button>
+                <button onClick={() => notify("Kalite ve altyazı ayarları YouTube tarafından desteklenir.")} aria-label="Ayarlar"><Settings2 /></button>
+              </div>
             </div>
             <div className="player-caption"><div><b>{current.artist} — {current.title}</b><small>{playing ? "Şimdi Yayında" : "Oynatılmaya Hazır"}</small></div><div className="player-actions"><button onClick={previous}><SkipBack /></button><button onClick={next}><SkipForward /></button><button onClick={toggleFavorite} className={favorites.includes(current.id) ? "favorited" : ""}><Heart /></button><button onClick={share}><Share2 /></button></div></div>
           </div>
