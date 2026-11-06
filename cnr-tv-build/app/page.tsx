@@ -2,7 +2,7 @@
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Activity, Bell, CalendarDays, ChevronRight, Disc3, Guitar, Headphones, HeartCrack, Home, Layers, Menu, Mic2, MonitorPlay, Music2, Newspaper, Pause, Play, Radio, Search, Settings2, Share2, SkipBack, SkipForward, Star, Volume2, VolumeX, X, Youtube, Instagram } from "lucide-react";
+import { Activity, Bell, CalendarDays, ChevronRight, Disc3, Guitar, Headphones, HeartCrack, Home, Layers, Menu, Mic2, MonitorPlay, Music2, Newspaper, Pause, Play, Radio, Search, Settings2, Share2, SkipBack, SkipForward, Star, Volume2, VolumeX, X, Camera } from "lucide-react";
 
 type Clip = { id: string; title: string; artist: string; category: string };
 type YTPlayer = {
@@ -225,7 +225,7 @@ export default function BroadcastApp() {
 
         <section className="content-section" id="artists"><div className="content-title"><span>SAHNE IŞIKLARI</span><h2><Activity size={20} /> SANATÇILAR</h2></div><div className="artist-row">{clips.slice(0, 5).map((clip) => <button key={clip.artist} onClick={() => selectClip(clips.findIndex((v) => v.id === clip.id), true)}><Image src={thumb(clip.id, "mqdefault")} alt="" width={72} height={48} unoptimized /><span><b>{clip.artist}</b><small>{clip.category}</small></span><ChevronRight size={16} /></button>)}</div></section>
 
-        <section className="ticker" id="news"><b><Signal size={15} /> CNR'DEN HABERLER</b><div><span>CNR Müzik TV® ekranlarında yeni klipler, özel programlar ve müzik dünyasından gelişmeler!　•　Müzik hiç durmasın!　•　CNR Müzik Yapım® özel yayınları yakında...</span></div><nav><a href="https://youtube.com/@memetcinar444" target="_blank" rel="noreferrer"><Youtube /></a><a href="https://instagram.com/memetcinarofficial" target="_blank" rel="noreferrer"><Instagram /></a><a href="https://open.spotify.com" target="_blank" rel="noreferrer"><Disc3 /></a></nav></section>
+        <section className="ticker" id="news"><b><Signal size={15} /> CNR'DEN HABERLER</b><div><span>CNR Müzik TV® ekranlarında yeni klipler, özel programlar ve müzik dünyasından gelişmeler!　•　Müzik hiç durmasın!　•　CNR Müzik Yapım® özel yayınları yakında...</span></div><nav><a href="https://youtube.com/@memetcinar444" target="_blank" rel="noreferrer"><MonitorPlay /></a><a href="https://instagram.com/memetcinarofficial" target="_blank" rel="noreferrer"><Camera /></a><a href="https://open.spotify.com" target="_blank" rel="noreferrer"><Disc3 /></a></nav></section>
         <footer>© 2026 <b>CNR Müzik Yapım®</b> · CNR Müzik TV® · TÜM HAKLARI SAKLIDIR.</footer>
       </section>
     </div>
