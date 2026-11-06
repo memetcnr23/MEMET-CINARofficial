@@ -33,7 +33,7 @@ const schedule: ScheduleItem[] = [
   ["20:00", "Efkar Gecesi", "Duygusal Şarkılar", 3],
   ["22:00", "Akustik Sahne", "Canlı Performanslar", 4]
 ];
-const logo = "/cnr-logo.webp";
+const logo = "/cnr-logo.svg";
 const thumb = (id: string, quality = "hqdefault") => "https://i.ytimg.com/vi/" + id + "/" + quality + ".jpg";
 const timeText = (seconds: number) => {
   if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
