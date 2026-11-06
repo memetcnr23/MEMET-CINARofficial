@@ -19,14 +19,6 @@ declare global { interface Window {
   onYouTubeIframeAPIReady?: () => void;
 } }
 
-const clips: Clip[] = [
-  { id: "_GOZDXq7I-I", title: "Yolla", artist: "Tarkan", category: "Türkçe Pop" },
-  { id: "yQ9lXHfv9Yg", title: "Antidepresan", artist: "Mabel Matiz", category: "Pop & Dans" },
-  { id: "JWLWczFtCag", title: "GİT", artist: "BLOK3", category: "Rap & Trap" },
-  { id: "rR2wVaZ4Fn4", title: "Ateşe Düştüm", artist: "Mert Demir", category: "Efkar" },
-  { id: "BemdSeSUJmM", title: "Akustik Sahne", artist: "Müzik Arşivi", category: "Akustik" },
-  { id: "9bZkp7q19f0", title: "Global Hits", artist: "PSY", category: "Pop & Dans" }
-];
 const categories = [
   { name: "Türkçe Pop", icon: Mic2 }, { name: "Rap & Trap", icon: Headphones },
   { name: "Pop & Dans", icon: Disc3 }, { name: "Efkar", icon: HeartCrack },
@@ -67,12 +59,13 @@ export default function BroadcastApp() {
   const [notice, setNotice] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(false);
-  const [catalog, setCatalog] = useState<Clip[]>(clips);
+  const [catalog, setCatalog] = useState<Clip[]>([]);
   const activeClips = catalog;
-  const [programSchedule, setProgramSchedule] = useState<ScheduleItem[]>(schedule);
-  const [catalogStatus, setCatalogStatus] = useState<"connecting" | "connected" | "demo">("connecting");
+  const [programSchedule, setProgramSchedule] = useState<ScheduleItem[]>([]);
+  const [catalogStatus, setCatalogStatus] = useState<"connecting" | "connected" | "error">("connecting");
+  const [catalogError, setCatalogError] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const current = activeClips[index] || activeClips[0];
+  const current = activeClips[index] || activeClips[0] || { id: "", title: "Yayın akışı hazırlanıyor", artist: "CNR Müzik TV", category: "" };
   const activeVideoIdRef = useRef(current.id);
   activeVideoIdRef.current = current.id;
 
@@ -95,14 +88,26 @@ export default function BroadcastApp() {
   useEffect(() => {
     let cancelled = false;
     fetch("/api/catalog", { cache: "no-store" })
-      .then((response) => { if (!response.ok) throw new Error("Database is not connected"); return response.json(); })
-      .then((data: { clips?: Clip[]; schedule?: ScheduleItem[] }) => {
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || "YouTube kataloğu alınamadı.");
+        return data as { clips?: Clip[]; schedule?: ScheduleItem[] };
+      })
+      .then((data) => {
         if (cancelled) return;
-        if (Array.isArray(data.clips) && data.clips.length) setCatalog(data.clips);
-        if (Array.isArray(data.schedule) && data.schedule.length) setProgramSchedule(data.schedule);
+        if (!Array.isArray(data.clips) || data.clips.length === 0) throw new Error("YouTube API uygun, gömülebilir klip döndürmedi.");
+        setCatalog(data.clips);
+        setProgramSchedule(Array.isArray(data.schedule) ? data.schedule : []);
+        setCatalogError("");
         setCatalogStatus("connected");
       })
-      .catch(() => { if (!cancelled) setCatalogStatus("demo"); });
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setCatalog([]);
+        setProgramSchedule([]);
+        setCatalogError(error instanceof Error ? error.message : "YouTube API bağlantısı başarısız.");
+        setCatalogStatus("error");
+      });
     return () => { cancelled = true; };
   }, []);
 
@@ -120,6 +125,7 @@ export default function BroadcastApp() {
     player.current?.cueVideoById(activeClips[0].id);
   }, [activeClips]);
   const selectClip = useCallback((nextIndex: number, start = false) => {
+    if (!activeClips.length) return;
     const safe = (nextIndex + activeClips.length) % activeClips.length;
     activeIndex.current = safe;
     activeVideoIdRef.current = activeClips[safe].id;
@@ -134,22 +140,40 @@ export default function BroadcastApp() {
     }
   }, [activeClips]);
   const playPause = useCallback(() => {
-    if (!player.current || !ready.current) { notify("Oynatıcı hazırlanıyor. Birkaç saniye sonra tekrar deneyin."); return; }
+    if (!player.current || !ready.current || !current.id) { notify("YouTube yayın listesi henüz hazır değil."); return; }
     if (playing) player.current.pauseVideo();
-    else { player.current.loadVideoById(current.id); player.current.playVideo(); }
+    else { player.current.unMute(); setMuted(false); player.current.loadVideoById(current.id); player.current.playVideo(); }
   }, [current.id, notify, playing]);
   const next = useCallback(() => selectClip(index + 1, true), [index, selectClip]);
   const previous = useCallback(() => selectClip(index - 1, true), [index, selectClip]);
 
   useEffect(() => {
     let disposed = false;
+    if (!activeClips.length || !activeVideoIdRef.current) return;
+    let visibilityObserver: IntersectionObserver | null = null;
     const init = () => {
       if (disposed || !window.YT || player.current) return;
       player.current = new window.YT.Player("cnr-player-frame", {
         videoId: activeVideoIdRef.current,
-        playerVars: { autoplay: 0, controls: 0, disablekb: 1, modestbranding: 1, rel: 0, showinfo: 0, playsinline: 1, fs: 0 },
+        playerVars: { autoplay: 0, controls: 0, disablekb: 1, rel: 0, playsinline: 1, fs: 0, iv_load_policy: 3 },
         events: {
-          onReady: () => { ready.current = true; player.current?.cueVideoById(activeVideoIdRef.current); },
+          onReady: () => {
+            ready.current = true;
+            player.current?.cueVideoById(activeVideoIdRef.current);
+            const stage = playerStageRef.current;
+            if (stage && "IntersectionObserver" in window) {
+              visibilityObserver = new IntersectionObserver((entries) => {
+                const visible = entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= 0.5);
+                if (visible && player.current) {
+                  player.current.mute();
+                  setMuted(true);
+                  player.current.playVideo();
+                  visibilityObserver?.disconnect();
+                }
+              }, { threshold: [0.5] });
+              visibilityObserver.observe(stage);
+            }
+          },
           onStateChange: (event) => {
             const state = window.YT?.PlayerState;
             if (!state) return;
@@ -173,8 +197,8 @@ export default function BroadcastApp() {
         document.head.appendChild(script);
       }
     }
-    return () => { disposed = true; };
-  }, [index, activeClips, logPlaybackEvent, lowerThird, notify, selectClip]);
+    return () => { disposed = true; visibilityObserver?.disconnect(); };
+  }, [activeClips, logPlaybackEvent, lowerThird, notify, selectClip]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -245,29 +269,31 @@ export default function BroadcastApp() {
           <div className="player-card">
             <div className="player-stage" ref={playerStageRef}>
               <div id="cnr-player-frame" className="youtube-frame" />
+            </div>
+            <div className="player-meta-bar">
               <div className="player-brand"><span className="live-badge"><i /> CANLI YAYIN</span><Image src={logo} alt="CNR Müzik TV" width={135} height={45} unoptimized /></div>
-              {!playing && <div className="player-cover"><div className="cover-bars"><i /><i /><i /><i /><i /><i /><i /></div><b>CNR MÜZİK TV</b><span>TÜRKİYE'NİN MÜZİK TELEVİZYONU</span><button onClick={playPause}><Play fill="currentColor" size={16} /> YAYINI BAŞLAT</button></div>}
-              <div className={"music-lower-third " + (lowerVisible ? "visible" : "")} key={lowerKey}>
-                <div className="lower-logo"><Image src={logo} alt="" width={132} height={44} unoptimized /></div>
-                <div className="lower-track"><span>ŞİMDİ ÇALIYOR <i /> CNR MÜZİK TV®</span><b>{current.title}</b><small>{current.artist}</small></div>
-                <div className="lower-equalizer">{Array.from({ length: 16 }, (_, i) => <i key={i} style={{ "--h": (8 + (i * 7 % 25)) + "px", "--delay": (i * .035) + "s" } as CSSProperties} />)}</div>
-                <div className="lower-onair"><small>ON AIR</small><b>HD</b></div>
-              </div>
-              <div className="player-controls">
-                <button onClick={playPause} aria-label={playing ? "Duraklat" : "Oynat"}>{playing ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}</button>
-                <button onClick={toggleMute} aria-label="Sesi aç/kapat">{muted ? <VolumeX /> : <Volume2 />}</button>
-                <input className="seek" type="range" min="0" max="100" step="0.1" value={progress} onChange={(e) => { const p = Number(e.target.value); setProgress(p); if (duration) player.current?.seekTo(p / 100 * duration, true); }} />
-                <span className="elapsed">{timeText(progress / 100 * duration)}</span>
-                <button className="hd" onClick={() => player.current?.setPlaybackQuality("hd1080")}>HD</button>
-                <button onClick={toggleFullscreen} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"}>{isFullscreen ? <Minimize2 /> : <Expand />}</button>
-                <button onClick={() => notify("Kalite ve altyazı ayarları YouTube tarafından desteklenir.")} aria-label="Ayarlar"><Settings2 /></button>
-              </div>
+              {!playing && current.id && <button className="start-broadcast" onClick={playPause}><Play fill="currentColor" size={15} /> YAYINI BAŞLAT</button>}
+              {playing && muted && <button className="start-broadcast" onClick={toggleMute}><Volume2 size={15} /> SESİ AÇ</button>}
+            </div>
+            <div className="player-controls">
+              <button onClick={playPause} aria-label={playing ? "Duraklat" : "Oynat"}>{playing ? <Pause fill="currentColor" /> : <Play fill="currentColor" />}</button>
+              <button onClick={toggleMute} aria-label="Sesi aç/kapat">{muted ? <VolumeX /> : <Volume2 />}</button>
+              <input className="seek" type="range" min="0" max="100" step="0.1" value={progress} onChange={(e) => { const p = Number(e.target.value); setProgress(p); if (duration) player.current?.seekTo(p / 100 * duration, true); }} />
+              <span className="elapsed">{timeText(progress / 100 * duration)}</span>
+              <button className="hd" onClick={() => player.current?.setPlaybackQuality("hd1080")}>HD</button>
+              <button onClick={toggleFullscreen} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"}>{isFullscreen ? <Minimize2 /> : <Expand />}</button>
+            </div>
+            <div className={"music-lower-third " + (lowerVisible ? "visible" : "")} key={lowerKey}>
+              <div className="lower-logo"><Image src={logo} alt="" width={132} height={44} unoptimized /></div>
+              <div className="lower-track"><span>ŞİMDİ ÇALIYOR <i /> CNR MÜZİK TV®</span><b>{current.title}</b><small>{current.artist}</small></div>
+              <div className="lower-equalizer">{Array.from({ length: 16 }, (_, i) => <i key={i} style={{ "--h": (8 + (i * 7 % 25)) + "px", "--delay": (i * .035) + "s" } as CSSProperties} />)}</div>
+              <div className="lower-onair"><small>ON AIR</small><b>HD</b></div>
             </div>
             <div className="player-caption"><div><b>{current.artist} — {current.title}</b><small>{playing ? "Şimdi Yayında" : "Oynatılmaya Hazır"}</small></div><div className="player-actions"><button onClick={previous}><SkipBack /></button><button onClick={next}><SkipForward /></button><button onClick={toggleFavorite} className={favorites.includes(current.id) ? "favorited" : ""}><Heart /></button><button onClick={share}><Share2 /></button></div></div>
           </div>
           <aside className="schedule-card" id="schedule">
-            <div className="section-title"><h2><CalendarDays size={18} /> YAYIN AKIŞI <span className={"db-status " + catalogStatus}>{catalogStatus === "connected" ? "DB AKTİF" : catalogStatus === "connecting" ? "DB BAĞLANIYOR" : "DEMO MODU"}</span></h2><button onClick={() => setExpanded(!expanded)}>{expanded ? "Daha Az" : "Tüm Program"} <ChevronRight size={14} /></button></div>
-            <div className="schedule-list">{programSchedule.slice(0, expanded ? 6 : 5).map((row, i) => <button className={"schedule-row " + (i === 0 ? "current" : "")} key={row[0]} onClick={() => selectClip(row[3], true)}><Image src={thumb(activeClips[row[3]].id, "mqdefault")} alt="" width={68} height={44} unoptimized /><span className="slot-time">{row[0]}</span><span className="slot-info"><b>{row[1]}</b><small>{row[2]}</small></span></button>)}</div>
+            <div className="section-title"><h2><CalendarDays size={18} /> YAYIN AKIŞI <span className={"db-status " + catalogStatus}>{catalogStatus === "connected" ? "YOUTUBE API AKTİF" : catalogStatus === "connecting" ? "API BAĞLANIYOR" : "API HATASI"}</span></h2><button onClick={() => setExpanded(!expanded)}>{expanded ? "Daha Az" : "Tüm Program"} <ChevronRight size={14} /></button></div>
+            <div className="schedule-list">{programSchedule.slice(0, expanded ? 6 : 5).map((row, i) => <button className={"schedule-row " + (i === 0 ? "current" : "")} key={row[0] + row[1]} onClick={() => selectClip(row[3], true)}><Image src={thumb(activeClips[row[3]].id, "mqdefault")} alt="" width={68} height={44} unoptimized /><span className="slot-time">{row[0]}</span><span className="slot-info"><b>{row[1]}</b><small>{row[2]}</small></span></button>)}</div>{catalogStatus === "error" && <p className="api-error">{catalogError || "YouTube API bağlantısı kurulamadı."}</p>}{catalogStatus === "connected" && <p className="api-note">Klipler YouTube Data API üzerinden güncellenir. Liste bittiğinde yayın sıradaki kliple devam eder.</p>}
           </aside>
         </section>
 
