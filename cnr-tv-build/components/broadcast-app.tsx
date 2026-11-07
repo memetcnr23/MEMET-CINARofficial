@@ -9,7 +9,7 @@ import {
   ChevronDown, ChevronRight, Clock3, Disc3, ExternalLink, Expand, Heart,
   Home, Info, ListMusic, Menu, Mic2, MonitorPlay, Music2, Newspaper, Play,
   Radio, Search, Settings, Share2, Signal, Sparkles, Trophy, UserCircle2,
-  Users, Volume2, VolumeX, X
+  Users, Volume2, VolumeX, X, Guitar
 } from "lucide-react";
 
 type Clip = {
