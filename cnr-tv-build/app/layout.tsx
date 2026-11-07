@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "CNR Müzik TV® | Türkiye'nin Müzik Televizyonu",
-  description: "CNR Müzik TV — müzik klipleri, sanatçılar, programlar ve yayın akışı.",
+  description: "CNR Müzik TV — canlı müzik yayını, yayın akışı, programlar, sanatçılar ve klip arşivi.",
   applicationName: "CNR Müzik TV",
   icons: { icon: "/cnr-logo.webp" }
 };
