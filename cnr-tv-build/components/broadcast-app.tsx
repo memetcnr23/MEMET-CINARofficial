@@ -578,7 +578,15 @@ export default function BroadcastApp() {
           <div className="live-screen">
             <div className="screen-top"><span className="live-dot"><i /> CANLI</span><span className="screen-quality">CNR MÜZİK TV · HD</span></div>
             {HLS_STREAM ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted playsInline preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
-            <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu"><Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized /></div>
+            <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
+              <div className="cnr-logo-effects">
+                <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
+                <span className="cnr-logo-snow" aria-hidden="true">
+                  {Array.from({ length: 22 }, (_, index) => <i key={index} style={{ left: ((index * 37) % 96 + 2) + "%", animationDelay: "-" + ((index * 0.43) % 5).toFixed(2) + "s", animationDuration: (2.8 + (index % 6) * 0.47) + "s", width: (1.5 + (index % 3) * 0.55) + "px", height: (1.5 + (index % 3) * 0.55) + "px" }} />)}
+                </span>
+                <span className="cnr-logo-metallic-shine" aria-hidden="true" />
+              </div>
+            </div>
             {!playerPlaying && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
             <div className="screen-bottom"><span>● SİNYAL AKTİF</span><span>{h}</span></div>
             <div className={"lower-third-panel " + (lowerActive ? "show" : "")} key={lowerKey} aria-live="polite">
