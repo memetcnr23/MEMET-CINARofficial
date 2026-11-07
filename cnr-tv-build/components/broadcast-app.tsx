@@ -99,6 +99,39 @@ const programNames = [
 function formatTime(value: string) {
   return new Intl.DateTimeFormat("tr-TR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" }).format(new Date(value));
 }
+type NationalDay = { month: number; day: number; label: string };
+
+const nationalDays: NationalDay[] = [
+  { month: 3, day: 18, label: "18 Mart Çanakkale Zaferi ve Şehitleri Anma Günü" },
+  { month: 4, day: 23, label: "23 Nisan Ulusal Egemenlik ve Çocuk Bayramı" },
+  { month: 5, day: 19, label: "19 Mayıs Atatürk'ü Anma, Gençlik ve Spor Bayramı" },
+  { month: 7, day: 15, label: "15 Temmuz Demokrasi ve Millî Birlik Günü" },
+  { month: 8, day: 30, label: "30 Ağustos Zafer Bayramı" },
+  { month: 10, day: 29, label: "29 Ekim Cumhuriyet Bayramı" },
+  { month: 11, day: 10, label: "10 Kasım Atatürk'ü Anma Günü" }
+];
+
+function getActiveNationalDay(now: Date): NationalDay | null {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Europe/Istanbul", year: "numeric", month: "numeric", day: "numeric"
+  }).formatToParts(now);
+  const part = (type: string) => Number(parts.find((item) => item.type === type)?.value || 0);
+  const year = part("year");
+  const todayUtc = Date.UTC(year, part("month") - 1, part("day"));
+  let active: { day: NationalDay; distance: number } | null = null;
+
+  for (const calendarYear of [year - 1, year, year + 1]) {
+    for (const day of nationalDays) {
+      const eventUtc = Date.UTC(calendarYear, day.month - 1, day.day);
+      const distance = Math.round((eventUtc - todayUtc) / 86400000);
+      if (distance >= -3 && distance <= 3 && (!active || Math.abs(distance) < Math.abs(active.distance))) {
+        active = { day, distance };
+      }
+    }
+  }
+  return active?.day || null;
+}
+
 function durationText(seconds: number) {
   const safe = Math.max(0, Math.floor(seconds || 0));
   return Math.floor(safe / 60) + ":" + String(safe % 60).padStart(2, "0");
@@ -158,6 +191,7 @@ export default function BroadcastApp() {
   const [lowerActive, setLowerActive] = useState(false);
   const [clock, setClock] = useState(new Date());
 
+  const activeNationalDay = getActiveNationalDay(clock);
   const clips = nowPlaying?.clips || [];
   const current = nowPlaying?.current.clip;
   const activeArtistSlug = pathname.startsWith("/sanatci/") ? decodeURIComponent(pathname.slice("/sanatci/".length).split("/")[0] || "") : "";
@@ -577,6 +611,16 @@ export default function BroadcastApp() {
         <div className="live-primary">
           <div className="live-screen">
             <div className="screen-top"><span className="live-dot"><i /> CANLI</span><span className="screen-quality">CNR MÜZİK TV · HD</span></div>
+            {activeNationalDay && <div className="special-day-bug" role="img" aria-label={activeNationalDay.label}>
+              <iframe
+                src="https://giphy.com/embed/Sqs3q0jJuafiJ6FAUn"
+                title={activeNationalDay.label}
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                allowFullScreen
+              />
+            </div>}
             {HLS_STREAM ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted playsInline preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
