@@ -9,6 +9,6 @@ const allowed = new Set([
 export default async function SectionPage({ params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params;
   const path = slug.join("/");
-  if (!allowed.has(path) && path !== "sanatci/memet-cinar") notFound();
+  if (!allowed.has(path) && !(slug.length === 2 && slug[0] === "sanatci" && /^[\p{L}\p{N}-]+$/u.test(slug[1]))) notFound();
   return <BroadcastApp />;
 }

@@ -29,15 +29,15 @@ function categoryFor(title: string, description: string): string {
   return "Türkçe Pop";
 }
 
-export async function getYouTubeCatalog(): Promise<YouTubeClip[]> {
+export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeClip[]> {
   const apiKey = process.env.YOUTUBE_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey) throw new Error("YOUTUBE_API_KEY sunucu ortamında tanımlı değil.");
   const searchUrl = new URL("https://www.googleapis.com/youtube/v3/search");
   searchUrl.search = new URLSearchParams({
     part: "snippet", type: "video", videoCategoryId: "10",
     videoEmbeddable: "true", videoSyndicated: "true", regionCode: "TR",
-    relevanceLanguage: "tr", safeSearch: "moderate", maxResults: "50",
-    order: "relevance", q: "Türkçe müzik klip resmi video"
+    relevanceLanguage: "tr", safeSearch: "moderate", maxResults: searchQuery ? "25" : "50",
+    order: "relevance", q: searchQuery ? (searchQuery.trim() + " resmi müzik klibi") : "Türkçe müzik klip resmi video"
   }).toString();
   searchUrl.searchParams.set("key", apiKey);
   const searchResponse = await fetch(searchUrl, { next: { revalidate: 21600 } });

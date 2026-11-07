@@ -5,9 +5,9 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Activity, ArrowUpRight, Bell, CalendarDays, CalendarRange, Camera, Check,
+  Activity, ArrowUpRight, BadgeCheck, Bell, CalendarDays, CalendarRange, Camera, Check,
   ChevronDown, ChevronRight, Clock3, Disc3, ExternalLink, Expand, Heart,
-  Home, Info, ListMusic, Menu, Mic2, MonitorPlay, Music2, Newspaper, Play,
+  Home, Info, ListMusic, Menu, Mic2, MonitorPlay, Music2, Newspaper, Pause, Play,
   Radio, Search, Settings, Share2, Signal, Sparkles, Trophy, UserCircle2,
   Users, Volume2, VolumeX, X, Guitar
 } from "lucide-react";
@@ -19,6 +19,8 @@ type Clip = {
   category: string;
   durationSeconds: number;
 };
+type Artist={slug:string;name:string;genre?:string|null;bio?:string|null;avatar_url?:string|null;cover_url?:string|null;youtube_url?:string|null;instagram_url?:string|null;spotify_url?:string|null;is_verified:boolean;verification_source?:string|null};
+type SearchResults={artists:Artist[];clips:Clip[];databaseConnected:boolean};
 type TimedClip = {
   clip: Clip;
   startsAt: string;
@@ -107,7 +109,7 @@ function thumb(id: string, quality = "hqdefault") {
 function pageTitle(path: string) {
   const match = navItems.find((item) => item.href === path);
   if (match) return match.label;
-  if (path === "/sanatci/memet-cinar") return "Sanatçı Profili";
+  if (path.startsWith("/sanatci/")) return "Sanatçı Profili";
   return "CNR Müzik TV";
 }
 function getProgramName(category: string) {
@@ -128,7 +130,14 @@ export default function BroadcastApp() {
   const playerReadyRef = useRef(false);
   const loadedVideoRef = useRef("");
   const nowRef = useRef<NowPlaying | null>(null);
+  const lowerWindowRef = useRef("");
   const [nowPlaying, setNowPlaying] = useState<NowPlaying | null>(null);
+  const [artists, setArtists] = useState<Artist[]>([]);
+  const [directorySearch, setDirectorySearch] = useState("");
+  const [artistDetail, setArtistDetail] = useState<Artist | null>(null);
+  const [artistError, setArtistError] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [catalogError, setCatalogError] = useState("");
   const [muted, setMuted] = useState(true);
   const [playerPlaying, setPlayerPlaying] = useState(false);
@@ -146,10 +155,12 @@ export default function BroadcastApp() {
   const [darkMode, setDarkMode] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [lowerKey, setLowerKey] = useState(0);
+  const [lowerActive, setLowerActive] = useState(false);
   const [clock, setClock] = useState(new Date());
 
   const clips = nowPlaying?.clips || [];
   const current = nowPlaying?.current.clip;
+  const activeArtistSlug = pathname.startsWith("/sanatci/") ? decodeURIComponent(pathname.slice("/sanatci/".length).split("/")[0] || "") : "";
   nowRef.current = nowPlaying;
 
   const notify = useCallback((message: string) => {
@@ -180,6 +191,65 @@ export default function BroadcastApp() {
     const timer = window.setInterval(() => setClock(new Date()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const response = await fetch("/api/artists", { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Sanatçı kataloğu alınamadı.");
+        if (!cancelled) { setArtists(Array.isArray(data.artists) ? data.artists : []); setArtistError(""); }
+      } catch (error) {
+        if (!cancelled) setArtistError(error instanceof Error ? error.message : "Sanatçı kataloğuna ulaşılamadı.");
+      }
+    };
+    void load();
+    const timer = window.setInterval(load, 60000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, []);
+
+  useEffect(() => {
+    if (!activeArtistSlug) { setArtistDetail(null); setArtistError(""); return; }
+    let cancelled = false;
+    fetch("/api/artists/" + encodeURIComponent(activeArtistSlug), { cache: "no-store" })
+      .then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(data.error || "Sanatçı profili bulunamadı."); return data.artist as Artist; })
+      .then((artist) => { if (!cancelled) { setArtistDetail(artist); setArtistError(""); } })
+      .catch((error: unknown) => { if (!cancelled) { setArtistDetail(null); setArtistError(error instanceof Error ? error.message : "Sanatçı profili yüklenemedi."); } });
+    return () => { cancelled = true; };
+  }, [activeArtistSlug]);
+
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (!searchOpen || query.length < 2) { setSearchResults(null); setSearchLoading(false); return; }
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      setSearchLoading(true);
+      try {
+        const response = await fetch("/api/search?q=" + encodeURIComponent(query), { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Arama tamamlanamadı.");
+        if (!cancelled) setSearchResults(data as SearchResults);
+      } catch {
+        if (!cancelled) setSearchResults({ artists: [], clips: [], databaseConnected: false });
+      } finally { if (!cancelled) setSearchLoading(false); }
+    }, 600);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [searchOpen, searchQuery]);
+
+  useEffect(() => {
+    const query = directorySearch.trim();
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      try {
+        const url = query.length >= 2 ? "/api/artists?q=" + encodeURIComponent(query) : "/api/artists";
+        const response = await fetch(url, { cache: "no-store" });
+        const data = await response.json();
+        if (response.ok && !cancelled) setArtists(Array.isArray(data.artists) ? data.artists : []);
+      } catch { /* Keep last successfully loaded results. */ }
+    }, query.length >= 2 ? 650 : 250);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [directorySearch]);
 
   useEffect(() => {
     try {
@@ -331,8 +401,28 @@ export default function BroadcastApp() {
   }, []);
 
   useEffect(() => {
-    if (nowPlaying?.current.clip.id) setLowerKey((v) => v + 1);
-  }, [nowPlaying?.current.clip.id]);
+    const item = nowPlaying?.current;
+    if (!item) { setLowerActive(false); return; }
+    let hideTimer: number | undefined;
+    const duration = Math.max(1, (Date.parse(item.endsAt) - Date.parse(item.startsAt)) / 1000);
+    const tick = () => {
+      const elapsed = (Date.now() - Date.parse(item.startsAt)) / 1000;
+      const marker = elapsed >= 0 && elapsed <= 8 ? "start:" + item.clip.id
+        : elapsed >= duration - 8 && elapsed <= duration + 0.5 ? "end:" + item.clip.id : "";
+      if (marker && marker !== lowerWindowRef.current) {
+        lowerWindowRef.current = marker;
+        setLowerKey((value) => value + 1);
+        setLowerActive(true);
+        if (hideTimer) window.clearTimeout(hideTimer);
+        hideTimer = window.setTimeout(() => setLowerActive(false), 7900);
+      }
+      if (!marker && elapsed > 8 && elapsed < duration - 8) lowerWindowRef.current = "";
+      if (elapsed > duration + 1) setLowerActive(false);
+    };
+    tick();
+    const timer = window.setInterval(tick, 250);
+    return () => { window.clearInterval(timer); if (hideTimer) window.clearTimeout(hideTimer); };
+  }, [nowPlaying?.current.clip.id, nowPlaying?.current.startsAt, nowPlaying?.current.endsAt]);
 
   const filteredClips = useMemo(() => clips.filter((clip) => {
     const categoryMatches = selectedCategory === "Tümü" || selectedCategory === "Top 20" || clip.category === selectedCategory;
@@ -349,6 +439,24 @@ export default function BroadcastApp() {
       return true;
     }).slice(0, 12);
   }, [clips]);
+
+  const visibleArtists = useMemo(() => {
+    const query = directorySearch.trim().toLocaleLowerCase("tr-TR");
+    return artists.filter((artist) => !query || (artist.name + " " + (artist.genre || "")).toLocaleLowerCase("tr-TR").includes(query));
+  }, [artists, directorySearch]);
+
+  const togglePlayPause = () => {
+    const video = HLS_STREAM ? hlsVideoRef.current : null;
+    if (video) {
+      if (video.paused) void video.play().then(() => setPlayerPlaying(true)).catch(() => notify("Yayın başlatılamadı."));
+      else { video.pause(); setPlayerPlaying(false); }
+      return;
+    }
+    const player = playerRef.current;
+    if (!player || !playerReadyRef.current) { notify("Oynatıcı hazırlanıyor."); return; }
+    if (player.getPlayerState() === 1) { player.pauseVideo(); setPlayerPlaying(false); }
+    else { player.playVideo(); setPlayerPlaying(true); }
+  };
 
   const toggleMute = () => {
     const video = HLS_STREAM ? hlsVideoRef.current : null;
@@ -442,6 +550,17 @@ export default function BroadcastApp() {
     </article>
   );
 
+  const renderArtistCard = (artist: Artist) => (
+    <Link className="artist-card" key={artist.slug} href={"/sanatci/" + encodeURIComponent(artist.slug)}>
+      <span className="artist-card-image">
+        {artist.avatar_url ? <Image src={artist.avatar_url} alt={artist.name} width={112} height={112} unoptimized /> : <span>{artist.name.split(/\s+/).slice(0,2).map((part) => part[0]).join("").toUpperCase()}</span>}
+      </span>
+      <b className="artist-card-name">{artist.name}{artist.is_verified && <BadgeCheck className="artist-red-check" size={17} aria-label="CNR tarafından doğrulandı" />}</b>
+      <small>{artist.genre || "Müzik Sanatçısı"}</small>
+      <span className="artist-card-link">Profili görüntüle <ChevronRight size={14} /></span>
+    </Link>
+  );
+
   const pageHeading = (eyebrow: string, title: string, subtitle: string) => (
     <div className="page-heading">
       <div><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{subtitle}</p></div>
@@ -459,10 +578,20 @@ export default function BroadcastApp() {
           <div className="live-screen">
             <div className="screen-top"><span className="live-dot"><i /> CANLI</span><span className="screen-quality">CNR MÜZİK TV · HD</span></div>
             {HLS_STREAM ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted playsInline preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
+            <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu"><Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized /></div>
             {!playerPlaying && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
             <div className="screen-bottom"><span>● SİNYAL AKTİF</span><span>{h}</span></div>
+            <div className={"lower-third-panel " + (lowerActive ? "show" : "")} key={lowerKey} aria-live="polite">
+              <div className="lower-live-label"><span /> ŞİMDİ YAYINDA</div>
+              <div className="lower-track">
+                <Image src={LOGO} alt="CNR Müzik TV" width={108} height={36} unoptimized />
+                <div><b>{current?.title || "Yayın hazırlanıyor"}</b><small>{current?.artist || "CNR Müzik TV"} · {current?.category || "Müzik Kuşağı"}</small></div>
+              </div>
+              <div className="lower-bars">{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ animationDelay: (i * 0.07) + "s" }} />)}</div>
+            </div>
           </div>
           <div className="broadcast-controls">
+            <button className="player-button" onClick={togglePlayPause} aria-label={playerPlaying ? "Yayını duraklat" : "Yayını oynat"}>{playerPlaying ? <Pause /> : <Play fill="currentColor" />}</button>
             <button className="control-live" onClick={() => { const video = HLS_STREAM ? hlsVideoRef.current : null; if (video) { try { if (video.seekable.length) video.currentTime = Math.max(0, video.seekable.end(video.seekable.length - 1) - 1); } catch {} void video.play(); notify("Canlı yayına yeniden bağlandınız."); } else { const p = playerRef.current; if (p) { p.playVideo(); notify("Canlı yayına yeniden bağlandınız."); } } }}><Radio size={16} /> CANLIYA DÖN</button>
             <div className="control-spacer" />
             <span className="sync-label"><span /> SENKRON YAYIN</span>
@@ -515,21 +644,38 @@ export default function BroadcastApp() {
     </>;
   } else if (pathname === "/sanatcilar") {
     content = <>
-      {pageHeading("SAHNE IŞIKLARI", "Sanatçılar", "CNR Müzik TV ekranında yer alan sanatçı ve müzik kanallarını keşfet.")}
-      <div className="artist-feature"><div className="artist-feature-image"><Image src={current ? thumb(current.id, "maxresdefault") : LOGO} alt="" fill unoptimized /></div><div><span className="eyebrow">CNR MÜZİK YAPIM SANATÇISI</span><h2>MEMET ÇINAR</h2><p>Türkçe pop, pop-rap ve melodik müzik dünyasından seçkiler.</p><Link href="/sanatci/memet-cinar" className="red-link">Sanatçı profilini aç <ChevronRight size={16} /></Link></div></div>
-      <div className="section-title-row"><div><span className="eyebrow">YOUTUBE KANALLARI</span><h2>Yayın Kataloğundaki Sanatçılar</h2></div><span className="result-count">{uniqueArtists.length} KANAL</span></div>
-      <div className="artist-grid">{uniqueArtists.map((clip) => <a className="artist-card" key={clip.artist} href={"https://www.youtube.com/results?search_query=" + encodeURIComponent(clip.artist + " resmi müzik")} target="_blank" rel="noreferrer"><Image src={thumb(clip.id, "mqdefault")} alt="" width={100} height={100} unoptimized /><b>{clip.artist}</b><small>{clip.category}</small><span><ExternalLink size={14} /> Kanalı keşfet</span></a>)}</div>
+      {pageHeading("ARTIST DIRECTORY", "Sanatçılar", "CNR Müzik TV kataloğundaki sanatçılar. İsim, tarz veya müzik türüyle ara.")}
+      <div className="artist-directory-search"><Search size={18} /><input value={directorySearch} onChange={(e) => setDirectorySearch(e.target.value)} placeholder="Sanatçı ara: Tarkan, pop, rap..." /><span>{visibleArtists.length} SONUÇ</span></div>
+      <div className="artist-trust-note"><BadgeCheck size={16} /> Kırmızı tik yalnızca CNR tarafından onaylanan profillerde gösterilir.</div>
+      {visibleArtists.length ? <div className="artist-grid">{visibleArtists.map(renderArtistCard)}</div> : <div className="empty-state"><Users size={32} /><b>{directorySearch ? "Eşleşen sanatçı bulunamadı" : "Sanatçı dizini yükleniyor"}</b><span>{artistError || "Sanatçı isimlerini aramak için arama alanını kullan."}</span><button onClick={() => setDirectorySearch("")}>Filtreyi temizle</button></div>}
     </>;
-  } else if (pathname === "/sanatci/memet-cinar") {
+  } else if (pathname.startsWith("/sanatci/")) {
+    const artistName = artistDetail?.name || activeArtistSlug.replace(/-/g, " ").replace(/\b\p{L}/gu, (letter) => letter.toLocaleUpperCase("tr-TR"));
     content = <>
-      {pageHeading("ARTIST PROFILE", "Memet Çınar", "Sanatçı sayfası · CNR Müzik Yapım®")}
-      <section className="artist-profile">
-        <div className="artist-profile-cover">{current && <Image src={thumb(current.id, "maxresdefault")} alt="" fill unoptimized />}</div>
-        <div className="artist-profile-main"><div className="avatar">MC</div><div><span className="verified">✓ DOĞRULANMIŞ SANATÇI</span><h2>MEMET ÇINAR</h2><p>Sanatçı · Türkçe Pop / Pop-Rap</p><div className="artist-stats"><span><b>{clips.length || "—"}</b>Yayın kataloğunda</span><span><b>CNR</b>Yapım şirketi</span></div></div><button onClick={sharePage}><Share2 size={16} /> Paylaş</button></div>
-      </section>
-      <div className="section-title-row"><div><span className="eyebrow">SANATÇI SEÇKİSİ</span><h2>Öne Çıkan Kayıtlar</h2></div></div>
-      <div className="clip-grid">{clips.slice(0, 8).map(renderClipCard)}</div>
-      <div className="platform-links"><a href="https://youtube.com/@memetcinar444" target="_blank" rel="noreferrer">YouTube <ExternalLink size={14} /></a><a href="https://open.spotify.com" target="_blank" rel="noreferrer">Spotify <ExternalLink size={14} /></a><a href="https://instagram.com/memetcinarofficial" target="_blank" rel="noreferrer">Instagram <ExternalLink size={14} /></a></div>
+      {pageHeading("ARTIST PROFILE", artistName || "Sanatçı Profili", artistDetail?.genre || "CNR Müzik TV sanatçı profili")}
+      {artistDetail ? <>
+        <section className="artist-profile">
+          <div className="artist-profile-cover">{artistDetail.cover_url ? <Image src={artistDetail.cover_url} alt="" fill unoptimized /> : current && <Image src={thumb(current.id, "maxresdefault")} alt="" fill unoptimized />}</div>
+          <div className="artist-profile-main">
+            <div className="avatar">{artistDetail.avatar_url ? <Image src={artistDetail.avatar_url} alt={artistDetail.name} width={86} height={86} unoptimized /> : artistDetail.name.split(/\s+/).slice(0,2).map((part) => part[0]).join("").toUpperCase()}</div>
+            <div>
+              {artistDetail.is_verified && <span className="verified"><BadgeCheck size={15} /> CNR TARAFINDAN DOĞRULANDI</span>}
+              <h2>{artistDetail.name}{artistDetail.is_verified && <BadgeCheck className="artist-red-check profile-check" size={24} aria-label="Doğrulanmış sanatçı" />}</h2>
+              <p>{artistDetail.genre || "Sanatçı"} · CNR Müzik TV</p>
+              <div className="artist-stats"><span><b>{clips.filter((clip) => clip.artist.toLocaleLowerCase("tr-TR") === artistDetail.name.toLocaleLowerCase("tr-TR")).length}</b>Yayın kataloğunda</span><span><b>CNR</b>Sanatçı dizini</span></div>
+            </div>
+            <button onClick={sharePage}><Share2 size={16} /> Paylaş</button>
+          </div>
+          {artistDetail.bio && <p className="artist-profile-bio">{artistDetail.bio}</p>}
+        </section>
+        <div className="platform-links">
+          {artistDetail.youtube_url && <a href={artistDetail.youtube_url} target="_blank" rel="noreferrer">YouTube <ExternalLink size={14} /></a>}
+          {artistDetail.spotify_url && <a href={artistDetail.spotify_url} target="_blank" rel="noreferrer">Spotify <ExternalLink size={14} /></a>}
+          {artistDetail.instagram_url && <a href={artistDetail.instagram_url} target="_blank" rel="noreferrer">Instagram <ExternalLink size={14} /></a>}
+        </div>
+        <div className="section-title-row"><div><span className="eyebrow">SANATÇI SEÇKİSİ</span><h2>Yayın Kataloğundaki Klipler</h2></div></div>
+        <div className="clip-grid">{clips.filter((clip) => clip.artist.toLocaleLowerCase("tr-TR") === artistDetail.name.toLocaleLowerCase("tr-TR")).slice(0, 12).map(renderClipCard)}</div>
+      </> : <div className="empty-state"><Users size={32} /><b>Sanatçı profili yükleniyor</b><span>{artistError || "Sanatçı bilgileri getiriliyor."}</span><Link href="/sanatcilar">Sanatçı dizinine dön</Link></div>}
     </>;
   } else if (pathname === "/klip-arsivi") {
     content = <>
@@ -611,7 +757,12 @@ export default function BroadcastApp() {
       </main>
     </div>
     <nav className="mobile-dock">{navItems.slice(0, 5).map((item) => { const Icon = item.icon; return <Link key={item.href} href={item.href} className={pathname === item.href ? "active" : ""}><Icon size={18} /><span>{item.label.split(" ")[0]}</span></Link>; })}</nav>
-    {searchOpen && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSearchOpen(false); }}><div className="search-modal"><div className="modal-head"><div><span className="eyebrow">CNR MUSIC SEARCH</span><b>Ne dinlemek istersin?</b></div><button onClick={() => setSearchOpen(false)}><X /></button></div><div className="modal-searchbox"><Search size={18} /><input autoFocus value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Sanatçı, şarkı veya kategori ara..." /></div><div className="modal-results">{filteredClips.slice(0, 8).map((clip) => <a href={"https://www.youtube.com/watch?v=" + clip.id} target="_blank" rel="noreferrer" key={clip.id}><Image src={thumb(clip.id, "mqdefault")} alt="" width={72} height={46} unoptimized /><span><b>{clip.title}</b><small>{clip.artist}</small></span><ExternalLink size={15} /></a>)}</div></div></div>}
+    {searchOpen && <div className="modal-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) setSearchOpen(false); }}><div className="search-modal"><div className="modal-head"><div><span className="eyebrow">CNR MUSIC SEARCH</span><b>Ne dinlemek istersin?</b></div><button onClick={() => setSearchOpen(false)}><X /></button></div><div className="modal-searchbox"><Search size={18} /><input autoFocus value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Sanatçı, şarkı veya kategori ara..." /></div><div className="modal-results">
+      {searchLoading && <p className="search-progress">YouTube ve sanatçı dizini aranıyor…</p>}
+      {(searchResults?.artists || []).slice(0,5).map((artist)=><Link href={"/sanatci/"+encodeURIComponent(artist.slug)} key={"artist-"+artist.slug} onClick={()=>setSearchOpen(false)}><span className="search-artist-avatar">{artist.name.split(/\s+/).slice(0,2).map((part)=>part[0]).join("").toUpperCase()}</span><span><b>{artist.name}{artist.is_verified&&<BadgeCheck className="artist-red-check" size={15}/>}</b><small>Sanatçı profili · {artist.genre||"Müzik"}</small></span><ChevronRight size={15}/></Link>)}
+      {(searchResults?.clips || (searchQuery.trim().length<2?filteredClips:[])).slice(0,8).map((clip)=><a href={"https://www.youtube.com/watch?v="+clip.id} target="_blank" rel="noreferrer" key={"clip-"+clip.id}><Image src={thumb(clip.id,"mqdefault")} alt="" width={72} height={46} unoptimized/><span><b>{clip.title}</b><small>{clip.artist}</small></span><ExternalLink size={15}/></a>)}
+      {!searchLoading&&searchQuery.trim().length>=2&&!searchResults?.artists.length&&!searchResults?.clips.length&&<p className="search-progress">Eşleşme bulunamadı. Başka bir sanatçı veya klip adı dene.</p>}
+    </div></div></div>}
     {toast && <div className="toast-message" role="status"><Check size={17} /> {toast}</div>}
   </div>;
 }
