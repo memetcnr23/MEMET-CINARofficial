@@ -612,13 +612,11 @@ export default function BroadcastApp() {
           <div className="live-screen">
             <div className="screen-top"><span className="live-dot"><i /> CANLI</span><span className="screen-quality">CNR MÜZİK TV · HD</span></div>
             {activeNationalDay && <div className="special-day-bug" role="img" aria-label={activeNationalDay.label}>
-              <iframe
-                src="https://giphy.com/embed/Sqs3q0jJuafiJ6FAUn"
-                title={activeNationalDay.label}
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                allowFullScreen
+              <img
+                src="https://media.giphy.com/media/Sqs3q0jJuafiJ6FAUn/giphy.gif"
+                alt=""
+                aria-hidden="true"
+                draggable={false}
               />
             </div>}
             {HLS_STREAM ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted playsInline preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
