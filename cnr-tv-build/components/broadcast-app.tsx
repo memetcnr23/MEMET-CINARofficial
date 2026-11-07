@@ -63,10 +63,12 @@ declare global {
       PlayerState: { PLAYING: number; PAUSED: number; ENDED: number; CUED: number };
     };
     onYouTubeIframeAPIReady?: () => void;
+    Hls?: { new(): { loadSource: (src: string) => void; attachMedia: (media: HTMLMediaElement) => void; on: (event: string, callback: () => void) => void; destroy: () => void; }; isSupported: () => boolean; Events: { MANIFEST_PARSED: string; ERROR: string }; };
   }
 }
 
 const LOGO = "/cnr-logo.webp";
+const HLS_STREAM = process.env.NEXT_PUBLIC_CNR_HLS_URL || "";
 const navItems = [
   { label: "Ana Sayfa", href: "/", icon: Home },
   { label: "Canlı Yayın", href: "/canli-yayin", icon: Radio },
@@ -121,6 +123,8 @@ export default function BroadcastApp() {
   const pathname = pathnameRaw.replace(/\/+$/, "") || "/";
   const router = useRouter();
   const playerRef = useRef<YTPlayer | null>(null);
+  const hlsVideoRef = useRef<HTMLVideoElement | null>(null);
+  const hlsInstanceRef = useRef<{ destroy: () => void } | null>(null);
   const playerReadyRef = useRef(false);
   const loadedVideoRef = useRef("");
   const nowRef = useRef<NowPlaying | null>(null);
@@ -188,7 +192,59 @@ export default function BroadcastApp() {
   }, []);
 
   useEffect(() => {
-    if (pathname !== "/canli-yayin" || !nowPlaying?.current.clip) return;
+    if (pathname !== "/canli-yayin" || !HLS_STREAM) return;
+    let disposed = false;
+    const video = hlsVideoRef.current;
+    if (!video) return;
+    const ready = () => {
+      if (disposed) return;
+      setPlayerReady(true);
+      void video.play().catch(() => notify("Yayın hazır. Başlatmak için ekrana dokunun."));
+    };
+    const attach = () => {
+      if (disposed || !window.Hls) return;
+      const Hls = window.Hls;
+      if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = HLS_STREAM;
+        video.addEventListener("loadedmetadata", ready, { once: true });
+        video.addEventListener("error", () => notify("HLS yayını yüklenemedi. Yayın adresini kontrol edin."), { once: true });
+        video.load();
+      } else if (Hls.isSupported()) {
+        const hls = new Hls();
+        hlsInstanceRef.current = hls;
+        hls.loadSource(HLS_STREAM);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, ready);
+        hls.on(Hls.Events.ERROR, () => { if (!disposed) notify("Canlı yayın bağlantısı yenileniyor."); });
+      } else notify("Bu cihaz HLS yayın biçimini desteklemiyor.");
+    };
+    if (window.Hls) attach();
+    else {
+      let script = document.querySelector<HTMLScriptElement>('script[data-cnr-hls="true"]');
+      if (!script) {
+        script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js";
+        script.async = true;
+        script.dataset.cnrHls = "true";
+        script.onload = attach;
+        script.onerror = () => notify("HLS oynatıcı kütüphanesi yüklenemedi.");
+        document.head.appendChild(script);
+      } else script.addEventListener("load", attach, { once: true });
+    }
+    return () => {
+      disposed = true;
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+      hlsInstanceRef.current?.destroy();
+      hlsInstanceRef.current = null;
+      setPlayerReady(false);
+      setPlayerPlaying(false);
+    };
+  }, [pathname, HLS_STREAM]);
+
+  useEffect(() => {
+    if (pathname !== "/canli-yayin" || HLS_STREAM || !nowPlaying?.current.clip) return;
     let disposed = false;
     const active = nowPlaying.current.clip;
     const init = () => {
@@ -246,7 +302,7 @@ export default function BroadcastApp() {
   }, [pathname === "/canli-yayin", Boolean(nowPlaying?.current.clip?.id)]);
 
   useEffect(() => {
-    if (pathname !== "/canli-yayin" || !playerReadyRef.current) return;
+    if (pathname !== "/canli-yayin" || HLS_STREAM || !playerReadyRef.current) return;
     const sync = () => {
       const data = nowRef.current;
       const item = data?.current;
@@ -295,6 +351,8 @@ export default function BroadcastApp() {
   }, [clips]);
 
   const toggleMute = () => {
+    const video = HLS_STREAM ? hlsVideoRef.current : null;
+    if (video) { video.muted = !video.muted; setMuted(video.muted); setSoundEnabled(!video.muted); localStorage.setItem("cnr-sound", String(!video.muted)); return; }
     const player = playerRef.current;
     if (!player || !playerReadyRef.current) {
       setMuted((value) => !value);
@@ -316,6 +374,8 @@ export default function BroadcastApp() {
   };
 
   const startWithSound = () => {
+    const video = HLS_STREAM ? hlsVideoRef.current : null;
+    if (video) { video.muted = false; setMuted(false); setSoundEnabled(true); localStorage.setItem("cnr-sound", "true"); void video.play().then(() => setPlayerPlaying(true)).catch(() => notify("Oynatma başlatılamadı. Yeniden deneyin.")); return; }
     const player = playerRef.current;
     if (!player || !playerReadyRef.current) {
       notify("Canlı yayın hazırlanıyor. Birkaç saniye sonra tekrar deneyin.");
@@ -398,12 +458,12 @@ export default function BroadcastApp() {
         <div className="live-primary">
           <div className="live-screen">
             <div className="screen-top"><span className="live-dot"><i /> CANLI</span><span className="screen-quality">CNR MÜZİK TV · HD</span></div>
-            <div id="cnr-live-player" className="youtube-video-host" />
+            {HLS_STREAM ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted playsInline preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
             {!playerPlaying && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
             <div className="screen-bottom"><span>● SİNYAL AKTİF</span><span>{h}</span></div>
           </div>
           <div className="broadcast-controls">
-            <button className="control-live" onClick={() => { const p = playerRef.current; if (p) { p.playVideo(); notify("Canlı yayına yeniden bağlandınız."); } }}><Radio size={16} /> CANLIYA DÖN</button>
+            <button className="control-live" onClick={() => { const video = HLS_STREAM ? hlsVideoRef.current : null; if (video) { try { if (video.seekable.length) video.currentTime = Math.max(0, video.seekable.end(video.seekable.length - 1) - 1); } catch {} void video.play(); notify("Canlı yayına yeniden bağlandınız."); } else { const p = playerRef.current; if (p) { p.playVideo(); notify("Canlı yayına yeniden bağlandınız."); } } }}><Radio size={16} /> CANLIYA DÖN</button>
             <div className="control-spacer" />
             <span className="sync-label"><span /> SENKRON YAYIN</span>
             <button className="player-button" onClick={toggleMute} aria-label={muted ? "Sesi aç" : "Sesi kapat"}>{muted ? <VolumeX /> : <Volume2 />}</button>
@@ -428,7 +488,7 @@ export default function BroadcastApp() {
           <button className="secondary-wide" onClick={sharePage}><Share2 size={16} /> YAYINI PAYLAŞ</button>
         </aside>
       </section>
-      <p className="broadcast-disclaimer">Senkronizasyon, sunucu saatine göre sağlanır. YouTube üzerinden oynatılan kliplerde YouTube'un kendi marka öğeleri bulunabilir; tamamen özel oynatıcı görünümü için lisanslı master dosyaların HLS yayını gerekir.</p>
+      <p className="broadcast-disclaimer">{HLS_STREAM ? "CNR özel HLS yayını etkin. Tek bir canlı kaynak tüm izleyicilere eşzamanlı iletilir." : "YouTube oynatımı kullanılıyor. YouTube marka öğelerini tamamen gizlemek mümkün değildir; yalnızca CNR arayüzü için lisanslı HLS yayın adresi tanımlanmalıdır."}</p>
     </>;
   } else if (pathname === "/yayin-akisi") {
     const upcoming = nowPlaying?.upcoming || [];
@@ -546,7 +606,7 @@ export default function BroadcastApp() {
       </aside>
       <main className="page-area">
         <div className="page-topline"><div className="breadcrumb"><Link href="/">CNR MÜZİK TV</Link><ChevronRight size={13} /><span>{pageTitle(pathname)}</span></div><div className="topline-right"><span><i /> YAYIN SİSTEMİ AKTİF</span><button onClick={sharePage}><Share2 size={15} /> Paylaş</button></div></div>
-        {content}
+        <div className="page-content" key={pathname}>{content}</div>
         <footer className="site-footer"><div><Image src={LOGO} alt="CNR Müzik TV" width={150} height={51} unoptimized /><span>Türkiye'nin Müzik Televizyonu</span></div><p>© 2026 CNR Müzik Yapım® · CNR Müzik TV® · Tüm hakları saklıdır.</p><div className="footer-social"><a href="https://youtube.com/@memetcinar444" target="_blank" rel="noreferrer"><MonitorPlay /></a><a href="https://instagram.com/memetcinarofficial" target="_blank" rel="noreferrer"><Camera /></a><a href="https://open.spotify.com" target="_blank" rel="noreferrer"><Music2 /></a></div></footer>
       </main>
     </div>
