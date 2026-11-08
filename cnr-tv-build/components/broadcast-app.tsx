@@ -646,16 +646,17 @@ export default function BroadcastApp() {
                       <stop offset="1" stopColor="#aeb9c2" />
                     </radialGradient>
                   </defs>
-                  <path d="M23 96 C40 61 59 27 101 11 C94 36 111 56 148 70 C119 88 79 91 43 107 Z" fill="url(#cnrHatRed)" stroke="#6f0611" strokeWidth="2.5" />
-                  <path d="M42 79 C60 51 76 31 99 17" fill="none" stroke="#ff9a9b" strokeWidth="4" strokeLinecap="round" opacity=".48" />
-                  <path d="M22 94 C49 76 74 77 99 80 C119 81 137 76 150 68" fill="none" stroke="#760713" strokeWidth="23" strokeLinecap="round" opacity=".5" />
-                  <path d="M22 89 C49 71 74 72 99 75 C119 76 137 71 150 63" fill="none" stroke="url(#cnrHatFur)" strokeWidth="18" strokeLinecap="round" />
-                  <path d="M24 84 C51 68 75 69 99 72 C120 73 137 68 148 61" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeDasharray="2 5" opacity=".88" />
+                  <path d="M23 88 C40 56 61 25 101 12 C99 34 118 50 149 64 C126 79 78 83 23 88 Z" fill="url(#cnrHatRed)" stroke="#6f0611" strokeWidth="2.5" />
+                  <path d="M43 76 C60 49 78 29 100 17" fill="none" stroke="#ff9a9b" strokeWidth="3.5" strokeLinecap="round" opacity=".5" />
+                  <path d="M20 91 C52 76 78 73 105 75 C123 76 140 71 152 63" fill="none" stroke="#760713" strokeWidth="21" strokeLinecap="round" opacity=".45" />
+                  <path d="M20 86 C52 71 78 68 105 70 C123 71 140 67 152 59" fill="none" stroke="url(#cnrHatFur)" strokeWidth="17" strokeLinecap="round" />
+                  <path d="M24 81 C55 69 80 66 105 68 C125 69 140 65 150 57" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="2 5" opacity=".9" />
+                  <path d="M30 88 C57 79 78 76 101 77" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity=".42" />
                   <g fill="url(#cnrHatPom)">
-                    <circle cx="19" cy="91" r="16" /><circle cx="10" cy="89" r="8" /><circle cx="23" cy="80" r="8" />
-                    <circle cx="30" cy="94" r="9" /><circle cx="16" cy="102" r="8" /><circle cx="6" cy="98" r="5" />
+                    <circle cx="18" cy="88" r="15" /><circle cx="9" cy="85" r="7.5" /><circle cx="22" cy="77" r="7.5" />
+                    <circle cx="29" cy="90" r="8.5" /><circle cx="15" cy="98" r="7.5" /><circle cx="6" cy="95" r="5" />
                   </g>
-                  <path d="M89 17 C96 8 106 7 112 15" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" opacity=".62" />
+                  <path d="M93 18 C99 10 107 10 113 17" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" opacity=".58" />
                 </svg>
               </div>
             </div>
