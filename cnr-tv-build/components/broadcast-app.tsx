@@ -111,7 +111,7 @@ const navItems = [
 ];
 function LayersIcon(props: React.ComponentProps<typeof Activity>) { return <Activity {...props} />; }
 
-const categoryNames = ["Tümü", "Türkçe Pop", "Rap & Trap", "Pop & Dans", "Akustik", "Efkar", "Top 20"];
+const categoryNames = ["Tümü", "Türkçe Pop", "Rap & Trap", "Pop & Dans", "K-Pop", "Global Pop", "Akustik", "Efkar", "Top 20"];
 const programNames = [
   { title: "CNR Station Deck", subtitle: "Gün boyu müzik kuşağı", time: "Kesintisiz", category: "Türkçe Pop", tone: "red" },
   { title: "Türkçe Pop Hits", subtitle: "En sevilen klipler", time: "14:00", category: "Türkçe Pop", tone: "pink" },
