@@ -4,4 +4,4 @@ export default function Page(){return <LegalPage title="Kullanım Koşulları" i
 {title:"İçerik ve fikrî haklar",body:"Üçüncü taraf platformlardan gömülü olarak sunulan içeriklerin hakları ilgili hak sahiplerine aittir. CNR Müzik TV, hak sahibi olmadığı içerikleri indirme, kopyalama veya yeniden dağıtma yetkisi verdiğini iddia etmez. Hak ihlali bildirimi için resmî iletişim kanallarına başvurulabilir."},
 {title:"Kabul edilemez kullanım",body:"Kullanıcılar otomatik trafik, sahte görüntülenme, reklam tıklaması veya reklam gösterimi üretmeye; hizmeti kötüye kullanmaya; güvenlik önlemlerini aşmaya çalışamaz."},
 {title:"Değişiklikler",body:"Hizmet ve bu koşullar zaman içinde güncellenebilir. Güncel metin bu sayfada yayımlanır."}
-]}}
+]}/>}
