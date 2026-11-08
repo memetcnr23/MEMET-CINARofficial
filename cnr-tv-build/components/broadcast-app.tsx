@@ -439,18 +439,19 @@ export default function BroadcastApp() {
     if (!item) { setLowerActive(false); return; }
     let hideTimer: number | undefined;
     const duration = Math.max(1, (Date.parse(item.endsAt) - Date.parse(item.startsAt)) / 1000);
+    const cardDuration = 7.2;
     const tick = () => {
       const elapsed = (Date.now() - Date.parse(item.startsAt)) / 1000;
-      const marker = elapsed >= 0 && elapsed <= 8 ? "start:" + item.clip.id
-        : elapsed >= duration - 8 && elapsed <= duration + 0.5 ? "end:" + item.clip.id : "";
+      const marker = elapsed >= 0 && elapsed <= cardDuration ? "start:" + item.clip.id
+        : elapsed >= duration - cardDuration && elapsed <= duration + 0.5 ? "end:" + item.clip.id : "";
       if (marker && marker !== lowerWindowRef.current) {
         lowerWindowRef.current = marker;
         setLowerKey((value) => value + 1);
         setLowerActive(true);
         if (hideTimer) window.clearTimeout(hideTimer);
-        hideTimer = window.setTimeout(() => setLowerActive(false), 7900);
+        hideTimer = window.setTimeout(() => setLowerActive(false), 7200);
       }
-      if (!marker && elapsed > 8 && elapsed < duration - 8) lowerWindowRef.current = "";
+      if (!marker && elapsed > cardDuration && elapsed < duration - cardDuration) lowerWindowRef.current = "";
       if (elapsed > duration + 1) setLowerActive(false);
     };
     tick();
@@ -632,13 +633,21 @@ export default function BroadcastApp() {
             </div>
             {!playerPlaying && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
             <div className="screen-bottom"><span>● SİNYAL AKTİF</span><span>{h}</span></div>
-            <div className={"lower-third-panel " + (lowerActive ? "show" : "")} key={lowerKey} aria-live="polite">
-              <div className="lower-live-label"><span /> ŞİMDİ YAYINDA</div>
-              <div className="lower-track">
-                <Image src={LOGO} alt="CNR Müzik TV" width={108} height={36} unoptimized />
-                <div><b>{current?.title || "Yayın hazırlanıyor"}</b><small>{current?.artist || "CNR Müzik TV"} · {current?.category || "Müzik Kuşağı"}</small></div>
+            <div className={"cnr-lower-third " + (lowerActive ? "show" : "")} key={lowerKey} aria-live="polite">
+              <div className="cnr-lt-logo">
+                <Image src={LOGO} alt="CNR Müzik TV" width={300} height={100} unoptimized />
+                <span className="cnr-lt-logo-glint" aria-hidden="true" />
               </div>
-              <div className="lower-bars">{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ animationDelay: (i * 0.07) + "s" }} />)}</div>
+              <div className="cnr-lt-divider" aria-hidden="true" />
+              <div className="cnr-lt-band">
+                <span className="cnr-lt-kicker"><i /> CNR MÜZİK TV <em>·</em> ŞİMDİ YAYINDA</span>
+                <b className="cnr-lt-artist">{current?.artist || "CNR Müzik TV"}</b>
+                <span className="cnr-lt-track">{current?.title || "Müzik Kuşağı"}</span>
+              </div>
+              <div className="cnr-lt-equalizer" aria-hidden="true">
+                {Array.from({ length: 9 }, (_, i) => <i key={i} style={{ animationDelay: (i * 0.065) + "s" }} />)}
+              </div>
+              <span className="cnr-lt-edge" aria-hidden="true" />
             </div>
           </div>
           <div className="broadcast-controls">
