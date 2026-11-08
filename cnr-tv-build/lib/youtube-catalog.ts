@@ -108,7 +108,7 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
     }, apiKey).catch(() => ({ items: [] as SearchItem[] }))
   ));
 
-  // Fairly rotate through Turkish genres, K-pop and international music.
+  // Fairly rotate through Turkish genres, K-pop and international music.\n  // Keep API discovery on a six-hour cache window to stay within YouTube quota.
   // YouTube search.list costs 100 quota units per query, so results are cached
   // for six hours to keep discovery broad without exhausting the daily quota.
   const ownIds = [...new Set(ownUploadIds)].slice(0, searchQuery?.trim() ? 0 : 8);
