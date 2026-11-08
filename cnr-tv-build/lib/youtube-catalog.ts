@@ -23,7 +23,7 @@ type VideoItem = {
 type YouTubeResponse<T> = { items?: T[]; nextPageToken?: string; error?: { message?: string; errors?: { reason?: string }[] } };
 
 function parseDuration(value: string): number {
-  const match = value.match(/^PT(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?$/);
+  const match = value.match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/);
   if (!match) return 0;
   return Number(match[1] || 0) * 3600 + Number(match[2] || 0) * 60 + Number(match[3] || 0);
 }
@@ -37,10 +37,10 @@ function categoryFor(title: string, description: string): string {
 }
 function videoTypeFor(title: string, description: string): string {
   const value = (title + " " + description).toLocaleLowerCase("tr-TR");
-  if (/\\b(lyrics?|lyric video|şarkı sözleri|sözleriyle)\\b/.test(value)) return "Şarkı Sözleri";
-  if (/\\b(visuali[sz]er|visualizer)\\b/.test(value)) return "Visualizer";
-  if (/\\b(audio|official audio|lyric audio)\\b/.test(value)) return "Audio";
-  if (/\\b(official video|official music video|resmî klip|resmi klip|klip)\\b/.test(value)) return "Resmî Klip";
+  if (/\b(lyrics?|lyric video|şarkı sözleri|sözleriyle)\b/.test(value)) return "Şarkı Sözleri";
+  if (/\b(visuali[sz]er|visualizer)\b/.test(value)) return "Visualizer";
+  if (/\b(audio|official audio|lyric audio)\b/.test(value)) return "Audio";
+  if (/\b(official video|official music video|resmî klip|resmi klip|klip)\b/.test(value)) return "Resmî Klip";
   return "Müzik Videosu";
 }
 
@@ -96,7 +96,7 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
       const duration = parseDuration(video.contentDetails?.duration || "");
       const title = video.snippet?.title || "";
       const description = video.snippet?.description || "";
-      const markedShort = /#shorts|\\bshorts\\b|short video/i.test(title + " " + description);
+      const markedShort = /#shorts|\bshorts\b|short video/i.test(title + " " + description);
       // The Data API does not expose frame orientation. Remove sub-minute uploads and
       // explicitly marked Shorts without discarding ordinary 1–3 minute music videos.
       return Boolean(video.id) && video.status?.privacyStatus === "public" &&
