@@ -111,12 +111,14 @@ const navItems = [
 ];
 function LayersIcon(props: React.ComponentProps<typeof Activity>) { return <Activity {...props} />; }
 
-const categoryNames = ["Tümü", "Türkçe Pop", "Rap & Trap", "Pop & Dans", "K-Pop", "Global Pop", "Akustik", "Efkar", "Top 20"];
+const categoryNames = ["Tümü", "Türkçe Pop", "Rap & Trap", "Pop & Dans", "K-Pop", "Global Pop", "Türkçe Rock & Arabesk", "Akustik", "Efkar", "Top 20"];
 const programNames = [
   { title: "CNR Station Deck", subtitle: "Gün boyu müzik kuşağı", time: "Kesintisiz", category: "Türkçe Pop", tone: "red" },
   { title: "Türkçe Pop Hits", subtitle: "En sevilen klipler", time: "14:00", category: "Türkçe Pop", tone: "pink" },
   { title: "CNR Top 20", subtitle: "Haftanın listesi", time: "16:00", category: "Top 20", tone: "gold" },
   { title: "Yeni Çıkanlar", subtitle: "Klip prömiyerleri", time: "18:00", category: "Pop & Dans", tone: "violet" },
+  { title: "K-Pop Zone", subtitle: "Kore pop müziği ve klipleri", time: "19:00", category: "K-Pop", tone: "violet" },
+  { title: "Global Music", subtitle: "Dünyadan müzik videoları", time: "21:00", category: "Global Pop", tone: "blue" },
   { title: "Efkar Gecesi", subtitle: "Duygusal şarkılar", time: "20:00", category: "Efkar", tone: "blue" },
   { title: "Akustik Sahne", subtitle: "Sade ve canlı performanslar", time: "22:00", category: "Akustik", tone: "silver" }
 ];
@@ -173,6 +175,9 @@ function pageTitle(path: string) {
 function getProgramName(category: string) {
   if (category === "Rap & Trap") return "CNR Rap & Trap";
   if (category === "Pop & Dans") return "Pop & Dans";
+  if (category === "K-Pop") return "K-Pop Zone";
+  if (category === "Global Pop") return "Global Music";
+  if (category === "Türkçe Rock & Arabesk") return "Türkçe Rock & Arabesk";
   if (category === "Akustik") return "Akustik Sahne";
   if (category === "Efkar") return "Efkar Gecesi";
   return category === "Top 20" ? "CNR Top 20" : "Türkçe Pop Hits";
