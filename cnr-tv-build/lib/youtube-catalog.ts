@@ -61,30 +61,36 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
   const apiKey = process.env.YOUTUBE_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey) throw new Error("YOUTUBE_API_KEY sunucu ortamında tanımlı değil.");
 
-  // Resolve the artist channel once, then use its uploads playlist as the broadcast source.
+  // Keep MEMET ÇINAR uploads in rotation, while also discovering music videos
+  // from the wider YouTube catalog so CNR TV remains a multi-artist channel.
   const channelData = await youtube<ChannelItem>("channels", {
     part: "contentDetails", forHandle: "memetcinar444"
   }, apiKey);
-  const channel = channelData.items?.[0];
-  const channelId = channel?.id;
-  const uploadsId = channel?.contentDetails?.relatedPlaylists?.uploads;
-  if (!channelId || !uploadsId) throw new Error("@memetcinar444 YouTube kanalı veya yüklemeler listesi bulunamadı.");
+  const uploadsId = channelData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
 
   let ids: string[] = [];
-  if (searchQuery?.trim()) {
-    const searchData = await youtube<SearchItem>("search", {
-      part: "snippet", type: "video", channelId, q: searchQuery.trim(),
-      videoEmbeddable: "true", videoSyndicated: "true", maxResults: "25", order: "relevance"
-    }, apiKey);
-    ids = (searchData.items || []).map((item) => item.id?.videoId).filter((id): id is string => Boolean(id));
-  } else {
+  if (uploadsId && !searchQuery?.trim()) {
     const playlistData = await youtube<PlaylistItem>("playlistItems", {
       part: "contentDetails", playlistId: uploadsId, maxResults: "50"
     }, apiKey);
-    ids = (playlistData.items || []).map((item) => item.contentDetails?.videoId).filter((id): id is string => Boolean(id));
+    ids.push(...(playlistData.items || []).map((item) => item.contentDetails?.videoId).filter((id): id is string => Boolean(id)));
   }
 
-  ids = [...new Set(ids)];
+  const discoveryQueries = searchQuery?.trim()
+    ? [searchQuery.trim()]
+    : ["Türkçe pop resmi klip", "Türkçe rap official music video", "Türkçe şarkı sözleri lyric video"];
+  const discovered = await Promise.all(discoveryQueries.map((query) =>
+    youtube<SearchItem>("search", {
+      part: "snippet", type: "video", q: query,
+      videoEmbeddable: "true", videoSyndicated: "true",
+      maxResults: "25", order: "relevance"
+    }, apiKey)
+  ));
+  for (const result of discovered) {
+    ids.push(...(result.items || []).map((item) => item.id?.videoId).filter((id): id is string => Boolean(id)));
+  }
+
+  ids = [...new Set(ids)].slice(0, 50);
   if (!ids.length) return [];
 
   const detailData = await youtube<VideoItem>("videos", {
@@ -96,14 +102,13 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
       const duration = parseDuration(video.contentDetails?.duration || "");
       const title = video.snippet?.title || "";
       const description = video.snippet?.description || "";
-      const markedShort = /#shorts|\bshorts\b|short video/i.test(title + " " + description);
+      const markedShort = /#shorts|\\bshorts\\b|short video/i.test(title + " " + description);
       const thumbnails = Object.values(video.snippet?.thumbnails || {});
       const hasLandscapeThumbnail = thumbnails.some((image) =>
         typeof image.width === "number" && typeof image.height === "number" &&
         image.width > image.height
       );
-      // Shorts may be up to 3 minutes. Keep long-form uploads only and reject
-      // portrait thumbnails wherever YouTube exposes their dimensions.
+      // Exclude Shorts (up to 3 minutes) and portrait-looking uploads.
       return Boolean(video.id) && video.status?.privacyStatus === "public" &&
         video.status?.embeddable === true && video.status?.madeForKids !== true &&
         duration > 180 && !markedShort && (thumbnails.length === 0 || hasLandscapeThumbnail);
@@ -114,14 +119,14 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
       return {
         id: video.id as string,
         title,
-        artist: video.snippet?.channelTitle?.trim() || "MEMET ÇINAR",
+        artist: video.snippet?.channelTitle?.trim() || "Bilinmeyen Sanatçı",
         category: categoryFor(title, description),
         videoType: videoTypeFor(title, description),
-        durationSeconds: parseDuration(video.contentDetails?.duration || "") || 180
+        durationSeconds: parseDuration(video.contentDetails?.duration || "") || 240
       };
     });
   if (!clips.length && !searchQuery) {
-    throw new Error("@memetcinar444 kanalında yayınlanabilir video bulunamadı. Videoların herkese açık ve yerleştirmeye izinli olduğundan emin ol.");
+    throw new Error("YouTube'da yayınlanabilir uzun formatlı müzik videosu bulunamadı.");
   }
   return clips;
 }
