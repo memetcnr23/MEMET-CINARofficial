@@ -52,7 +52,7 @@ export default function TvPlayer() {
     let cancelled = false;
     fetch("/api/youtube")
       .then(async r => { const data = await r.json(); if (!r.ok) throw new Error(data.error || "Yayın listesi alınamadı."); return data; })
-      .then(data => { if (!cancelled) { setTracks(data.tracks || []); setError(data.notice || ""); } })
+      .then(data => { if (!cancelled) { setTracks(data.tracks || []); setError(data.error || data.notice || ""); } })
       .catch(e => { if (!cancelled) setError(e.message); })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
@@ -85,7 +85,7 @@ export default function TvPlayer() {
       window.onYouTubeIframeAPIReady = () => { previous?.(); boot(); };
     }
     return () => {};
-  }, [current?.id, queue.length, volume]);
+  }, [current?.id, queue.length]);
 
   useEffect(() => { if (player.current) player.current.setVolume(muted ? 0 : volume); }, [volume, muted]);
   useEffect(() => {
