@@ -17,7 +17,7 @@ npm run start
 ## Included
 - Separate responsive desktop and mobile broadcast layouts.
 - Supplied CNR logo and Atatürk / Turkish flag artwork.
-- Live-player surface powered by the YouTube IFrame API. The first clip is cued, not autoplayed.
+- Native CNR HLS live-player surface with adaptive bitrate playback and no YouTube iframe in default HLS-only mode.
 - Play/pause, mute, progress/seek, HD quality request, fullscreen and automatic next clip.
 - Programme guide, genre selection, searchable clip library, artist shortcuts and social links.
 - Animated Music Lower Third with CNR branding, track metadata, equalizer bars, metallic light sweep and red broadcast glow.
@@ -32,4 +32,4 @@ This app supports a persistent Supabase PostgreSQL database for the clip catalog
 
 ## Player behavior
 
-The CNR fullscreen button expands the complete broadcast stage (not just the cross-origin YouTube iframe). YouTube controls are disabled with the supported embed parameter. YouTube may still show channel/title/branding layers in some states; those cannot be fully removed through supported IFrame parameters.
+The CNR fullscreen button expands the complete broadcast stage. The default live path uses a native HTML video element with hls.js on Media Source Extensions browsers and native HLS on Safari/iOS. YouTube playback is opt-in only and is not used in the default HLS-only mode.
