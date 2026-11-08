@@ -115,5 +115,8 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
         durationSeconds: parseDuration(video.contentDetails?.duration || "") || 180
       };
     });
+  if (!clips.length && !searchQuery) {
+    throw new Error("@memetcinar444 kanalında yayınlanabilir video bulunamadı. Videoların herkese açık ve yerleştirmeye izinli olduğundan emin ol.");
+  }
   return clips;
 }
