@@ -61,24 +61,35 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
   const apiKey = process.env.YOUTUBE_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey) throw new Error("YOUTUBE_API_KEY sunucu ortamında tanımlı değil.");
 
-  // Keep MEMET ÇINAR uploads in rotation, while also discovering music videos
-  // from the wider YouTube catalog so CNR TV remains a multi-artist channel.
-  const channelData = await youtube<ChannelItem>("channels", {
-    part: "contentDetails", forHandle: "memetcinar444"
-  }, apiKey);
-  const uploadsId = channelData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
-
-  let ids: string[] = [];
-  if (uploadsId && !searchQuery?.trim()) {
-    const playlistData = await youtube<PlaylistItem>("playlistItems", {
-      part: "contentDetails", playlistId: uploadsId, maxResults: "50"
-    }, apiKey);
-    ids.push(...(playlistData.items || []).map((item) => item.contentDetails?.videoId).filter((id): id is string => Boolean(id)));
+  // The artist's own uploads are one source, not the whole TV channel.
+  // If channel lookup fails, global music discovery must still continue.
+  let ownUploadIds: string[] = [];
+  if (!searchQuery?.trim()) {
+    try {
+      const channelData = await youtube<ChannelItem>("channels", {
+        part: "contentDetails", forHandle: "memetcinar444"
+      }, apiKey);
+      const uploadsId = channelData.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
+      if (uploadsId) {
+        const playlistData = await youtube<PlaylistItem>("playlistItems", {
+          part: "contentDetails", playlistId: uploadsId, maxResults: "50"
+        }, apiKey);
+        ownUploadIds = (playlistData.items || [])
+          .map((item) => item.contentDetails?.videoId)
+          .filter((id): id is string => Boolean(id));
+      }
+    } catch {
+      // Continue with the multi-artist YouTube discovery source.
+    }
   }
 
   const discoveryQueries = searchQuery?.trim()
     ? [searchQuery.trim()]
-    : ["Türkçe pop resmi klip", "Türkçe rap official music video", "Türkçe şarkı sözleri lyric video"];
+    : [
+        "Türkçe pop resmi klip",
+        "Türkçe rap resmi klip",
+        "Türkçe müzik video official music video"
+      ];
   const discovered = await Promise.all(discoveryQueries.map((query) =>
     youtube<SearchItem>("search", {
       part: "snippet", type: "video", q: query,
@@ -86,11 +97,13 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
       maxResults: "25", order: "relevance"
     }, apiKey)
   ));
-  for (const result of discovered) {
-    ids.push(...(result.items || []).map((item) => item.id?.videoId).filter((id): id is string => Boolean(id)));
-  }
 
-  ids = [...new Set(ids)].slice(0, 50);
+  const ids = [...new Set([
+    ...ownUploadIds,
+    ...discovered.flatMap((result) =>
+      (result.items || []).map((item) => item.id?.videoId).filter((id): id is string => Boolean(id))
+    )
+  ])].slice(0, 50);
   if (!ids.length) return [];
 
   const detailData = await youtube<VideoItem>("videos", {
@@ -108,10 +121,13 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
         typeof image.width === "number" && typeof image.height === "number" &&
         image.width > image.height
       );
-      // Exclude Shorts (up to 3 minutes) and portrait-looking uploads.
-      return Boolean(video.id) && video.status?.privacyStatus === "public" &&
-        video.status?.embeddable === true && video.status?.madeForKids !== true &&
-        duration > 180 && !markedShort && (thumbnails.length === 0 || hasLandscapeThumbnail);
+      return Boolean(video.id) &&
+        video.status?.privacyStatus === "public" &&
+        video.status?.embeddable === true &&
+        video.status?.madeForKids !== true &&
+        duration > 180 &&
+        !markedShort &&
+        (thumbnails.length === 0 || hasLandscapeThumbnail);
     })
     .map((video) => {
       const title = video.snippet?.title?.trim() || "İsimsiz müzik videosu";
@@ -125,6 +141,7 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
         durationSeconds: parseDuration(video.contentDetails?.duration || "") || 240
       };
     });
+
   if (!clips.length && !searchQuery) {
     throw new Error("YouTube'da yayınlanabilir uzun formatlı müzik videosu bulunamadı.");
   }
