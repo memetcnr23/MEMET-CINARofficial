@@ -83,27 +83,43 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
     }
   }
 
+  // Build a real multi-artist channel feed: several genres and every major
+  // music-video format are discovered independently, then fairly mixed.
   const discoveryQueries = searchQuery?.trim()
     ? [searchQuery.trim()]
     : [
         "Türkçe pop resmi klip",
-        "Türkçe rap resmi klip",
-        "Türkçe müzik video official music video"
+        "Türkçe rap official music video",
+        "Türkçe rock official music video",
+        "Türkçe arabesk müzik klip",
+        "Türkçe şarkı sözleri lyric video",
+        "Türkçe official audio visualizer",
+        "Turkish music official music video"
       ];
   const discovered = await Promise.all(discoveryQueries.map((query) =>
     youtube<SearchItem>("search", {
       part: "snippet", type: "video", q: query,
       videoEmbeddable: "true", videoSyndicated: "true",
-      maxResults: "25", order: "relevance"
-    }, apiKey)
+      maxResults: "50", order: "relevance"
+    }, apiKey).catch(() => ({ items: [] as SearchItem[] }))
   ));
 
-  const ids = [...new Set([
-    ...ownUploadIds,
-    ...discovered.flatMap((result) =>
-      (result.items || []).map((item) => item.id?.videoId).filter((id): id is string => Boolean(id))
-    )
-  ])].slice(0, 50);
+  // Never let a large MEMET ÇINAR upload archive occupy the entire 50-video
+  // YouTube details request. Reserve slots for other artists and formats.
+  const ownIds = [...new Set(ownUploadIds)].slice(0, searchQuery?.trim() ? 0 : 8);
+  const discoveryIds: string[] = [];
+  const seenDiscovery = new Set<string>();
+  const perQueryLimit = searchQuery?.trim() ? 50 : 7;
+  for (let index = 0; index < perQueryLimit; index += 1) {
+    for (const result of discovered) {
+      const id = result.items?.[index]?.id?.videoId;
+      if (id && !seenDiscovery.has(id)) {
+        seenDiscovery.add(id);
+        discoveryIds.push(id);
+      }
+    }
+  }
+  const ids = [...new Set([...ownIds, ...discoveryIds])].slice(0, 50);
   if (!ids.length) return [];
 
   const detailData = await youtube<VideoItem>("videos", {
