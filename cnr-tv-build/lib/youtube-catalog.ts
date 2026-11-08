@@ -29,10 +29,12 @@ function parseDuration(value: string): number {
 }
 function categoryFor(title: string, description: string): string {
   const value = (title + " " + description).toLocaleLowerCase("tr-TR");
+  if (/k[ -]?pop|korean pop|k-pop|케이팝|아이돌/.test(value)) return "K-Pop";
   if (/akustik|unplugged|acoustic|live session|canlı performans/.test(value)) return "Akustik";
   if (/rap|trap|hip.?hop|drill|freestyle/.test(value)) return "Rap & Trap";
   if (/slow|efkar|ayrılık|hüzün|duygusal|ballad/.test(value)) return "Efkar";
   if (/dance|dans|remix|club|edm/.test(value)) return "Pop & Dans";
+  if (/official music video|official video|music video|lyrics|lyric video|visualizer|official audio/.test(value) && !/türkçe|turkish|türkiye/.test(value)) return "Global Pop";
   return "Türkçe Pop";
 }
 function videoTypeFor(title: string, description: string): string {
@@ -47,7 +49,7 @@ function videoTypeFor(title: string, description: string): string {
 async function youtube<T>(endpoint: string, params: Record<string, string>, apiKey: string): Promise<YouTubeResponse<T>> {
   const url = new URL("https://www.googleapis.com/youtube/v3/" + endpoint);
   url.search = new URLSearchParams({ ...params, key: apiKey }).toString();
-  const response = await fetch(url, { next: { revalidate: 900 } });
+  const response = await fetch(url, { next: { revalidate: 21600 } });
   const data = await response.json() as YouTubeResponse<T>;
   if (!response.ok) {
     const reason = data.error?.errors?.[0]?.reason;
@@ -88,28 +90,31 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
   const discoveryQueries = searchQuery?.trim()
     ? [searchQuery.trim()]
     : [
-        "Türkçe pop resmi klip",
-        "Türkçe rap official music video",
-        "Türkçe rock official music video",
-        "Türkçe arabesk müzik klip",
-        "Türkçe şarkı sözleri lyric video",
-        "Türkçe official audio visualizer",
-        "Turkish music official music video"
+        "Türkçe pop resmi klip official music video",
+        "Türkçe rap official music video klip",
+        "Türkçe rock arabesk resmi klip",
+        "Türkçe şarkı sözleri lyric video official",
+        "K-pop official music video latest",
+        "K-pop lyrics official music video",
+        "international pop official music video",
+        "global music official lyrics video visualizer"
       ];
-  const discovered = await Promise.all(discoveryQueries.map((query) =>
+  const discovered = await Promise.all(discoveryQueries.map((query, index) =>
     youtube<SearchItem>("search", {
       part: "snippet", type: "video", q: query,
       videoEmbeddable: "true", videoSyndicated: "true",
+      ...(index < 4 ? { regionCode: "TR", relevanceLanguage: "tr" } : {}),
       maxResults: "50", order: "relevance"
     }, apiKey).catch(() => ({ items: [] as SearchItem[] }))
   ));
 
-  // Never let a large MEMET ÇINAR upload archive occupy the entire 50-video
-  // YouTube details request. Reserve slots for other artists and formats.
+  // Fairly rotate through Turkish genres, K-pop and international music.
+  // YouTube search.list costs 100 quota units per query, so results are cached
+  // for six hours to keep discovery broad without exhausting the daily quota.
   const ownIds = [...new Set(ownUploadIds)].slice(0, searchQuery?.trim() ? 0 : 8);
   const discoveryIds: string[] = [];
   const seenDiscovery = new Set<string>();
-  const perQueryLimit = searchQuery?.trim() ? 50 : 7;
+  const perQueryLimit = searchQuery?.trim() ? 50 : 6;
   for (let index = 0; index < perQueryLimit; index += 1) {
     for (const result of discovered) {
       const id = result.items?.[index]?.id?.videoId;
@@ -141,7 +146,8 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
         video.status?.privacyStatus === "public" &&
         video.status?.embeddable === true &&
         video.status?.madeForKids !== true &&
-        duration > 180 &&
+        duration > 90 &&
+        duration <= 900 &&
         !markedShort &&
         (thumbnails.length === 0 || hasLandscapeThumbnail);
     })
@@ -154,7 +160,7 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
         artist: video.snippet?.channelTitle?.trim() || "Bilinmeyen Sanatçı",
         category: categoryFor(title, description),
         videoType: videoTypeFor(title, description),
-        durationSeconds: parseDuration(video.contentDetails?.duration || "") || 240
+        durationSeconds: parseDuration(video.contentDetails?.duration || "")
       };
     });
 
