@@ -622,7 +622,7 @@ export default function BroadcastApp() {
             {HLS_STREAM ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted playsInline preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
-                <Image src="/cnr-logo.svg" alt="CNR Müzik TV" width={164} height={55} unoptimized />
+                <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
                 <span className="cnr-logo-snow" aria-hidden="true">
                   {Array.from({ length: 100 }, (_, index) => <i key={index} className={index % 12 === 0 ? "snow-near" : index % 7 === 0 ? "snow-crystal" : index % 4 === 0 ? "snow-soft" : ""} style={{ left: ((index * 61) % 96 + 2) + "%", animationDelay: "-" + ((index * 0.39) % 9.8).toFixed(2) + "s", animationDuration: (4.1 + (index % 13) * 0.57) + "s", width: (index % 12 === 0 ? 5.8 : 1.35 + (index % 6) * 0.72) + "px", height: (index % 12 === 0 ? 5.8 : 1.35 + (index % 6) * 0.72) + "px" }} />)}
                 </span>
