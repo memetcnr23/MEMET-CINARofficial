@@ -16,7 +16,7 @@ type PlaylistItem = { contentDetails?: { videoId?: string } };
 type SearchItem = { id?: { videoId?: string } };
 type VideoItem = {
   id?: string;
-  snippet?: { title?: string; description?: string; channelTitle?: string };
+  snippet?: { title?: string; description?: string; channelTitle?: string; thumbnails?: Record<string, { width?: number; height?: number }> };
   status?: { embeddable?: boolean; privacyStatus?: string; madeForKids?: boolean };
   contentDetails?: { duration?: string };
 };
@@ -97,11 +97,16 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
       const title = video.snippet?.title || "";
       const description = video.snippet?.description || "";
       const markedShort = /#shorts|\bshorts\b|short video/i.test(title + " " + description);
-      // The Data API does not expose frame orientation. Remove sub-minute uploads and
-      // explicitly marked Shorts without discarding ordinary 1–3 minute music videos.
+      const thumbnails = Object.values(video.snippet?.thumbnails || {});
+      const hasLandscapeThumbnail = thumbnails.some((image) =>
+        typeof image.width === "number" && typeof image.height === "number" &&
+        image.width > image.height
+      );
+      // Shorts may be up to 3 minutes. Keep long-form uploads only and reject
+      // portrait thumbnails wherever YouTube exposes their dimensions.
       return Boolean(video.id) && video.status?.privacyStatus === "public" &&
         video.status?.embeddable === true && video.status?.madeForKids !== true &&
-        duration > 60 && !markedShort;
+        duration > 180 && !markedShort && (thumbnails.length === 0 || hasLandscapeThumbnail);
     })
     .map((video) => {
       const title = video.snippet?.title?.trim() || "İsimsiz müzik videosu";
