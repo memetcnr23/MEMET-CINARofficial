@@ -624,40 +624,10 @@ export default function BroadcastApp() {
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
                 <span className="cnr-logo-snow" aria-hidden="true">
-                  {Array.from({ length: 72 }, (_, index) => <i key={index} className={index % 13 === 0 ? "snow-near" : index % 7 === 0 ? "snow-crystal" : index % 4 === 0 ? "snow-soft" : ""} style={{ left: ((index * 61) % 96 + 2) + "%", animationDelay: "-" + ((index * 0.47) % 8.7).toFixed(2) + "s", animationDuration: (4.4 + (index % 11) * 0.62) + "s", width: (index % 13 === 0 ? 5.2 : 1.15 + (index % 6) * 0.67) + "px", height: (index % 13 === 0 ? 5.2 : 1.15 + (index % 6) * 0.67) + "px" }} />)}
+                  {Array.from({ length: 100 }, (_, index) => <i key={index} className={index % 12 === 0 ? "snow-near" : index % 7 === 0 ? "snow-crystal" : index % 4 === 0 ? "snow-soft" : ""} style={{ left: ((index * 61) % 96 + 2) + "%", animationDelay: "-" + ((index * 0.39) % 9.8).toFixed(2) + "s", animationDuration: (4.1 + (index % 13) * 0.57) + "s", width: (index % 12 === 0 ? 5.8 : 1.35 + (index % 6) * 0.72) + "px", height: (index % 12 === 0 ? 5.8 : 1.35 + (index % 6) * 0.72) + "px" }} />)}
                 </span>
                 <span className="cnr-logo-metallic-shine" aria-hidden="true" />
-                <svg className="cnr-santa-hat" viewBox="0 0 170 130" role="img" aria-label="Noel şapkası" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="cnrHatRed" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0" stopColor="#ff666b" />
-                      <stop offset=".32" stopColor="#df1725" />
-                      <stop offset=".72" stopColor="#a40719" />
-                      <stop offset="1" stopColor="#650511" />
-                    </linearGradient>
-                    <linearGradient id="cnrHatFur" x1="0" y1="0" x2=".15" y2="1">
-                      <stop offset="0" stopColor="#fff" />
-                      <stop offset=".52" stopColor="#edf2f5" />
-                      <stop offset="1" stopColor="#b9c3cb" />
-                    </linearGradient>
-                    <radialGradient id="cnrHatPom" cx=".35" cy=".28" r=".72">
-                      <stop offset="0" stopColor="#fff" />
-                      <stop offset=".68" stopColor="#f4f6f7" />
-                      <stop offset="1" stopColor="#aeb9c2" />
-                    </radialGradient>
-                  </defs>
-                  <path d="M23 88 C40 56 61 25 101 12 C99 34 118 50 149 64 C126 79 78 83 23 88 Z" fill="url(#cnrHatRed)" stroke="#6f0611" strokeWidth="2.5" />
-                  <path d="M43 76 C60 49 78 29 100 17" fill="none" stroke="#ff9a9b" strokeWidth="3.5" strokeLinecap="round" opacity=".5" />
-                  <path d="M20 91 C52 76 78 73 105 75 C123 76 140 71 152 63" fill="none" stroke="#760713" strokeWidth="21" strokeLinecap="round" opacity=".45" />
-                  <path d="M20 86 C52 71 78 68 105 70 C123 71 140 67 152 59" fill="none" stroke="url(#cnrHatFur)" strokeWidth="17" strokeLinecap="round" />
-                  <path d="M24 81 C55 69 80 66 105 68 C125 69 140 65 150 57" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="2 5" opacity=".9" />
-                  <path d="M30 88 C57 79 78 76 101 77" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" opacity=".42" />
-                  <g fill="url(#cnrHatPom)">
-                    <circle cx="18" cy="88" r="15" /><circle cx="9" cy="85" r="7.5" /><circle cx="22" cy="77" r="7.5" />
-                    <circle cx="29" cy="90" r="8.5" /><circle cx="15" cy="98" r="7.5" /><circle cx="6" cy="95" r="5" />
-                  </g>
-                  <path d="M93 18 C99 10 107 10 113 17" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" opacity=".58" />
-                </svg>
+                
               </div>
             </div>
             {!playerPlaying && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
