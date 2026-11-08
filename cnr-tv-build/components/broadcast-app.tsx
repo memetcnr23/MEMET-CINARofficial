@@ -5,10 +5,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Activity, ArrowUpRight, BadgeCheck, Bell, CalendarDays, CalendarRange, Camera, Check,
-  ChevronDown, ChevronRight, Clock3, Disc3, ExternalLink, Expand, Heart,
+  Activity, ArrowUpRight, BadgeCheck, Bell, CalendarDays, CalendarRange, Camera, Captions, Check,
+  ChevronDown, ChevronRight, Clock3, Disc3, ExternalLink, Expand, FileUp, Heart,
   Home, Info, ListMusic, Menu, Mic2, MonitorPlay, Music2, Newspaper, Pause, Play,
-  Radio, Search, Settings, Share2, Signal, Sparkles, Trophy, UserCircle2,
+  Radio, Save, Search, Settings, Share2, Signal, Sparkles, Trash2, Trophy, UserCircle2,
   Users, Volume2, VolumeX, X, Guitar
 } from "lucide-react";
 
@@ -28,6 +28,33 @@ type TimedClip = {
   endsAt: string;
   offsetSeconds: number;
 };
+type SubtitleCue = { start: number; end: number; text: string };
+
+function parseSubtitleTime(value: string): number {
+  const clean = value.trim().replace(",", ".").split(/\\s+/)[0];
+  const parts = clean.split(":");
+  if (parts.length === 3) return Number(parts[0]) * 3600 + Number(parts[1]) * 60 + Number(parts[2]);
+  if (parts.length === 2) return Number(parts[0]) * 60 + Number(parts[1]);
+  return Number(clean);
+}
+
+function parseSubtitleTrack(raw: string): SubtitleCue[] {
+  const lines = raw.replace(/^\\uFEFF/, "").replace(/\\r/g, "").split("\\n");
+  const cues: SubtitleCue[] = [];
+  for (let i = 0; i < lines.length; i += 1) {
+    if (!lines[i].includes("-->")) continue;
+    const [startRaw, endRaw] = lines[i].split("-->");
+    const start = parseSubtitleTime(startRaw || "");
+    const end = parseSubtitleTime((endRaw || "").trim().split(/\\s+/)[0] || "");
+    const textLines: string[] = [];
+    for (let j = i + 1; j < lines.length && lines[j].trim(); j += 1) {
+      if (!/^\\d+$/.test(lines[j].trim())) textLines.push(lines[j].trim());
+    }
+    const text = textLines.join("\\n").replace(/<[^>]*>/g, "").trim();
+    if (Number.isFinite(start) && Number.isFinite(end) && end > start && text) cues.push({ start, end, text });
+  }
+  return cues.sort((a, b) => a.start - b.start);
+}
 type NowPlaying = {
   source: string;
   serverTime: string;
@@ -208,6 +235,12 @@ export default function BroadcastApp() {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [lowerKey, setLowerKey] = useState(0);
   const [lowerActive, setLowerActive] = useState(false);
+  const [subtitleDraft, setSubtitleDraft] = useState("");
+  const [subtitleCues, setSubtitleCues] = useState<SubtitleCue[]>([]);
+  const [subtitleTrackClipId, setSubtitleTrackClipId] = useState("");
+  const [subtitleEnabled, setSubtitleEnabled] = useState(false);
+  const [subtitleEditorOpen, setSubtitleEditorOpen] = useState(false);
+  const [activeSubtitle, setActiveSubtitle] = useState("");
   const [clock, setClock] = useState(new Date());
 
   const activeNationalDay = getActiveNationalDay(clock);
@@ -310,10 +343,86 @@ export default function BroadcastApp() {
       setFavorites(JSON.parse(localStorage.getItem("cnr-favorites") || "[]"));
       setDarkMode(localStorage.getItem("cnr-dark-mode") !== "false");
       setSoundEnabled(localStorage.getItem("cnr-sound") === "true");
+      const savedTrack = localStorage.getItem("cnr-caption-track");
+      if (savedTrack) {
+        const parsed = JSON.parse(savedTrack) as { clipId?: string; text?: string; enabled?: boolean };
+        const text = typeof parsed.text === "string" ? parsed.text : "";
+        setSubtitleDraft(text);
+        setSubtitleCues(parseSubtitleTrack(text));
+        setSubtitleTrackClipId(parsed.clipId || "");
+        setSubtitleEnabled(Boolean(parsed.enabled));
+      }
     } catch {
       setFavorites([]);
     }
   }, []);
+
+  useEffect(() => {
+    if (pathname !== "/canli-yayin" || !subtitleEnabled || !current || subtitleTrackClipId !== current.id || !subtitleCues.length) {
+      setActiveSubtitle("");
+      return;
+    }
+    const updateCaption = () => {
+      let seconds = 0;
+      if (currentHlsUrl) seconds = hlsVideoRef.current?.currentTime || 0;
+      else if (playerReadyRef.current && playerRef.current) {
+        try { seconds = playerRef.current.getCurrentTime(); } catch { seconds = 0; }
+      }
+      let active = "";
+      for (let i = subtitleCues.length - 1; i >= 0; i -= 1) {
+        const cue = subtitleCues[i];
+        if (seconds >= cue.start && seconds < cue.end) { active = cue.text; break; }
+        if (seconds >= cue.end) break;
+      }
+      setActiveSubtitle((previous) => previous === active ? previous : active);
+    };
+    updateCaption();
+    const timer = window.setInterval(updateCaption, 120);
+    return () => window.clearInterval(timer);
+  }, [pathname, subtitleEnabled, subtitleCues, subtitleTrackClipId, current?.id, currentHlsUrl, playerReady]);
+
+  const toggleSubtitles = () => {
+    const next = !subtitleEnabled;
+    setSubtitleEnabled(next);
+    try {
+      const value = { clipId: subtitleTrackClipId, text: subtitleDraft, enabled: next };
+      localStorage.setItem("cnr-caption-track", JSON.stringify(value));
+    } catch { notify("Altyazı tercihi bu tarayıcıya kaydedilemedi."); }
+  };
+
+  const saveSubtitleTrack = () => {
+    if (!current?.id) { notify("Önce yayın klibinin yüklenmesini bekleyin."); return; }
+    const parsed = parseSubtitleTrack(subtitleDraft);
+    if (!parsed.length) { notify("Geçerli bir VTT veya SRT altyazı satırı bulunamadı."); return; }
+    setSubtitleCues(parsed);
+    setSubtitleTrackClipId(current.id);
+    setSubtitleEnabled(true);
+    try {
+      localStorage.setItem("cnr-caption-track", JSON.stringify({ clipId: current.id, text: subtitleDraft, enabled: true }));
+      notify(parsed.length + " altyazı satırı kaydedildi.");
+    } catch { notify("Altyazı dosyası tarayıcı belleğine kaydedilemedi."); }
+  };
+
+  const clearSubtitleTrack = () => {
+    setSubtitleDraft("");
+    setSubtitleCues([]);
+    setSubtitleTrackClipId("");
+    setSubtitleEnabled(false);
+    setActiveSubtitle("");
+    try { localStorage.removeItem("cnr-caption-track"); } catch {}
+    notify("Bu cihazdaki altyazı kaydı temizlendi.");
+  };
+
+  const importSubtitleFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 1024 * 1024) { notify("Altyazı dosyası 1 MB sınırını aşamaz."); event.target.value = ""; return; }
+    void file.text().then((text) => {
+      setSubtitleDraft(text);
+      notify(file.name + " dosyası düzenleyiciye aktarıldı.");
+    }).catch(() => notify("Altyazı dosyası okunamadı."));
+    event.target.value = "";
+  };
 
   // HLS-first playback: prefer hls.js on MSE-capable browsers, then native HLS.
   useEffect(() => {
@@ -475,7 +584,8 @@ export default function BroadcastApp() {
         videoId: currentItem.clip.id,
         playerVars: {
           autoplay: 1, controls: 0, disablekb: 1, rel: 0, playsinline: 1,
-          fs: 0, iv_load_policy: 3, enablejsapi: 1, origin: window.location.origin
+          fs: 0, iv_load_policy: 3, cc_load_policy: 0, hl: "tr",
+          enablejsapi: 1, origin: window.location.origin
         },
         events: {
           onReady: (event) => {
@@ -774,6 +884,7 @@ export default function BroadcastApp() {
               />
             </div>}
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : HLS_ONLY ? <div className="hls-source-pending"><div className="hls-source-mark"><Radio size={30} /></div><b>CNR HLS YAYIN KAYNAĞI BEKLENİYOR</b><span>Bu kanal YouTube oynatıcısına geri dönmez. CNR yayın manifesti (.m3u8) tanımlandığında yayın burada otomatik açılır.</span><small>YAYIN MOTORU · HLS / ADAPTIVE BITRATE</small></div> : <div id="cnr-live-player" className="youtube-video-host" />}
+            {activeSubtitle && subtitleEnabled && <div className="cnr-caption-overlay" role="status" aria-live="polite">{activeSubtitle}</div>}
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
@@ -788,12 +899,13 @@ export default function BroadcastApp() {
             <div className="screen-bottom"><span>● {currentHlsUrl ? "CNR HLS YAYINI" : HLS_ONLY ? "HLS KAYNAĞI BEKLENİYOR" : "YOUTUBE YEDEK YAYIN"}</span><span>{h}</span></div>
             <div className={"cnr-lower-third " + (lowerActive ? "show" : "")} key={lowerKey} aria-live="polite">
               <div className="cnr-lt-logo">
+                <span className="cnr-lt-logo-frame" aria-hidden="true" />
                 <Image src={LOGO} alt="CNR Müzik TV" width={300} height={100} unoptimized />
                 <span className="cnr-lt-logo-glint" aria-hidden="true" />
               </div>
               <div className="cnr-lt-divider" aria-hidden="true" />
               <div className="cnr-lt-band">
-                <span className="cnr-lt-kicker"><i /> CNR MÜZİK TV <em>·</em> ŞİMDİ YAYINDA</span>
+                <span className="cnr-lt-kicker"><i /> CNR MUSIC PREMIERE <em>·</em> ON AIR</span>
                 <b className="cnr-lt-artist">{current?.artist || "CNR Müzik TV"}</b>
                 <span className="cnr-lt-track">{current?.title || "Müzik Kuşağı"}</span>
               </div>
@@ -808,17 +920,26 @@ export default function BroadcastApp() {
             <button className="control-live" onClick={returnToLive}><Radio size={16} /> CANLIYA DÖN</button>
             <div className="control-spacer" />
             <span className="sync-label"><span /> {currentHlsUrl ? "HLS YAYIN" : HLS_ONLY ? "HLS KAYNAĞI BEKLENİYOR" : "YOUTUBE YEDEK"}</span>
-            <button className="player-button" onClick={toggleMute} aria-label={muted ? "Sesi aç" : "Sesi kapat"}>{muted ? <VolumeX /> : <Volume2 />}</button>
+            <button className={"player-button caption-toggle " + (subtitleEnabled ? "is-active" : "")} onClick={toggleSubtitles} aria-label={subtitleEnabled ? "Altyazıyı kapat" : "Altyazıyı aç"} title={subtitleEnabled ? "Altyazıyı kapat" : "Altyazıyı aç"}><Captions /></button>
             <button className="player-button" onClick={toggleFullscreen} aria-label="Tam ekran">{fullScreen ? <X /> : <Expand />}</button>
           </div>
-          <div className="lower-third-panel" key={lowerKey}>
-            <div className="lower-live-label"><span /> ŞİMDİ YAYINDA</div>
-            <div className="lower-track">
-              <Image src={LOGO} alt="" width={115} height={39} unoptimized />
-              <div><b>{current?.title || "Yayın hazırlanıyor"}</b><small>{current?.artist || "CNR Müzik TV"} · {current?.category || "Müzik Kuşağı"}</small></div>
-            </div>
-            <div className="lower-bars">{Array.from({ length: 12 }, (_, i) => <i key={i} style={{ animationDelay: (i * 0.07) + "s" }} />)}</div>
-          </div>
+          <section className={"caption-console " + (subtitleEditorOpen ? "is-open" : "")}>
+            <button className="caption-console-heading" type="button" onClick={() => setSubtitleEditorOpen((value) => !value)} aria-expanded={subtitleEditorOpen}>
+              <span className="caption-console-icon"><Captions size={18} /></span>
+              <span><b>CNR ALTYAZI KONTROLÜ</b><small>{subtitleCues.length ? subtitleCues.length + " zamanlanmış satır · " + (subtitleTrackClipId === current?.id ? "bu klibe bağlı" : "başka klip için kayıtlı") : "Harici VTT / SRT dosyası yükle veya metin yapıştır"}</small></span>
+              <span className={"caption-console-state " + (subtitleEnabled ? "enabled" : "")}>{subtitleEnabled ? "AÇIK" : "KAPALI"}</span>
+              <ChevronDown className="caption-console-chevron" size={18} />
+            </button>
+            {subtitleEditorOpen && <div className="caption-console-body">
+              <div className="caption-console-actions">
+                <label className="caption-file-button"><FileUp size={15} /> DOSYA YÜKLE<input type="file" accept=".vtt,.srt,text/vtt,application/x-subrip" onChange={importSubtitleFile} /></label>
+                <button type="button" className="caption-action-primary" onClick={saveSubtitleTrack}><Save size={15} /> KAYDET & UYGULA</button>
+                <button type="button" className="caption-action-quiet" onClick={clearSubtitleTrack}><Trash2 size={15} /> TEMİZLE</button>
+              </div>
+              <textarea className="caption-editor" value={subtitleDraft} onChange={(event) => setSubtitleDraft(event.target.value)} placeholder={"WEBVTT\\n\\n00:00:01.000 --> 00:00:04.000\\nŞarkı sözleri veya konuşma metni..."} spellCheck={false} />
+              <div className="caption-console-foot"><span>VTT / SRT · ZAMAN KODLU · YALNIZCA BU TARAYICIDA SAKLANIR</span><span>{subtitleCues.length} SATIR</span></div>
+            </div>}
+          </section>
         </div>
         <aside className="live-side-panel">
           <div className="panel-heading"><div><span className="eyebrow">ŞU ANDA</span><h2>Yayında</h2></div><span className="live-chip">CANLI</span></div>
