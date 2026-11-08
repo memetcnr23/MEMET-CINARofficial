@@ -95,7 +95,8 @@ const LOGO = "/cnr-logo.webp";
 const HLS_STREAM = process.env.NEXT_PUBLIC_CNR_HLS_URL || "";
 // Default: HLS per-clip when available, YouTube embed fallback otherwise.
 // Set NEXT_PUBLIC_CNR_PLAYER_MODE=hls to enforce HLS-only mode.
-const HLS_ONLY = process.env.NEXT_PUBLIC_CNR_PLAYER_MODE === "hls";
+// Always keep the YouTube fallback available when no HLS manifest is configured.
+const HLS_ONLY = false;
 const navItems = [
   { label: "Ana Sayfa", href: "/", icon: Home },
   { label: "Canlı Yayın", href: "/canli-yayin", icon: Radio },
@@ -826,7 +827,8 @@ export default function BroadcastApp() {
                 draggable={false}
               />
             </div>}
-            {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : HLS_ONLY ? <div className="hls-source-pending"><div className="hls-source-mark"><Radio size={30} /></div><b>CNR HLS YAYIN KAYNAĞI BEKLENİYOR</b><span>Bu kanal YouTube oynatıcısına geri dönmez. CNR yayın manifesti (.m3u8) tanımlandığında yayın burada otomatik açılır.</span><small>YAYIN MOTORU · HLS / ADAPTIVE BITRATE</small></div> : <div id="cnr-live-player" className="youtube-video-host" />}
+            {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
+            {!current && <div className="broadcast-empty-overlay"><Radio size={30} /><b>CNR YAYINI HAZIRLANIYOR</b><span>{catalogError || "Müzik kataloğundan oynatılabilir klip bekleniyor."}</span><small>Yayın ekranı bağlantı kurulduğunda otomatik güncellenecek.</small></div>}
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
@@ -868,9 +870,9 @@ export default function BroadcastApp() {
           </div>
         </div>
         <aside className="live-side-panel">
-          <div className="panel-heading"><div><span className="eyebrow">ŞU ANDA</span><h2>Yayında</h2></div><span className="live-chip">CANLI</span></div>
+          <div className="panel-heading"><div><span className="eyebrow">ŞU ANDA</span><h2>Yayında</h2></div><span className="live-chip">{current ? "CANLI" : "BEKLEMEDE"}</span></div>
           {current && <div className="now-playing-card"><Image src={thumb(current.id)} alt={current.title} width={400} height={225} unoptimized /><div><small>{getProgramName(current.category)}</small><b>{current.title}</b><span>{current.artist}</span></div></div>}
-          <div className="live-status-grid"><div><span>Yayın durumu</span><b><i /> AKTİF</b></div><div><span>Oynatıcı</span><b>{playerReady ? "HAZIR" : HLS_ONLY && !currentHlsUrl ? "KAYNAK BEKLENİYOR" : "BAĞLANIYOR"}</b></div></div>
+          <div className="live-status-grid"><div><span>Yayın durumu</span><b><i /> {current ? "AKTİF" : "BEKLEMEDE"}</b></div><div><span>Oynatıcı</span><b>{playerReady ? "HAZIR" : HLS_ONLY && !currentHlsUrl ? "KAYNAK BEKLENİYOR" : "BAĞLANIYOR"}</b></div></div>
           <div className="panel-heading upcoming-heading"><div><span className="eyebrow">SIRADAKİ</span><h2>Yayın Akışı</h2></div><Link href="/yayin-akisi">Tümü <ChevronRight size={15} /></Link></div>
           <div className="upcoming-list">{(nowPlaying?.upcoming || []).slice(1, 6).map((item) => <div className="upcoming-row" key={item.clip.id + item.startsAt}><Image src={thumb(item.clip.id, "mqdefault")} alt="" width={88} height={50} unoptimized /><span className="upcoming-time">{formatTime(item.startsAt)}</span><div><b>{item.clip.title}</b><small>{getProgramName(item.clip.category)}</small></div></div>)}</div>
           {catalogError && <p className="error-note">{catalogError}</p>}
