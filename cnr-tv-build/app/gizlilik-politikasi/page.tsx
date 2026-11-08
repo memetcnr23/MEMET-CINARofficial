@@ -5,4 +5,4 @@ export default function Page(){return <LegalPage title="Gizlilik Politikası" in
 {title:"Üçüncü taraf hizmetleri",body:"Video içerikleri YouTube üzerinden gömülü oynatıcılarla sunulabilir. Bu oynatıcılar kullanıldığında YouTube/Google kendi gizlilik koşulları kapsamında veri işleyebilir. Reklam hizmetleri etkinleştirilirse reklam sağlayıcıları da kendi politikaları doğrultusunda veri işleyebilir."},
 {title:"Veri güvenliği ve saklama",body:"Veriler yalnızca hizmetin sunulması, güvenliğin sağlanması ve yasal yükümlülüklerin yerine getirilmesi için gerekli süre boyunca tutulmalıdır. Banka hesap bilgileri bu web sitesinde tutulmaz; ödeme sağlayıcısının güvenli panelinde yönetilmelidir."},
 {title:"Haklar ve iletişim",body:"Kişisel verilerle ilgili talepler için CNR Müzik TV'nin resmî sosyal medya/iletişim kanallarından başvuru yapılabilir. İşletmeci kimliği ve resmî iletişim adresi yayımdan önce bu sayfaya eklenmelidir."}
-]}}
+]}/>}
