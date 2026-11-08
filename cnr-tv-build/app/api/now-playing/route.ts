@@ -77,6 +77,9 @@ function getTimeline(clips: YouTubeClip[], nowMs: number) {
 export async function GET() {
   try {
     const sourceClips = await getYouTubeCatalog();
+    if (sourceClips.length === 0) {
+      throw new Error("Yayın kataloğu boş. YouTube API erişimi veya video filtreleri nedeniyle oynatılabilir klip bulunamadı.");
+    }
     const hlsMap = getHlsClipMap();
     const clips = sourceClips.map((clip) => ({ ...clip, hlsUrl: hlsMap[clip.id] || null }));
     const hlsConfiguredCount = clips.filter((clip) => Boolean(clip.hlsUrl)).length;
