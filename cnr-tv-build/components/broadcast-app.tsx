@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import type Hls from "hls.js";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -18,6 +19,7 @@ type Clip = {
   artist: string;
   category: string;
   durationSeconds: number;
+  hlsUrl?: string | null;
 };
 type Artist={slug:string;name:string;genre?:string|null;bio?:string|null;avatar_url?:string|null;cover_url?:string|null;youtube_url?:string|null;instagram_url?:string|null;spotify_url?:string|null;is_verified:boolean;verification_source?:string|null};
 type SearchResults={artists:Artist[];clips:Clip[];databaseConnected:boolean};
@@ -65,7 +67,6 @@ declare global {
       PlayerState: { PLAYING: number; PAUSED: number; ENDED: number; CUED: number };
     };
     onYouTubeIframeAPIReady?: () => void;
-    Hls?: { new(): { loadSource: (src: string) => void; attachMedia: (media: HTMLMediaElement) => void; on: (event: string, callback: () => void) => void; destroy: () => void; }; isSupported: () => boolean; Events: { MANIFEST_PARSED: string; ERROR: string }; };
   }
 }
 
@@ -194,6 +195,7 @@ export default function BroadcastApp() {
   const activeNationalDay = getActiveNationalDay(clock);
   const clips = nowPlaying?.clips || [];
   const current = nowPlaying?.current.clip;
+  const currentHlsUrl = HLS_STREAM || current?.hlsUrl || "";
   const activeArtistSlug = pathname.startsWith("/sanatci/") ? decodeURIComponent(pathname.slice("/sanatci/".length).split("/")[0] || "") : "";
   nowRef.current = nowPlaying;
 
@@ -295,60 +297,139 @@ export default function BroadcastApp() {
     }
   }, []);
 
+  // HLS-first playback: prefer hls.js on MSE-capable browsers, then native HLS.
   useEffect(() => {
-    if (pathname !== "/canli-yayin" || !HLS_STREAM) return;
+    if (pathname !== "/canli-yayin" || !currentHlsUrl) return;
     let disposed = false;
+    let started = false;
+    let localHls: Hls | null = null;
     const video = hlsVideoRef.current;
     if (!video) return;
-    const ready = () => {
-      if (disposed) return;
+
+    setPlayerReady(false);
+    setPlayerPlaying(false);
+    video.crossOrigin = "anonymous";
+    video.playsInline = true;
+    video.muted = true;
+
+    const alignToSchedule = () => {
+      if (HLS_STREAM) return;
+      const data = nowRef.current;
+      const item = data?.current;
+      if (!item) return;
+      const serverTime = Date.parse(data.serverTime);
+      const elapsed = Number.isFinite(serverTime) ? Math.max(0, (Date.now() - serverTime) / 1000) : 0;
+      const target = Math.max(0, item.offsetSeconds + elapsed);
+      if (Number.isFinite(video.duration) && target < video.duration - 0.5) {
+        try { video.currentTime = target; } catch { /* Metadata may still be settling. */ }
+      }
+    };
+
+    const startPlayback = () => {
+      if (disposed || started || video.readyState < HTMLMediaElement.HAVE_METADATA) return;
+      started = true;
+      alignToSchedule();
       setPlayerReady(true);
-      void video.play().catch(() => notify("Yayın hazır. Başlatmak için ekrana dokunun."));
+      video.muted = true;
+      setMuted(true);
+      void video.play()
+        .then(() => { if (!disposed) setPlayerPlaying(true); })
+        .catch(() => { if (!disposed) notify("HLS yayını hazır. Oynatmayı başlatmak için ekrana dokunun."); });
     };
-    const attach = () => {
-      if (disposed || !window.Hls) return;
-      const Hls = window.Hls;
-      if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = HLS_STREAM;
-        video.addEventListener("loadedmetadata", ready, { once: true });
-        video.addEventListener("error", () => notify("HLS yayını yüklenemedi. Yayın adresini kontrol edin."), { once: true });
-        video.load();
-      } else if (Hls.isSupported()) {
-        const hls = new Hls();
-        hlsInstanceRef.current = hls;
-        hls.loadSource(HLS_STREAM);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, ready);
-        hls.on(Hls.Events.ERROR, () => { if (!disposed) notify("Canlı yayın bağlantısı yenileniyor."); });
-      } else notify("Bu cihaz HLS yayın biçimini desteklemiyor.");
+
+    const onMetadata = () => startPlayback();
+    const onVideoError = () => {
+      if (!disposed) {
+        setPlayerReady(false);
+        setPlayerPlaying(false);
+        notify("HLS kaynağı yüklenemedi. Manifest adresini, segmentleri ve CORS ayarlarını kontrol edin.");
+      }
     };
-    if (window.Hls) attach();
-    else {
-      let script = document.querySelector<HTMLScriptElement>('script[data-cnr-hls="true"]');
-      if (!script) {
-        script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js";
-        script.async = true;
-        script.dataset.cnrHls = "true";
-        script.onload = attach;
-        script.onerror = () => notify("HLS oynatıcı kütüphanesi yüklenemedi.");
-        document.head.appendChild(script);
-      } else script.addEventListener("load", attach, { once: true });
-    }
+    video.addEventListener("loadedmetadata", onMetadata);
+    video.addEventListener("error", onVideoError);
+
+    const attachHls = async () => {
+      try {
+        const module = await import("hls.js");
+        if (disposed) return;
+        const HlsPlayer = module.default;
+        if (HlsPlayer.isSupported()) {
+          localHls = new HlsPlayer({
+            enableWorker: true,
+            lowLatencyMode: Boolean(HLS_STREAM),
+            backBufferLength: 60,
+            maxBufferLength: 30
+          });
+          hlsInstanceRef.current = localHls;
+          localHls.on(HlsPlayer.Events.MANIFEST_PARSED, () => {
+            if (video.readyState >= HTMLMediaElement.HAVE_METADATA) startPlayback();
+          });
+          localHls.on(HlsPlayer.Events.ERROR, (_event, data) => {
+            if (disposed || !data.fatal) return;
+            if (data.type === HlsPlayer.ErrorTypes.NETWORK_ERROR) localHls?.startLoad();
+            else if (data.type === HlsPlayer.ErrorTypes.MEDIA_ERROR) localHls?.recoverMediaError();
+            else {
+              setPlayerReady(false);
+              setPlayerPlaying(false);
+              notify("HLS oynatıcı kritik bir hata aldı. Yayın kaynağını kontrol edin.");
+            }
+          });
+          localHls.loadSource(currentHlsUrl);
+          localHls.attachMedia(video);
+          return;
+        }
+        if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          video.src = currentHlsUrl;
+          video.load();
+          return;
+        }
+        notify("Bu cihaz HLS oynatmayı desteklemiyor.");
+      } catch (error) {
+        if (!disposed) {
+          console.error("CNR HLS initialization failed:", error);
+          notify("HLS oynatıcı yüklenemedi. Sayfayı yenileyip tekrar deneyin.");
+        }
+      }
+    };
+    void attachHls();
+
     return () => {
       disposed = true;
       video.pause();
+      video.removeEventListener("loadedmetadata", onMetadata);
+      video.removeEventListener("error", onVideoError);
       video.removeAttribute("src");
       video.load();
-      hlsInstanceRef.current?.destroy();
-      hlsInstanceRef.current = null;
+      localHls?.destroy();
+      if (hlsInstanceRef.current === localHls) hlsInstanceRef.current = null;
       setPlayerReady(false);
       setPlayerPlaying(false);
     };
-  }, [pathname, HLS_STREAM]);
+  }, [pathname, currentHlsUrl, nowPlaying?.current.clip.id]);
+
+  // Keep each HLS VOD clip aligned to the channel clock without reloading its manifest.
+  useEffect(() => {
+    if (pathname !== "/canli-yayin" || !currentHlsUrl || HLS_STREAM || !playerReady) return;
+    const sync = () => {
+      const data = nowRef.current;
+      const item = data?.current;
+      const video = hlsVideoRef.current;
+      if (!data || !item || !video || !Number.isFinite(video.duration)) return;
+      const serverTime = Date.parse(data.serverTime);
+      const elapsed = Number.isFinite(serverTime) ? Math.max(0, (Date.now() - serverTime) / 1000) : 0;
+      const target = Math.max(0, item.offsetSeconds + elapsed);
+      if (target < video.duration - 0.5 && Math.abs(video.currentTime - target) > 4) {
+        try { video.currentTime = target; } catch { /* Ignore transient seek errors. */ }
+      }
+      if (video.paused) void video.play().catch(() => undefined);
+    };
+    sync();
+    const timer = window.setInterval(sync, 12000);
+    return () => window.clearInterval(timer);
+  }, [pathname, currentHlsUrl, nowPlaying?.current.clip.id, playerReady]);
 
   useEffect(() => {
-    if (pathname !== "/canli-yayin" || HLS_STREAM || !nowPlaying?.current.clip) return;
+    if (pathname !== "/canli-yayin" || currentHlsUrl || !nowPlaying?.current.clip) return;
     let disposed = false;
     const active = nowPlaying.current.clip;
     const init = () => {
@@ -403,10 +484,10 @@ export default function BroadcastApp() {
       setPlayerReady(false);
       setPlayerPlaying(false);
     };
-  }, [pathname === "/canli-yayin", Boolean(nowPlaying?.current.clip?.id)]);
+  }, [pathname === "/canli-yayin", Boolean(nowPlaying?.current.clip?.id), Boolean(currentHlsUrl)]);
 
   useEffect(() => {
-    if (pathname !== "/canli-yayin" || HLS_STREAM || !playerReadyRef.current) return;
+    if (pathname !== "/canli-yayin" || currentHlsUrl || !playerReadyRef.current) return;
     const sync = () => {
       const data = nowRef.current;
       const item = data?.current;
@@ -481,7 +562,7 @@ export default function BroadcastApp() {
   }, [artists, directorySearch]);
 
   const togglePlayPause = () => {
-    const video = HLS_STREAM ? hlsVideoRef.current : null;
+    const video = currentHlsUrl ? hlsVideoRef.current : null;
     if (video) {
       if (video.paused) void video.play().then(() => setPlayerPlaying(true)).catch(() => notify("Yayın başlatılamadı."));
       else { video.pause(); setPlayerPlaying(false); }
@@ -494,7 +575,7 @@ export default function BroadcastApp() {
   };
 
   const toggleMute = () => {
-    const video = HLS_STREAM ? hlsVideoRef.current : null;
+    const video = currentHlsUrl ? hlsVideoRef.current : null;
     if (video) { video.muted = !video.muted; setMuted(video.muted); setSoundEnabled(!video.muted); localStorage.setItem("cnr-sound", String(!video.muted)); return; }
     const player = playerRef.current;
     if (!player || !playerReadyRef.current) {
@@ -517,7 +598,7 @@ export default function BroadcastApp() {
   };
 
   const startWithSound = () => {
-    const video = HLS_STREAM ? hlsVideoRef.current : null;
+    const video = currentHlsUrl ? hlsVideoRef.current : null;
     if (video) { video.muted = false; setMuted(false); setSoundEnabled(true); localStorage.setItem("cnr-sound", "true"); void video.play().then(() => setPlayerPlaying(true)).catch(() => notify("Oynatma başlatılamadı. Yeniden deneyin.")); return; }
     const player = playerRef.current;
     if (!player || !playerReadyRef.current) {
@@ -529,6 +610,40 @@ export default function BroadcastApp() {
     setMuted(false);
     setSoundEnabled(true);
     localStorage.setItem("cnr-sound", "true");
+  };
+
+  const returnToLive = () => {
+    const video = currentHlsUrl ? hlsVideoRef.current : null;
+    if (video) {
+      if (HLS_STREAM && video.seekable.length) {
+        try { video.currentTime = Math.max(0, video.seekable.end(video.seekable.length - 1) - 1); } catch {}
+      } else {
+        const data = nowRef.current;
+        const item = data?.current;
+        if (data && item) {
+          const serverTime = Date.parse(data.serverTime);
+          const elapsed = Number.isFinite(serverTime) ? Math.max(0, (Date.now() - serverTime) / 1000) : 0;
+          const target = Math.max(0, item.offsetSeconds + elapsed);
+          if (Number.isFinite(video.duration) && target < video.duration) {
+            try { video.currentTime = target; } catch {}
+          }
+        }
+      }
+      void video.play().then(() => setPlayerPlaying(true)).catch(() => notify("Canlı konuma dönülemedi."));
+      notify("Yayın çizelgesinin canlı konumuna dönüldü.");
+      return;
+    }
+    const player = playerRef.current;
+    if (player && playerReadyRef.current) {
+      const data = nowRef.current;
+      const item = data?.current;
+      if (data && item) {
+        const elapsed = Math.max(0, (Date.now() - Date.parse(data.serverTime)) / 1000);
+        player.seekTo(item.offsetSeconds + elapsed, true);
+      }
+      player.playVideo();
+      notify("Canlı konuma dönüldü.");
+    }
   };
 
   const toggleFullscreen = async () => {
@@ -620,7 +735,7 @@ export default function BroadcastApp() {
                 draggable={false}
               />
             </div>}
-            {HLS_STREAM ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted playsInline preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
+            {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
@@ -652,9 +767,9 @@ export default function BroadcastApp() {
           </div>
           <div className="broadcast-controls">
             <button className="player-button" onClick={togglePlayPause} aria-label={playerPlaying ? "Yayını duraklat" : "Yayını oynat"}>{playerPlaying ? <Pause /> : <Play fill="currentColor" />}</button>
-            <button className="control-live" onClick={() => { const video = HLS_STREAM ? hlsVideoRef.current : null; if (video) { try { if (video.seekable.length) video.currentTime = Math.max(0, video.seekable.end(video.seekable.length - 1) - 1); } catch {} void video.play(); notify("Canlı yayına yeniden bağlandınız."); } else { const p = playerRef.current; if (p) { p.playVideo(); notify("Canlı yayına yeniden bağlandınız."); } } }}><Radio size={16} /> CANLIYA DÖN</button>
+            <button className="control-live" onClick={returnToLive}><Radio size={16} /> CANLIYA DÖN</button>
             <div className="control-spacer" />
-            <span className="sync-label"><span /> SENKRON YAYIN</span>
+            <span className="sync-label"><span /> {currentHlsUrl ? "HLS YAYIN" : "YOUTUBE YEDEK"}</span>
             <button className="player-button" onClick={toggleMute} aria-label={muted ? "Sesi aç" : "Sesi kapat"}>{muted ? <VolumeX /> : <Volume2 />}</button>
             <button className="player-button" onClick={toggleFullscreen} aria-label="Tam ekran">{fullScreen ? <X /> : <Expand />}</button>
           </div>

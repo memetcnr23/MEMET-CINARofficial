@@ -3,6 +3,33 @@ import { getYouTubeCatalog, type YouTubeClip } from "@/lib/youtube-catalog";
 
 export const dynamic = "force-dynamic";
 
+function getHlsClipMap(): Record<string, string> {
+  const raw = process.env.CNR_HLS_CLIP_MAP;
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    const safe: Record<string, string> = {};
+    for (const [clipId, candidate] of Object.entries(parsed)) {
+      if (typeof candidate !== "string") continue;
+      const value = candidate.trim();
+      if (value.startsWith("/") && !value.startsWith("//") && value.toLowerCase().endsWith(".m3u8")) {
+        safe[clipId] = value;
+        continue;
+      }
+      try {
+        const url = new URL(value);
+        if (url.protocol === "https:" && url.pathname.toLowerCase().endsWith(".m3u8")) safe[clipId] = url.toString();
+      } catch {
+        // Ignore invalid or non-HTTPS manifest URLs.
+      }
+    }
+    return safe;
+  } catch {
+    return {};
+  }
+}
+
 function programFor(category: string) {
   if (category === "Rap & Trap") return "CNR Rap & Trap";
   if (category === "Pop & Dans") return "Pop & Dans";
@@ -49,11 +76,20 @@ function getTimeline(clips: YouTubeClip[], nowMs: number) {
 
 export async function GET() {
   try {
-    const clips = await getYouTubeCatalog();
+    const sourceClips = await getYouTubeCatalog();
+    const hlsMap = getHlsClipMap();
+    const clips = sourceClips.map((clip) => ({ ...clip, hlsUrl: hlsMap[clip.id] || null }));
+    const hlsConfiguredCount = clips.filter((clip) => Boolean(clip.hlsUrl)).length;
     const now = Date.now();
     const timeline = getTimeline(clips, now);
     return NextResponse.json({
-      source: "CNR synchronized YouTube playlist",
+      source: "CNR synchronized HLS-first playlist",
+      hls: {
+        mode: process.env.NEXT_PUBLIC_CNR_HLS_URL ? "continuous" : "per-clip",
+        configuredClips: hlsConfiguredCount,
+        totalClips: clips.length,
+        fallbackClips: clips.length - hlsConfiguredCount
+      },
       serverTime: new Date(now).toISOString(),
       current: timeline.upcoming[0],
       upcoming: timeline.upcoming,

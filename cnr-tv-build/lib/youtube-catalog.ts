@@ -4,6 +4,7 @@ export type YouTubeClip = {
   artist: string;
   category: string;
   durationSeconds: number;
+  hlsUrl?: string | null;
 };
 
 type SearchItem = { id?: { videoId?: string } };
