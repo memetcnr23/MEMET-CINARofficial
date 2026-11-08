@@ -12,15 +12,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   description:
-    "CNR Müzik TV® — 7/24 kesintisiz müzik yayını, klipler, şarkı sözleri ve visualizer videoları.",
+    "MEMET CINAR Official: AI-routed contact, lead, and issue forms powered by Jev and AI SDK, with email delivery via Resend.",
   title: {
-    default: "CNR Müzik TV®",
-    template: "%s · CNR Müzik TV",
+    default: "MEMET CINAR Official · Form Router",
+    template: "%s · MEMET CINAR Official",
   },
 };
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => (
-  <html lang="tr" className={`${geist.variable} ${geistMono.variable}`}>
+  <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
     <body>
       <a
         href="#main"
@@ -28,6 +28,23 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode }>) => (
       >
         Skip to content
       </a>
+      <header className="border-b">
+        <div className="mx-auto flex min-h-16 max-w-6xl items-center px-5 sm:px-8">
+          <div className="flex flex-col py-3">
+            <h1 className="text-lg leading-6 font-semibold tracking-tight">
+              <Link
+                href="/leads"
+                className="focus-visible:ring-ring rounded-sm outline-none focus-visible:ring-2"
+              >
+                MEMET CINAR Official
+              </Link>
+            </h1>
+            <p className="text-muted-foreground text-sm leading-5">
+              AI Form Router · Jev and AI SDK
+            </p>
+          </div>
+        </div>
+      </header>
       {children}
     </body>
   </html>
