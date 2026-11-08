@@ -41,13 +41,13 @@
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
-  <path d="M113 106 C126 77 143 47 179 31 C173 57 190 78 235 102 C198 91 153 91 113 106 Z"
+  <path d="M115 102 C130 74 147 44 180 25 C173 51 190 75 236 105 C198 85 151 83 115 102 Z"
         fill="url(#cnrHatRed)" stroke="#790515" stroke-width="3" stroke-linejoin="round"/>
   <path d="M132 79 C146 52 159 42 177 34" fill="none" stroke="#ff9da0" stroke-width="4.5" stroke-linecap="round" opacity=".56"/>
-  <path d="M117 108 C150 87 193 84 234 104" fill="none" stroke="#7c0715" stroke-width="22" stroke-linecap="round" opacity=".42"/>
-  <path d="M115 103 C150 82 193 80 236 99" fill="none" stroke="url(#cnrHatFur)" stroke-width="17" stroke-linecap="round"/>
-  <path d="M120 100 C153 82 192 80 232 97" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="1.5 5" opacity=".88"/>
-  <path d="M123 108 C155 93 196 91 229 105" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+  <path d="M115 104 C150 82 193 80 236 111" fill="none" stroke="#7c0715" stroke-width="22" stroke-linecap="round" opacity=".42"/>
+  <path d="M115 104 C150 82 193 80 236 111" fill="none" stroke="url(#cnrHatFur)" stroke-width="15" stroke-linecap="round"/>
+  <path d="M120 101 C153 86 193 85 232 108" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="1.5 5" opacity=".88"/>
+  <path d="M123 109 C155 96 196 95 229 115" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".35"/>
   <g fill="url(#cnrHatPom)">
     <circle cx="178" cy="32" r="13"/>
     <circle cx="168" cy="32" r="8.5"/>
