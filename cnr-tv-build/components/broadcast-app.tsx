@@ -366,38 +366,40 @@ export default function BroadcastApp() {
     const attachHls = () => {
       if (disposed) return;
       const HlsPlayer = window.Hls;
-        if (HlsPlayer.isSupported()) {
-          localHls = new HlsPlayer({
-            enableWorker: true,
-            lowLatencyMode: Boolean(HLS_STREAM),
-            backBufferLength: 60,
-            maxBufferLength: 30
-          });
-          hlsInstanceRef.current = localHls;
-          localHls.on(HlsPlayer.Events.MANIFEST_PARSED, () => {
-            if (video.readyState >= HTMLMediaElement.HAVE_METADATA) startPlayback();
-          });
-          localHls.on(HlsPlayer.Events.ERROR, (_event, data) => {
-            if (disposed || !data || !data.fatal) return;
-            if (data.type === HlsPlayer.ErrorTypes.NETWORK_ERROR) localHls?.startLoad();
-            else if (data.type === HlsPlayer.ErrorTypes.MEDIA_ERROR) localHls?.recoverMediaError();
-            else {
-              setPlayerReady(false);
-              setPlayerPlaying(false);
-              notify("HLS oynatıcı kritik bir hata aldı. Yayın kaynağını kontrol edin.");
-            }
-          });
-          localHls.loadSource(currentHlsUrl);
-          localHls.attachMedia(video);
-          return;
-        }
-        if (video.canPlayType("application/vnd.apple.mpegurl")) {
-          video.src = currentHlsUrl;
-          video.load();
-          return;
-        }
-        notify("Bu cihaz HLS oynatmayı desteklemiyor.");
+
+      if (HlsPlayer?.isSupported()) {
+        localHls = new HlsPlayer({
+          enableWorker: true,
+          lowLatencyMode: Boolean(HLS_STREAM),
+          backBufferLength: 60,
+          maxBufferLength: 30
+        });
+        hlsInstanceRef.current = localHls;
+        localHls.on(HlsPlayer.Events.MANIFEST_PARSED, () => {
+          if (video.readyState >= HTMLMediaElement.HAVE_METADATA) startPlayback();
+        });
+        localHls.on(HlsPlayer.Events.ERROR, (_event, data) => {
+          if (disposed || !data || !data.fatal) return;
+          if (data.type === HlsPlayer.ErrorTypes.NETWORK_ERROR) localHls?.startLoad();
+          else if (data.type === HlsPlayer.ErrorTypes.MEDIA_ERROR) localHls?.recoverMediaError();
+          else {
+            setPlayerReady(false);
+            setPlayerPlaying(false);
+            notify("HLS oynatıcı kritik bir hata aldı. Yayın kaynağını kontrol edin.");
+          }
+        });
+        localHls.loadSource(currentHlsUrl);
+        localHls.attachMedia(video);
+        return;
       }
+
+      if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = currentHlsUrl;
+        video.load();
+        return;
+      }
+
+      notify("Bu cihaz HLS oynatmayı desteklemiyor.");
     };
 
     const ensureHls = () => {
