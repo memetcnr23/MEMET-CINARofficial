@@ -17,7 +17,7 @@ if [[ ! -f "$INPUT" ]]; then
   exit 2
 fi
 
-mkdir -p "$OUTPUT_DIR/0" "$OUTPUT_DIR/1" "$OUTPUT_DIR/2"
+mkdir -p "$OUTPUT_DIR/1080p" "$OUTPUT_DIR/720p" "$OUTPUT_DIR/480p"
 
 ffmpeg -hide_banner -y -i "$INPUT" \
   -filter_complex "[0:v:0]fps=25,split=3[v1080src][v720src][v480src];[v1080src]scale=-2:1080:force_original_aspect_ratio=decrease[v1080];[v720src]scale=-2:720:force_original_aspect_ratio=decrease[v720];[v480src]scale=-2:480:force_original_aspect_ratio=decrease[v480]" \

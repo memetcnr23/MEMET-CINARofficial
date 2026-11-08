@@ -87,8 +87,9 @@ declare global {
 
 const LOGO = "/cnr-logo.webp";
 const HLS_STREAM = process.env.NEXT_PUBLIC_CNR_HLS_URL || "";
-// HLS-only is the default. YouTube is available only when explicitly opted in.
-const HLS_ONLY = process.env.NEXT_PUBLIC_CNR_PLAYER_MODE !== "youtube";
+// Default: HLS per-clip when available, YouTube embed fallback otherwise.
+// Set NEXT_PUBLIC_CNR_PLAYER_MODE=hls to enforce HLS-only mode.
+const HLS_ONLY = process.env.NEXT_PUBLIC_CNR_PLAYER_MODE === "hls";
 const navItems = [
   { label: "Ana Sayfa", href: "/", icon: Home },
   { label: "Canlı Yayın", href: "/canli-yayin", icon: Radio },
@@ -784,7 +785,7 @@ export default function BroadcastApp() {
               </div>
             </div>
             {!playerPlaying && (currentHlsUrl || !HLS_ONLY) && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
-            <div className="screen-bottom"><span>● SİNYAL AKTİF</span><span>{h}</span></div>
+            <div className="screen-bottom"><span>● {currentHlsUrl ? "CNR HLS YAYINI" : HLS_ONLY ? "HLS KAYNAĞI BEKLENİYOR" : "YOUTUBE YEDEK YAYIN"}</span><span>{h}</span></div>
             <div className={"cnr-lower-third " + (lowerActive ? "show" : "")} key={lowerKey} aria-live="polite">
               <div className="cnr-lt-logo">
                 <Image src={LOGO} alt="CNR Müzik TV" width={300} height={100} unoptimized />

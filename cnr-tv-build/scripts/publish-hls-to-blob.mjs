@@ -49,6 +49,7 @@ for (const filePath of files) {
   const result = await put(pathname, await readFile(filePath), {
     access: "public",
     addRandomSuffix: false,
+    allowOverwrite: true,
     contentType: mimeTypes[extension] || "application/octet-stream",
     cacheControlMaxAge: isPlaylist ? 60 : 31536000
   });
