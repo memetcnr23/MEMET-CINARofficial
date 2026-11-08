@@ -378,7 +378,7 @@ export default function BroadcastApp() {
             if (video.readyState >= HTMLMediaElement.HAVE_METADATA) startPlayback();
           });
           localHls.on(HlsPlayer.Events.ERROR, (_event, data) => {
-            if (disposed || !data.fatal) return;
+            if (disposed || !data || !data.fatal) return;
             if (data.type === HlsPlayer.ErrorTypes.NETWORK_ERROR) localHls?.startLoad();
             else if (data.type === HlsPlayer.ErrorTypes.MEDIA_ERROR) localHls?.recoverMediaError();
             else {
