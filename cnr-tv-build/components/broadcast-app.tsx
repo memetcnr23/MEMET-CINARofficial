@@ -31,7 +31,7 @@ type TimedClip = {
 type SubtitleCue = { start: number; end: number; text: string };
 
 function parseSubtitleTime(value: string): number {
-  const clean = value.trim().replace(",", ".").split(/\\s+/)[0];
+  const clean = value.trim().replace(",", ".").split(/\s+/)[0];
   const parts = clean.split(":");
   if (parts.length === 3) return Number(parts[0]) * 3600 + Number(parts[1]) * 60 + Number(parts[2]);
   if (parts.length === 2) return Number(parts[0]) * 60 + Number(parts[1]);
@@ -39,18 +39,18 @@ function parseSubtitleTime(value: string): number {
 }
 
 function parseSubtitleTrack(raw: string): SubtitleCue[] {
-  const lines = raw.replace(/^\\uFEFF/, "").replace(/\\r/g, "").split("\\n");
+  const lines = raw.replace(/^\uFEFF/, "").replace(/\r/g, "").split("\n");
   const cues: SubtitleCue[] = [];
   for (let i = 0; i < lines.length; i += 1) {
     if (!lines[i].includes("-->")) continue;
     const [startRaw, endRaw] = lines[i].split("-->");
     const start = parseSubtitleTime(startRaw || "");
-    const end = parseSubtitleTime((endRaw || "").trim().split(/\\s+/)[0] || "");
+    const end = parseSubtitleTime((endRaw || "").trim().split(/\s+/)[0] || "");
     const textLines: string[] = [];
     for (let j = i + 1; j < lines.length && lines[j].trim(); j += 1) {
-      if (!/^\\d+$/.test(lines[j].trim())) textLines.push(lines[j].trim());
+      if (!/^\d+$/.test(lines[j].trim())) textLines.push(lines[j].trim());
     }
-    const text = textLines.join("\\n").replace(/<[^>]*>/g, "").trim();
+    const text = textLines.join("\n").replace(/<[^>]*>/g, "").trim();
     if (Number.isFinite(start) && Number.isFinite(end) && end > start && text) cues.push({ start, end, text });
   }
   return cues.sort((a, b) => a.start - b.start);
@@ -383,6 +383,11 @@ export default function BroadcastApp() {
 
   const toggleSubtitles = () => {
     const next = !subtitleEnabled;
+    if (next && (!subtitleCues.length || subtitleTrackClipId !== current?.id)) {
+      notify("Bu klip için önce VTT veya SRT altyazısı yükleyip kaydedin.");
+      setSubtitleEditorOpen(true);
+      return;
+    }
     setSubtitleEnabled(next);
     try {
       const value = { clipId: subtitleTrackClipId, text: subtitleDraft, enabled: next };
