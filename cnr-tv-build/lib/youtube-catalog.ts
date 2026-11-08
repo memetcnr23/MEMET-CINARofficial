@@ -94,15 +94,15 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
         "Türkçe rap official music video klip",
         "Türkçe rock arabesk resmi klip",
         "Türkçe şarkı sözleri lyric video official",
-        "K-pop official music video latest",
-        "K-pop lyrics official music video",
+        "K-pop official music video BLACKPINK BTS aespa NewJeans TWICE Stray Kids",
+        "K-pop official MV lyric video Korean pop 2026",
         "international pop official music video",
         "global music official lyrics video visualizer"
       ];
   const discovered = await Promise.all(discoveryQueries.map((query, index) =>
     youtube<SearchItem>("search", {
       part: "snippet", type: "video", q: query,
-      videoEmbeddable: "true", videoSyndicated: "true",
+      videoEmbeddable: "true",
       ...(index < 4 ? { regionCode: "TR", relevanceLanguage: "tr" } : {}),
       maxResults: "50", order: "relevance"
     }, apiKey).catch(() => ({ items: [] as SearchItem[] }))
@@ -113,14 +113,21 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
   // for six hours to keep discovery broad without exhausting the daily quota.
   const ownIds = [...new Set(ownUploadIds)].slice(0, searchQuery?.trim() ? 0 : 8);
   const discoveryIds: string[] = [];
+  const categoryByVideoId = new Map<string, string>();
   const seenDiscovery = new Set<string>();
-  const perQueryLimit = searchQuery?.trim() ? 50 : 6;
+  const perQueryLimit = searchQuery?.trim() ? 50 : 10;
   for (let index = 0; index < perQueryLimit; index += 1) {
-    for (const result of discovered) {
+    for (const [queryIndex, result] of discovered.entries()) {
       const id = result.items?.[index]?.id?.videoId;
       if (id && !seenDiscovery.has(id)) {
         seenDiscovery.add(id);
         discoveryIds.push(id);
+        if (queryIndex === 4 || queryIndex === 5) categoryByVideoId.set(id, "K-Pop");
+        else if (queryIndex >= 6) categoryByVideoId.set(id, "Global Pop");
+        else if (queryIndex === 1) categoryByVideoId.set(id, "Rap & Trap");
+        else if (queryIndex === 2) categoryByVideoId.set(id, "Türkçe Rock & Arabesk");
+        else if (queryIndex === 3) categoryByVideoId.set(id, "Türkçe Pop");
+        else categoryByVideoId.set(id, "Türkçe Pop");
       }
     }
   }
@@ -158,7 +165,7 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
         id: video.id as string,
         title,
         artist: video.snippet?.channelTitle?.trim() || "Bilinmeyen Sanatçı",
-        category: categoryFor(title, description),
+        category: categoryByVideoId.get(video.id as string) || categoryFor(title, description),
         videoType: videoTypeFor(title, description),
         durationSeconds: parseDuration(video.contentDetails?.duration || "")
       };
