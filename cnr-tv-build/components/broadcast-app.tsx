@@ -624,7 +624,7 @@ export default function BroadcastApp() {
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
                 <span className="cnr-logo-snow" aria-hidden="true">
-                  {Array.from({ length: 44 }, (_, index) => <i key={index} className={index % 6 === 0 ? "snow-near" : index % 3 === 0 ? "snow-soft" : ""} style={{ left: ((index * 37) % 96 + 2) + "%", animationDelay: "-" + ((index * 0.31) % 5.9).toFixed(2) + "s", animationDuration: (3.1 + (index % 7) * 0.43) + "s", width: (1.7 + (index % 5) * 0.5) + "px", height: (1.7 + (index % 5) * 0.5) + "px" }} />)}
+                  {Array.from({ length: 72 }, (_, index) => <i key={index} className={index % 13 === 0 ? "snow-near" : index % 7 === 0 ? "snow-crystal" : index % 4 === 0 ? "snow-soft" : ""} style={{ left: ((index * 61) % 96 + 2) + "%", animationDelay: "-" + ((index * 0.47) % 8.7).toFixed(2) + "s", animationDuration: (4.4 + (index % 11) * 0.62) + "s", width: (index % 13 === 0 ? 5.2 : 1.15 + (index % 6) * 0.67) + "px", height: (index % 13 === 0 ? 5.2 : 1.15 + (index % 6) * 0.67) + "px" }} />)}
                 </span>
                 <span className="cnr-logo-metallic-shine" aria-hidden="true" />
                 <svg className="cnr-santa-hat" viewBox="0 0 170 130" role="img" aria-label="Noel şapkası" xmlns="http://www.w3.org/2000/svg">
