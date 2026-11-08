@@ -17,6 +17,7 @@ type Clip = {
   title: string;
   artist: string;
   category: string;
+  videoType?: string;
   durationSeconds: number;
   hlsUrl?: string | null;
 };
@@ -203,6 +204,7 @@ export default function BroadcastApp() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Tümü");
+  const [selectedFormat, setSelectedFormat] = useState("Tümü");
   const [scheduleTab, setScheduleTab] = useState("Bugün");
   const [profileTab, setProfileTab] = useState("Hesabım");
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -617,9 +619,10 @@ export default function BroadcastApp() {
 
   const filteredClips = useMemo(() => clips.filter((clip) => {
     const categoryMatches = selectedCategory === "Tümü" || selectedCategory === "Top 20" || clip.category === selectedCategory;
+    const formatMatches = selectedFormat === "Tümü" || (clip.videoType || "Müzik Videosu") === selectedFormat;
     const query = searchQuery.trim().toLocaleLowerCase("tr-TR");
-    return categoryMatches && (!query || (clip.title + " " + clip.artist + " " + clip.category).toLocaleLowerCase("tr-TR").includes(query));
-  }), [clips, selectedCategory, searchQuery]);
+    return categoryMatches && formatMatches && (!query || (clip.title + " " + clip.artist + " " + clip.category + " " + (clip.videoType || "")).toLocaleLowerCase("tr-TR").includes(query));
+  }), [clips, selectedCategory, selectedFormat, searchQuery]);
 
   const uniqueArtists = useMemo(() => {
     const seen = new Set<string>();
@@ -777,7 +780,7 @@ export default function BroadcastApp() {
         <span className="clip-duration">{durationText(clip.durationSeconds)}</span>
       </a>
       <div className="clip-info">
-        <div><small>{clip.category}</small><a href={"https://www.youtube.com/watch?v=" + clip.id} target="_blank" rel="noreferrer"><b>{clip.title}</b></a><span>{clip.artist}</span></div>
+        <div><small>{clip.category} · {clip.videoType || "Müzik Videosu"}</small><a href={"https://www.youtube.com/watch?v=" + clip.id} target="_blank" rel="noreferrer"><b>{clip.title}</b></a><span>{clip.artist}</span></div>
         <button className={favorites.includes(clip.id) ? "icon-action favourite active" : "icon-action favourite"} onClick={() => toggleFavorite(clip.id)} aria-label="Favorilere ekle"><Heart size={17} fill={favorites.includes(clip.id) ? "currentColor" : "none"} /></button>
       </div>
     </article>
@@ -934,7 +937,9 @@ export default function BroadcastApp() {
       {pageHeading("VIDEO LIBRARY", "Klip Arşivi", "Yayın kataloğundaki klipleri türüne, sanatçıya veya adına göre bul.")}
       <div className="archive-toolbar"><div className="archive-search"><Search size={17} /><input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Klip veya sanatçı ara..." /></div><span className="result-count">{filteredClips.length} SONUÇ</span></div>
       <div className="filter-chips">{categoryNames.map((name) => <button key={name} className={selectedCategory === name ? "active" : ""} onClick={() => setSelectedCategory(name)}>{name}</button>)}</div>
-      {filteredClips.length ? <div className="clip-grid archive-grid">{filteredClips.map(renderClipCard)}</div> : <div className="empty-state"><Search size={34} /><b>Aradığın klip bulunamadı</b><span>Başka bir sanatçı veya kategori deneyebilirsin.</span><button onClick={() => { setSearchQuery(""); setSelectedCategory("Tümü"); }}>Filtreleri temizle</button></div>}
+      <div className="archive-format-heading"><span>VİDEO TÜRÜ</span><small>Kanalındaki içerikler otomatik sınıflandırılır.</small></div>
+      <div className="filter-chips">{["Tümü", "Resmî Klip", "Şarkı Sözleri", "Audio", "Visualizer", "Müzik Videosu"].map((name) => <button key={name} className={selectedFormat === name ? "active" : ""} onClick={() => setSelectedFormat(name)}>{name}</button>)}</div>
+      {filteredClips.length ? <div className="clip-grid archive-grid">{filteredClips.map(renderClipCard)}</div> : <div className="empty-state"><Search size={34} /><b>Aradığın klip bulunamadı</b><span>Başka bir sanatçı veya kategori deneyebilirsin.</span><button onClick={() => { setSearchQuery(""); setSelectedCategory("Tümü"); setSelectedFormat("Tümü"); }}>Filtreleri temizle</button></div>}
     </>;
   } else if (pathname === "/haberler") {
     content = <>
