@@ -90,14 +90,13 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
   const discoveryQueries = searchQuery?.trim()
     ? [searchQuery.trim()]
     : [
-        "Türkçe pop resmi klip official music video",
-        "Türkçe rap official music video klip",
-        "Türkçe rock arabesk resmi klip",
-        "Türkçe şarkı sözleri lyric video official",
+        "Türkçe pop yeni çıkanlar resmi klip official music video",
+        "Türkçe rap trap hip hop resmi klip official music video",
+        "Türkçe rock arabesk halk müziği resmi klip",
+        "Türkçe şarkılar lyric video official audio visualizer",
+        "Türkiye müzik listeleri pop rap rock resmi klip",
         "K-pop official music video BLACKPINK BTS aespa NewJeans TWICE Stray Kids",
-        "K-pop official MV lyric video Korean pop 2026",
-        "international pop official music video",
-        "global music official lyrics video visualizer"
+        "international pop official music video"
       ];
   const discovered = await Promise.all(discoveryQueries.map((query, index) =>
     youtube<SearchItem>("search", {
@@ -115,19 +114,44 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
   const discoveryIds: string[] = [];
   const categoryByVideoId = new Map<string, string>();
   const seenDiscovery = new Set<string>();
-  const perQueryLimit = searchQuery?.trim() ? 50 : 10;
-  for (let index = 0; index < perQueryLimit; index += 1) {
-    for (const [queryIndex, result] of discovered.entries()) {
-      const id = result.items?.[index]?.id?.videoId;
+  if (searchQuery?.trim()) {
+    const result = discovered[0];
+    for (const item of result?.items || []) {
+      const id = item.id?.videoId;
       if (id && !seenDiscovery.has(id)) {
         seenDiscovery.add(id);
         discoveryIds.push(id);
-        if (queryIndex === 4 || queryIndex === 5) categoryByVideoId.set(id, "K-Pop");
-        else if (queryIndex >= 6) categoryByVideoId.set(id, "Global Pop");
-        else if (queryIndex === 1) categoryByVideoId.set(id, "Rap & Trap");
-        else if (queryIndex === 2) categoryByVideoId.set(id, "Türkçe Rock & Arabesk");
-        else if (queryIndex === 3) categoryByVideoId.set(id, "Türkçe Pop");
-        else categoryByVideoId.set(id, "Türkçe Pop");
+      }
+    }
+  } else {
+    // Turkish artists dominate the broadcast: reserve at least 47 of 50
+    // discovery slots for Turkish music, with only 1 K-pop and 2 global clips.
+    const turkishLimits = [10, 10, 10, 10, 7];
+    for (const [queryIndex, limit] of turkishLimits.entries()) {
+      const result = discovered[queryIndex];
+      let added = 0;
+      for (const item of result?.items || []) {
+        const id = item.id?.videoId;
+        if (id && !seenDiscovery.has(id) && added < limit) {
+          seenDiscovery.add(id);
+          discoveryIds.push(id);
+          added += 1;
+          if (queryIndex === 1) categoryByVideoId.set(id, "Rap & Trap");
+          else if (queryIndex === 2) categoryByVideoId.set(id, "Türkçe Rock & Arabesk");
+          else categoryByVideoId.set(id, "Türkçe Pop");
+        }
+      }
+    }
+    for (const [queryIndex, limit, category] of [[5, 1, "K-Pop"], [6, 2, "Global Pop"]] as const) {
+      let added = 0;
+      for (const item of discovered[queryIndex]?.items || []) {
+        const id = item.id?.videoId;
+        if (id && !seenDiscovery.has(id) && added < limit) {
+          seenDiscovery.add(id);
+          discoveryIds.push(id);
+          categoryByVideoId.set(id, category);
+          added += 1;
+        }
       }
     }
   }
