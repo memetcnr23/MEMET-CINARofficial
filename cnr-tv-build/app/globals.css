@@ -248,3 +248,16 @@
 @media(prefers-reduced-motion:reduce){
  .cnr-lower-third,.cnr-lt-logo,.cnr-lt-band,.cnr-lt-logo-glint,.cnr-lt-equalizer i,.caption-console-chevron{animation:none!important;transition:none!important}
 }
+
+
+/* CNR compact live controls: separate audio and caption toggles */
+.broadcast-controls .player-button.is-active,
+.broadcast-controls .caption-toggle.is-active{
+  color:#f1c995;
+  border-color:rgba(241,201,149,.55);
+  background:rgba(147,87,42,.18);
+}
+.broadcast-controls .player-button:focus-visible{
+  outline:2px solid rgba(241,201,149,.85);
+  outline-offset:2px;
+}
