@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,5 +17,16 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="tr"><body>{children}</body></html>;
+  const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
+  const validAdsenseClient = /^ca-pub-\d+$/.test(adsenseClient);
+  return <html lang="tr"><body>
+    {children}
+    {validAdsenseClient && <Script
+      id="google-adsense"
+      async
+      strategy="afterInteractive"
+      crossOrigin="anonymous"
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+    />}
+  </body></html>;
 }
