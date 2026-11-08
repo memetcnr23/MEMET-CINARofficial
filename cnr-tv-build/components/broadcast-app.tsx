@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import type Hls from "hls.js";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -52,6 +51,21 @@ type YTPlayer = {
 };
 type YTReadyEvent = { target: YTPlayer };
 type YTStateEvent = { data: number };
+type HlsErrorData = { fatal: boolean; type: string };
+type HlsInstance = {
+  loadSource: (src: string) => void;
+  attachMedia: (media: HTMLMediaElement) => void;
+  on: (event: string, callback: (event?: string, data?: HlsErrorData) => void) => void;
+  startLoad: () => void;
+  recoverMediaError: () => void;
+  destroy: () => void;
+};
+type HlsConstructor = {
+  new (options?: Record<string, unknown>): HlsInstance;
+  isSupported: () => boolean;
+  Events: { MANIFEST_PARSED: string; ERROR: string };
+  ErrorTypes: { NETWORK_ERROR: string; MEDIA_ERROR: string };
+};
 declare global {
   interface Window {
     YT?: {
@@ -67,6 +81,7 @@ declare global {
       PlayerState: { PLAYING: number; PAUSED: number; ENDED: number; CUED: number };
     };
     onYouTubeIframeAPIReady?: () => void;
+    Hls?: HlsConstructor;
   }
 }
 
@@ -348,11 +363,9 @@ export default function BroadcastApp() {
     video.addEventListener("loadedmetadata", onMetadata);
     video.addEventListener("error", onVideoError);
 
-    const attachHls = async () => {
-      try {
-        const module = await import("hls.js");
-        if (disposed) return;
-        const HlsPlayer = module.default;
+    const attachHls = () => {
+      if (disposed) return;
+      const HlsPlayer = window.Hls;
         if (HlsPlayer.isSupported()) {
           localHls = new HlsPlayer({
             enableWorker: true,
@@ -384,14 +397,35 @@ export default function BroadcastApp() {
           return;
         }
         notify("Bu cihaz HLS oynatmayı desteklemiyor.");
-      } catch (error) {
-        if (!disposed) {
-          console.error("CNR HLS initialization failed:", error);
-          notify("HLS oynatıcı yüklenemedi. Sayfayı yenileyip tekrar deneyin.");
-        }
+      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+        video.src = currentHlsUrl;
+        video.load();
+      } else {
+        notify("Bu cihaz HLS oynatmayı desteklemiyor.");
       }
     };
-    void attachHls();
+
+    const ensureHls = () => {
+      if (disposed) return;
+      if (window.Hls) {
+        attachHls();
+        return;
+      }
+      const existing = document.querySelector<HTMLScriptElement>('script[data-cnr-hls="true"]');
+      if (existing) {
+        existing.addEventListener("load", attachHls, { once: true });
+        existing.addEventListener("error", onVideoError, { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/hls.js@1.7.4/dist/hls.min.js";
+      script.async = true;
+      script.dataset.cnrHls = "true";
+      script.onload = attachHls;
+      script.onerror = onVideoError;
+      document.head.appendChild(script);
+    };
+    ensureHls();
 
     return () => {
       disposed = true;
