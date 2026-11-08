@@ -98,14 +98,21 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
         "K-pop official music video BLACKPINK BTS aespa NewJeans TWICE Stray Kids",
         "international pop official music video"
       ];
+  const discoveryErrors: string[] = [];
   const discovered = await Promise.all(discoveryQueries.map((query, index) =>
     youtube<SearchItem>("search", {
       part: "snippet", type: "video", q: query,
       videoEmbeddable: "true",
-      ...(index < 4 ? { regionCode: "TR", relevanceLanguage: "tr" } : {}),
+      ...(index < 5 ? { regionCode: "TR", relevanceLanguage: "tr" } : {}),
       maxResults: "50", order: "relevance"
-    }, apiKey).catch(() => ({ items: [] as SearchItem[] }))
+    }, apiKey).catch((error: unknown) => {
+      discoveryErrors.push(error instanceof Error ? error.message : "YouTube arama isteği başarısız.");
+      return { items: [] as SearchItem[] };
+    })
   ));
+  if (discovered.every((result) => !result.items?.length)) {
+    throw new Error(discoveryErrors[0] || "YouTube araması sonuç döndürmedi. API erişimini ve günlük kotayı kontrol edin.");
+  }
 
   // Fairly rotate through Turkish genres, K-pop and international music.\n  // Keep API discovery on a six-hour cache window to stay within YouTube quota.
   // YouTube search.list costs 100 quota units per query, so results are cached
