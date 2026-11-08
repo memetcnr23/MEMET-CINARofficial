@@ -76,7 +76,7 @@
 @media(prefers-reduced-motion:reduce){.republic-banner img,.republic-banner:before,.lower-third-panel,.lower-third-panel:before,.page-content{animation:none!important}}
 
 .live-channel-bug{position:absolute;z-index:12;top:58px;left:8.2%;width:clamp(112px,16%,170px);aspect-ratio:3/1;display:flex;align-items:center;justify-content:center;overflow:visible;border-radius:4px;pointer-events:none;filter:drop-shadow(0 2px 10px rgba(0,0,0,.75));}
-.cnr-logo-effects{position:relative;display:block;width:100%;height:100%;overflow:visible;isolation:isolate;}
+.cnr-logo-effects{position:relative;display:block;width:100%;height:100%;overflow:hidden;isolation:isolate;contain:paint;}
 .cnr-logo-effects>img{position:absolute!important;inset:0;width:100%!important;height:100%!important;object-fit:contain;z-index:1;opacity:.99;}
 .cnr-logo-snow,.cnr-logo-metallic-shine{position:absolute;inset:0;z-index:2;overflow:hidden;pointer-events:none;-webkit-mask-image:url("/cnr-logo.svg");mask-image:url("/cnr-logo.svg");-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:100% 100%;mask-size:100% 100%;}
 .cnr-logo-snow{isolation:isolate;}
@@ -98,8 +98,9 @@
 @keyframes cnrLogoWindSweep{0%,10%{opacity:0;transform:translate3d(-38%,0,0) rotate(-7deg)}28%{opacity:.22}45%{opacity:.34;transform:translate3d(7%,5%,0) rotate(-2deg)}63%{opacity:.12}100%{opacity:0;transform:translate3d(48%,10%,0) rotate(3deg)}}
 @keyframes cnrLogoSnowCloud{0%,14%{opacity:0;transform:translate3d(-13%,2%,0) scale(.8)}38%{opacity:.18}58%{opacity:.3;transform:translate3d(11%,0,0) scale(1.05)}82%{opacity:.1}100%{opacity:0;transform:translate3d(32%,4%,0) scale(1.12)}}
 
-.cnr-logo-metallic-shine{z-index:3;opacity:0;background:linear-gradient(108deg,transparent 0%,rgba(255,255,255,0) 35%,rgba(223,239,255,.06) 42%,rgba(255,255,255,.22) 46%,rgba(255,255,255,.96) 49.5%,rgba(255,255,255,.35) 51.5%,rgba(213,232,255,.08) 56%,transparent 64%);transform:translate3d(-145%,0,0) skewX(-18deg);animation:cnrMetallicSweep 7.2s cubic-bezier(.4,0,.2,1) infinite;will-change:transform,opacity;}
-@keyframes cnrMetallicSweep{0%,17%{opacity:0;transform:translate3d(-145%,0,0) skewX(-18deg)}24%{opacity:.88}53%{opacity:0;transform:translate3d(145%,0,0) skewX(-18deg)}100%{opacity:0;transform:translate3d(145%,0,0) skewX(-18deg)}}
+.cnr-logo-metallic-shine{z-index:3;opacity:1;transform:none;animation:none;overflow:hidden;isolation:isolate;}
+.cnr-logo-metallic-shine::before{content:"";position:absolute;top:-8%;bottom:-8%;left:0;width:42%;pointer-events:none;background:linear-gradient(108deg,transparent 0%,rgba(255,255,255,0) 28%,rgba(223,239,255,.08) 40%,rgba(255,255,255,.35) 46%,rgba(255,255,255,.98) 50%,rgba(255,255,255,.42) 54%,rgba(213,232,255,.08) 62%,transparent 74%);filter:blur(.35px);transform:translate3d(-140%,0,0) skewX(-18deg);animation:cnrMetallicSweep 7.2s cubic-bezier(.4,0,.2,1) infinite;will-change:transform,opacity;}
+@keyframes cnrMetallicSweep{0%,17%{opacity:0;transform:translate3d(-140%,0,0) skewX(-18deg)}24%{opacity:.9}53%{opacity:0;transform:translate3d(355%,0,0) skewX(-18deg)}100%{opacity:0;transform:translate3d(355%,0,0) skewX(-18deg)}}
 .youtube-video-host,.youtube-video-host iframe,.cnr-hls-video{pointer-events:none!important;}
 .lower-third-panel{position:absolute!important;z-index:13;left:clamp(10px,2.7%,28px);right:clamp(10px,2.7%,28px);bottom:clamp(38px,8%,72px);display:grid!important;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px;margin:0!important;padding:10px 15px!important;min-height:66px;border:1px solid rgba(255,62,80,.66)!important;border-left:4px solid #ed1831!important;border-radius:8px!important;background:linear-gradient(100deg,rgba(18,10,13,.95),rgba(8,8,12,.91) 68%,rgba(25,3,8,.94))!important;box-shadow:0 8px 28px rgba(0,0,0,.42),0 0 20px rgba(220,0,32,.17);opacity:0;visibility:hidden;transform:translate3d(-46px,0,0);filter:blur(5px);pointer-events:none;animation:none!important;overflow:hidden;}
 .lower-third-panel.show{visibility:visible;animation:cnrLowerThirdJourney 7.9s cubic-bezier(.2,.7,.15,1) both!important;}
