@@ -317,7 +317,7 @@ export default function BroadcastApp() {
     if (pathname !== "/canli-yayin" || !currentHlsUrl) return;
     let disposed = false;
     let started = false;
-    let localHls: Hls | null = null;
+    let localHls: HlsInstance | null = null;
     const video = hlsVideoRef.current;
     if (!video) return;
 
