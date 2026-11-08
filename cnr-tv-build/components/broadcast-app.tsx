@@ -397,11 +397,6 @@ export default function BroadcastApp() {
           return;
         }
         notify("Bu cihaz HLS oynatmayı desteklemiyor.");
-      } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-        video.src = currentHlsUrl;
-        video.load();
-      } else {
-        notify("Bu cihaz HLS oynatmayı desteklemiyor.");
       }
     };
 
