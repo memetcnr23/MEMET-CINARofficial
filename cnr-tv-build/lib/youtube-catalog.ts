@@ -115,7 +115,7 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
       const duration = parseDuration(video.contentDetails?.duration || "");
       const title = video.snippet?.title || "";
       const description = video.snippet?.description || "";
-      const markedShort = /#shorts|\\bshorts\\b|short video/i.test(title + " " + description);
+      const markedShort = /#shorts|\bshorts\b|short video/i.test(title + " " + description);
       const thumbnails = Object.values(video.snippet?.thumbnails || {});
       const hasLandscapeThumbnail = thumbnails.some((image) =>
         typeof image.width === "number" && typeof image.height === "number" &&
