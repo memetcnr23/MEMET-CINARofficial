@@ -4,4 +4,4 @@ export default function Page(){return <LegalPage title="Reklam ve Gelir Bilgilen
 {title:"Geçersiz trafik",body:"Kendi reklamlarına tıklamak, ziyaretçilerden reklama tıklamalarını istemek, otomatik tıklama/gösterim üretmek veya ödüllü trafikle reklam etkileşimi sağlamak yasaktır. Şüpheli trafik reklam sunumunun sınırlandırılmasına veya hesabın kapatılmasına yol açabilir."},
 {title:"Ödeme ve banka bilgileri",body:"Reklam sağlayıcısının kazanç eşiği, kimlik/adres doğrulaması, vergi bilgileri ve ödeme takvimi geçerlidir. Banka hesabı bilgileri yalnızca ilgili sağlayıcının güvenli ödeme paneline girilmelidir; CNR Müzik TV'nin herkese açık sayfalarında yayımlanmaz."},
 {title:"Üçüncü taraf içerikler",body:"Gömülü video içeriklerinin izlenmesi, video hak sahiplerinin veya platformun reklam/gelir programlarına tabidir. CNR Müzik TV, üçüncü taraf videoların her görüntülenmesinden gelir elde edildiğini taahhüt etmez."}
-]}}
+]}/>}
