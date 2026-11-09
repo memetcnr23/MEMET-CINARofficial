@@ -1,0 +1,7 @@
+import LegalPage from "@/components/legal-page";
+export default function Page(){return <LegalPage title="Reklam ve Gelir Bilgilendirmesi" intro="CNR Müzik TV, uygunluk ve gerekli onaylar sağlandığında reklam, sponsorluk ve ücretli dijital hizmetlerden gelir elde edebilir." sections={[
+{title:"Reklam gösterimleri",body:"Reklam geliri yalnızca reklam sağlayıcısının geçerli saydığı gösterim ve etkileşimlerden doğar. Site ziyareti, sayfa geçişi, oynatma veya buton tıklaması tek başına sabit ya da garanti edilmiş bir ödeme oluşturmaz."},
+{title:"Geçersiz trafik",body:"Kendi reklamlarına tıklamak, ziyaretçilerden reklama tıklamalarını istemek, otomatik tıklama/gösterim üretmek veya ödüllü trafikle reklam etkileşimi sağlamak yasaktır. Şüpheli trafik reklam sunumunun sınırlandırılmasına veya hesabın kapatılmasına yol açabilir."},
+{title:"Ödeme ve banka bilgileri",body:"Reklam sağlayıcısının kazanç eşiği, kimlik/adres doğrulaması, vergi bilgileri ve ödeme takvimi geçerlidir. Banka hesabı bilgileri yalnızca ilgili sağlayıcının güvenli ödeme paneline girilmelidir; CNR Müzik TV'nin herkese açık sayfalarında yayımlanmaz."},
+{title:"Üçüncü taraf içerikler",body:"Gömülü video içeriklerinin izlenmesi, video hak sahiplerinin veya platformun reklam/gelir programlarına tabidir. CNR Müzik TV, üçüncü taraf videoların her görüntülenmesinden gelir elde edildiğini taahhüt etmez."}
+]}/>}

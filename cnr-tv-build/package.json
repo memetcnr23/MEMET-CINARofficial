@@ -1,0 +1,27 @@
+{
+  "name": "cnr-muzik-tv",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "hls:encode": "bash scripts/encode-hls.sh",
+    "hls:upload": "node scripts/publish-hls-to-blob.mjs"
+  },
+  "dependencies": {
+    "lucide-react": "1.47.0",
+    "next": "16.3.5",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "@vercel/blob": "2.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.9.3",
+    "@tailwindcss/postcss": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}
