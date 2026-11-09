@@ -312,7 +312,7 @@ export default function BroadcastApp() {
       }
     };
     void update();
-    const timer = window.setInterval(update, 5 * 60 * 1000);
+    const timer = window.setInterval(update, 10 * 1000);
     return () => { cancelled = true; window.clearInterval(timer); };
   }, []);
 
@@ -543,7 +543,7 @@ export default function BroadcastApp() {
       setPlayerReady(false);
       setPlayerPlaying(false);
     };
-  }, [pathname, currentHlsUrl, nowPlaying?.current.clip.id]);
+  }, [pathname, currentHlsUrl, HLS_STREAM ? "continuous-stream" : nowPlaying?.current.clip.id]);
 
   // Keep each HLS VOD clip aligned to the channel clock without reloading its manifest.
   useEffect(() => {
@@ -606,7 +606,7 @@ export default function BroadcastApp() {
             const captionsOn = localStorage.getItem("cnr-subtitles-enabled") === "true";
             try { event.target.setOption?.("captions", "track", captionsOn ? { languageCode: "tr" } : {}); } catch {}
           },
-          onError: () => notify("Bu klip oynatılamadı. Yayın sırası korunuyor; sıradaki senkron kontrol devam edecek.")
+          onError: () => { setPlayerPlaying(false); setVideoTransitioning(true); notify("Bu klip oynatılamadı. Yayın akışı sıradaki uygun klibe geçmeye çalışıyor."); }
         }
       });
     };
@@ -659,7 +659,7 @@ export default function BroadcastApp() {
     sync();
     const timer = window.setInterval(sync, 12000);
     return () => window.clearInterval(timer);
-  }, [pathname, nowPlaying?.current.clip.id]);
+  }, [pathname, nowPlaying?.current.clip.id, playerReady]);
 
   useEffect(() => {
     const onFullscreen = () => setFullScreen(Boolean(document.fullscreenElement));
