@@ -316,17 +316,8 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid rgba(
 .cnr-video-transition{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center,rgba(7,7,10,.72),rgba(0,0,0,.96));opacity:0;visibility:hidden;transition:opacity .38s ease,visibility .38s ease;backdrop-filter:blur(5px)}.cnr-video-transition.is-active{opacity:1;visibility:visible}.live-screen:has(.cnr-video-transition.is-active) .screen-top,.live-screen:has(.cnr-video-transition.is-active) .screen-bottom{opacity:.45;transition:opacity .3s ease}@media(prefers-reduced-motion:reduce){.cnr-video-transition{transition:none}}
 
 
-/* CNR winter crystal treatment — vector ice flakes, natural drift and slower chrome reflection */
-.cnr-logo-snow i{display:grid!important;place-items:center;line-height:0!important;font-size:0!important;width:14px;height:14px;filter:drop-shadow(0 0 3px rgba(225,244,255,.95)) drop-shadow(0 0 8px rgba(144,201,245,.55));}
-.cnr-logo-snow i svg{display:block;width:100%;height:100%;overflow:visible;fill:none;stroke:rgba(235,248,255,.96);stroke-width:5.5;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 1px #fff);}
-.cnr-logo-snow i.snow-near svg{stroke:#fff;stroke-width:6.5;filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 7px rgba(177,221,255,.95));}
-.cnr-logo-snow i.snow-crystal svg{stroke:#d9efff;stroke-width:5.8;}
-.cnr-logo-snow i.snow-soft{opacity:.7;filter:blur(.35px) drop-shadow(0 0 5px rgba(190,224,255,.6));}
-.cnr-logo-snow i{animation-name:cnrSnowCrystalFloat;animation-timing-function:cubic-bezier(.35,.05,.25,1);will-change:transform,opacity;}
-@keyframes cnrSnowCrystalFloat{0%{opacity:0;transform:translate3d(-13px,-22px,0) rotate(-35deg) scale(.55)}14%{opacity:.9}34%{opacity:1;transform:translate3d(9px,-5px,0) rotate(75deg) scale(1.06)}57%{opacity:.88;transform:translate3d(20px,12px,0) rotate(195deg) scale(.88)}78%{opacity:.72;transform:translate3d(-10px,25px,0) rotate(300deg) scale(1.12)}92%{opacity:.25}100%{opacity:0;transform:translate3d(-13px,-22px,0) rotate(420deg) scale(.55)}}
+/* CNR logo: metallic reflection only; snowfall removed */
 .cnr-logo-metallic-shine::before{animation-duration:22s!important;animation-timing-function:cubic-bezier(.36,0,.2,1)!important;}
-@media(prefers-reduced-motion:reduce){.cnr-logo-snow i,.cnr-logo-snow::before,.cnr-logo-snow::after,.cnr-logo-metallic-shine::before{animation-duration:0.01ms!important;animation-iteration-count:1!important;}}
-
 
 /* CNR BROADCAST CONSOLE — angular premium broadcast surfaces */
 :root{--cnr-accent:#d91f43;--cnr-chrome:#c7cbd3;--cnr-cut:14px}
