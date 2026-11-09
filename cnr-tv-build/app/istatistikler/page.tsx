@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Activity, ArrowLeft, BarChart3, CalendarDays, CheckCircle2, Clock3, Disc3, Eye, Globe2, Headphones, Radio, RefreshCw, Signal, Sparkles, Users } from "lucide-react";
+import { Activity, ArrowLeft, BarChart3, CalendarDays, CheckCircle2, Clock3, Disc3, Eye, Globe2, Headphones, Radio, RefreshCw, Signal, Sparkles, Users, LockKeyhole, ShieldCheck, LogOut } from "lucide-react";
 
 type Clip={id:string;title:string;artist:string;category:string;durationSeconds:number};
 type Feed={current?:{clip:Clip};clips?:Clip[];playlistDurationSeconds?:number};
@@ -29,6 +29,11 @@ function Empty({title,detail,icon}:{title:string;detail:string;icon:React.ReactN
 }
 
 export default function AnalyticsPage(){
+ const [authenticated,setAuthenticated]=useState(false);
+ const [authChecking,setAuthChecking]=useState(true);
+ const [password,setPassword]=useState("");
+ const [loginError,setLoginError]=useState("");
+ const [loggingIn,setLoggingIn]=useState(false);
  const [summary,setSummary]=useState<Summary|null>(null);
  const [feed,setFeed]=useState<Feed|null>(null);
  const [loading,setLoading]=useState(true);
@@ -46,18 +51,23 @@ export default function AnalyticsPage(){
   }catch(e){setError(e instanceof Error?e.message:"İstatistik verisi alınamadı.");}
   finally{setLoading(false);setRefreshing(false);}
  },[]);
- useEffect(()=>{void refresh();const t=window.setInterval(()=>void refresh(true),30000);return()=>window.clearInterval(t)},[refresh]);
+ useEffect(()=>{let alive=true;fetch("/api/admin/session",{cache:"no-store"}).then(r=>{if(alive)setAuthenticated(r.ok)}).catch(()=>{}).finally(()=>{if(alive)setAuthChecking(false)});return()=>{alive=false}},[]);
+ useEffect(()=>{if(!authenticated)return;void refresh();const t=window.setInterval(()=>void refresh(true),30000);return()=>window.clearInterval(t)},[refresh,authenticated]);
+ const login=async(e:React.FormEvent)=>{e.preventDefault();setLoggingIn(true);setLoginError("");try{const r=await fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password})});const data=await r.json();if(!r.ok)throw new Error(data.error||"Giriş başarısız.");setPassword("");setAuthenticated(true)}catch(err){setLoginError(err instanceof Error?err.message:"Giriş yapılamadı.")}finally{setLoggingIn(false)}};
+ const logout=async()=>{await fetch("/api/admin/session",{method:"DELETE"});setAuthenticated(false);setSummary(null);setFeed(null)};
  const clips=feed?.clips||[],days=summary?.last7Days||[];
  const categories=useMemo(()=>Object.entries(clips.reduce<Record<string,number>>((a,c)=>{const k=c.category||"Diğer";a[k]=(a[k]||0)+1;return a},{})).sort((a,b)=>b[1]-a[1]),[clips]);
  const artists=useMemo(()=>{const m=new Map<string,number>();clips.forEach(c=>m.set(c.artist,(m.get(c.artist)||0)+1));return [...m].sort((a,b)=>b[1]-a[1]).slice(0,6)},[clips]);
  const totalWeek=days.reduce((a,d)=>a+d.views,0),max=Math.max(1,...days.map(d=>d.views)),current=feed?.current?.clip;
  const duration=feed?.playlistDurationSeconds?Math.floor(feed.playlistDurationSeconds/3600)+" sa "+Math.floor(feed.playlistDurationSeconds%3600/60)+" dk":"—";
+ if(authChecking)return <main className="min-h-screen grid place-items-center bg-[#08080b] text-[#d7b488]">CNR SECURE ACCESS</main>;
+ if(!authenticated)return <main className="min-h-screen grid place-items-center bg-[#08080b] px-4 text-white"><form onSubmit={login} className="w-full max-w-md rounded-3xl border border-[#c69b6b]/25 bg-[#111116] p-8 shadow-2xl"><div className="mb-6 flex items-center justify-between"><span className="grid h-12 w-12 place-items-center rounded-2xl border border-[#c69b6b]/25 text-[#dfbd91]"><ShieldCheck/></span><span className="text-[9px] tracking-[.2em] text-emerald-300">PRIVATE ACCESS</span></div><p className="text-[9px] tracking-[.25em] text-[#d5ad7c]">CNR MÜZİK YAPIM®</p><h1 className="mt-2 text-3xl font-black">Şirket erişimi.</h1><p className="mt-2 text-sm text-zinc-400">İstatistik Merkezi özel yönetim alanıdır.</p><label className="mt-7 block text-[10px] font-bold tracking-widest text-zinc-400">ŞİRKET ŞİFRESİ</label><div className="relative mt-2"><LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2 text-[#c69b6b]" size={17}/><input type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)} required className="h-12 w-full rounded-xl border border-white/10 bg-black/30 pl-11 pr-4 tracking-[.25em] outline-none focus:border-[#c69b6b]/60" placeholder="••••••••"/></div>{loginError&&<p className="mt-3 text-xs text-rose-300">{loginError}</p>}<button disabled={loggingIn||!password} className="mt-5 h-12 w-full rounded-xl bg-gradient-to-r from-[#9b1736] to-[#6f1028] text-xs font-black tracking-widest disabled:opacity-50">{loggingIn?"KONTROL EDİLİYOR":"GÜVENLİ GİRİŞ"}</button><div className="mt-5 flex items-center justify-center gap-2 border-t border-white/[.07] pt-4 text-[9px] text-zinc-600"><ShieldCheck size={13}/> SUNUCUDA DOĞRULAMA · GÜVENLİ OTURUM</div></form></main>;
  return <main className="relative min-h-screen overflow-hidden bg-[#08080b] px-4 pb-12 pt-5 text-white sm:px-6 lg:px-9 lg:pt-8">
   <div className="pointer-events-none fixed inset-0 -z-0"><div className="absolute -top-56 left-[28%] h-[480px] w-[480px] rounded-full bg-[#9b1534]/[.12] blur-[130px]"/><div className="absolute right-[-180px] top-[42%] h-[420px] w-[420px] rounded-full bg-[#9b713c]/[.055] blur-[130px]"/><div className="absolute inset-0 opacity-[.025]" style={{backgroundImage:"linear-gradient(rgba(255,255,255,.45) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.45) 1px,transparent 1px)",backgroundSize:"48px 48px"}}/></div>
   <div className="relative z-10 mx-auto max-w-[1440px]">
    <header className="mb-7 flex flex-wrap items-center justify-between gap-4">
     <div className="flex items-center gap-3"><Link href="/" aria-label="Ana sayfa" className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[.04] text-zinc-300 transition hover:border-[#c18d5d]/50 hover:text-white"><ArrowLeft size={17}/></Link><div><div className="flex items-center gap-2 text-[9px] font-bold tracking-[.28em] text-[#d5ad7c]"><span className="h-1.5 w-1.5 rounded-full bg-[#d5ad7c] shadow-[0_0_10px_#d5ad7c]"/> CNR MÜZİK YAPIM®</div><div className="mt-1 text-xs text-zinc-500">Yönetim paneli <span className="mx-1 text-zinc-700">/</span><span className="text-zinc-300">İstatistik Merkezi</span></div></div></div>
-    <div className="flex items-center gap-2"><div className="hidden items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[.055] px-3 py-2 text-[10px] font-semibold text-emerald-300 sm:flex"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400"/> MERKEZİ SİSTEM AKTİF</div><button onClick={()=>void refresh(true)} disabled={refreshing} className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[.045] px-4 text-xs font-bold text-zinc-200 transition hover:border-[#c18d5d]/40 hover:bg-white/[.08] disabled:opacity-50"><RefreshCw size={14} className={refreshing?"animate-spin":""}/>{refreshing?"Güncelleniyor":"Verileri yenile"}</button></div>
+    <div className="flex items-center gap-2"><div className="hidden items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[.055] px-3 py-2 text-[10px] font-semibold text-emerald-300 sm:flex"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400"/> MERKEZİ SİSTEM AKTİF</div><button onClick={()=>void logout()} className="inline-flex h-10 items-center gap-2 rounded-xl border border-rose-300/15 px-3 text-xs font-bold text-rose-200"><LogOut size={14}/> Çıkış</button><button onClick={()=>void refresh(true)} disabled={refreshing} className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[.045] px-4 text-xs font-bold text-zinc-200 transition hover:border-[#c18d5d]/40 hover:bg-white/[.08] disabled:opacity-50"><RefreshCw size={14} className={refreshing?"animate-spin":""}/>{refreshing?"Güncelleniyor":"Verileri yenile"}</button></div>
    </header>
    <section className="relative mb-6 overflow-hidden rounded-[26px] border border-[#bd8b5b]/20 bg-[linear-gradient(112deg,#1a1115_0%,#151116_46%,#101014_100%)] p-6 shadow-[0_25px_80px_rgba(0,0,0,.3)] sm:p-8">
     <div className="absolute -right-12 -top-28 h-72 w-72 rounded-full border border-[#d4ad7b]/10"/><div className="absolute -right-2 -top-16 h-52 w-52 rounded-full border border-[#d4ad7b]/[.07]"/><div className="absolute bottom-[-90px] right-[18%] h-52 w-52 rounded-full bg-[#a31d3c]/20 blur-[75px]"/>
