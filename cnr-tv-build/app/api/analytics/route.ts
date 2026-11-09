@@ -12,7 +12,7 @@ function config() {
 }
 
 function headers(key: string) {
-  return { apikey: key, Authorization: \`Bearer \${key}\`, "Content-Type": "application/json" };
+  return { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" };
 }
 
 export async function POST(request: Request) {
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     if (!path.startsWith("/") || path.length > 300 || /[\u0000-\u001f\u007f]/.test(path) || !UUID.test(sessionId)) {
       return NextResponse.json({ error: "Invalid analytics event" }, { status: 400 });
     }
-    const response = await fetch(\`\${supabase.url}/rest/v1/rpc/cnr_record_page_view\`, {
+    const response = await fetch(supabase.url + "/rest/v1/rpc/cnr_record_page_view", {
       method: "POST",
       headers: headers(supabase.key),
       body: JSON.stringify({ p_path: path, p_session_id: sessionId }),
@@ -55,7 +55,7 @@ export async function GET() {
   const supabase = config();
   if (!supabase) return NextResponse.json({ error: "Analytics database is not configured" }, { status: 503 });
   try {
-    const response = await fetch(\`\${supabase.url}/rest/v1/rpc/cnr_analytics_summary\`, {
+    const response = await fetch(supabase.url + "/rest/v1/rpc/cnr_analytics_summary", {
       method: "POST",
       headers: headers(supabase.key),
       body: "{}",
