@@ -197,6 +197,8 @@ export default function BroadcastApp() {
   const loadedVideoRef = useRef("");
   const nowRef = useRef<NowPlaying | null>(null);
   const lowerWindowRef = useRef("");
+  const transitionTimerRef = useRef<number | null>(null);
+  const [videoTransitioning, setVideoTransitioning] = useState(false);
   const [nowPlaying, setNowPlaying] = useState<NowPlaying | null>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [directorySearch, setDirectorySearch] = useState("");
@@ -595,6 +597,10 @@ export default function BroadcastApp() {
             const states = window.YT?.PlayerState;
             if (!states) return;
             setPlayerPlaying(event.data === states.PLAYING);
+            if (event.data === states.PLAYING) {
+              if (transitionTimerRef.current !== null) window.clearTimeout(transitionTimerRef.current);
+              transitionTimerRef.current = window.setTimeout(() => setVideoTransitioning(false), 420);
+            }
           },
           onApiChange: (event) => {
             const captionsOn = localStorage.getItem("cnr-subtitles-enabled") === "true";
@@ -622,6 +628,9 @@ export default function BroadcastApp() {
       playerRef.current = null;
       playerReadyRef.current = false;
       loadedVideoRef.current = "";
+      if (transitionTimerRef.current !== null) window.clearTimeout(transitionTimerRef.current);
+      transitionTimerRef.current = null;
+      setVideoTransitioning(false);
       setPlayerReady(false);
       setPlayerPlaying(false);
     };
@@ -637,12 +646,14 @@ export default function BroadcastApp() {
       const age = Math.max(0, (Date.now() - Date.parse(data.serverTime)) / 1000);
       const target = Math.max(0, item.offsetSeconds + age);
       if (loadedVideoRef.current !== item.clip.id) {
+        setVideoTransitioning(true);
+        if (transitionTimerRef.current !== null) window.clearTimeout(transitionTimerRef.current);
         loadedVideoRef.current = item.clip.id;
         player.loadVideoById({ videoId: item.clip.id, startSeconds: target });
         return;
       }
       const actual = player.getCurrentTime();
-      if (Number.isFinite(actual) && Math.abs(actual - target) > 3.2) player.seekTo(target, true);
+      if (Number.isFinite(actual) && Math.abs(actual - target) > 8) player.seekTo(target, true);
       if (player.getPlayerState() !== 1 && player.getPlayerState() !== 3) player.playVideo();
     };
     sync();
@@ -907,6 +918,7 @@ export default function BroadcastApp() {
               />
             </div>}
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
+            <div className={"cnr-video-transition " + (videoTransitioning ? "is-active" : "")} aria-hidden="true" />
             {(!current || (Boolean(catalogError) && !playerPlaying)) && <div className="broadcast-empty-overlay" role="status" aria-live="polite"><Radio size={32} /><b>YAKINDA YAYINDAYIZ</b><span>CNR Müzik TV yayın akışı hazırlanıyor.</span><small>Klipler yeniden yüklendiğinde yayın otomatik başlayacak.</small><strong>ÇOK YAKINDA · CNR MÜZİK TV</strong></div>}
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
