@@ -906,7 +906,7 @@ export default function BroadcastApp() {
               />
             </div>}
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
-            {!current && <div className="broadcast-empty-overlay"><Radio size={30} /><b>CNR YAYINI HAZIRLANIYOR</b><span>{catalogError || "Müzik kataloğundan oynatılabilir klip bekleniyor."}</span><small>Yayın ekranı bağlantı kurulduğunda otomatik güncellenecek.</small></div>}
+            {!current && <div className="broadcast-empty-overlay" role="status" aria-live="polite"><Radio size={32} /><b>YAKINDA YAYINDAYIZ</b><span>CNR Müzik TV yayın akışı hazırlanıyor.</span><small>Klipler yeniden yüklendiğinde bu ekran otomatik olarak yayına geçecek.</small><strong>ÇOK YAKINDA · CNR MÜZİK TV</strong></div>}
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
@@ -953,7 +953,7 @@ export default function BroadcastApp() {
           <div className="live-status-grid"><div><span>Yayın durumu</span><b><i /> {current ? "AKTİF" : "BEKLEMEDE"}</b></div><div><span>Oynatıcı</span><b>{playerReady ? "HAZIR" : HLS_ONLY && !currentHlsUrl ? "KAYNAK BEKLENİYOR" : "BAĞLANIYOR"}</b></div></div>
           <div className="panel-heading upcoming-heading"><div><span className="eyebrow">SIRADAKİ</span><h2>Yayın Akışı</h2></div><Link href="/yayin-akisi">Tümü <ChevronRight size={15} /></Link></div>
           <div className="upcoming-list">{(nowPlaying?.upcoming || []).slice(1, 6).map((item) => <div className="upcoming-row" key={item.clip.id + item.startsAt}><Image src={thumb(item.clip.id, "mqdefault")} alt="" width={88} height={50} unoptimized /><span className="upcoming-time">{formatTime(item.startsAt)}</span><div><b>{item.clip.title}</b><small>{getProgramName(item.clip.category)}</small></div></div>)}</div>
-          {catalogError && <p className="error-note">{catalogError}</p>}
+          
           <button className="secondary-wide" onClick={sharePage}><Share2 size={16} /> YAYINI PAYLAŞ</button>
         </aside>
       </section>
