@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { isAdminSession } from "@/lib/admin-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,7 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
+  if (!(await isAdminSession())) return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401, headers: { "Cache-Control": "no-store" } });
   const supabase = config();
   if (!supabase) return NextResponse.json({ error: "Analytics database is not configured" }, { status: 503 });
   try {
