@@ -5,13 +5,14 @@ export const dynamic = "force-dynamic";
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function config() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\\/+$/, "");
+  let url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+  while (url.endsWith("/")) url = url.slice(0, -1);
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   return url && key ? { url, key } : null;
 }
 
 function headers(key: string) {
-  return { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" };
+  return { apikey: key, Authorization: \`Bearer \${key}\`, "Content-Type": "application/json" };
 }
 
 export async function POST(request: Request) {
@@ -30,10 +31,10 @@ export async function POST(request: Request) {
     const body = await request.json() as { path?: unknown; sessionId?: unknown };
     const path = typeof body.path === "string" ? body.path : "";
     const sessionId = typeof body.sessionId === "string" ? body.sessionId : "";
-    if (!path.startsWith("/") || path.length > 300 || !/^\\/[a-zA-Z0-9/_?&=.%~-]*$/.test(path) || !UUID.test(sessionId)) {
+    if (!path.startsWith("/") || path.length > 300 || /[\u0000-\u001f\u007f]/.test(path) || !UUID.test(sessionId)) {
       return NextResponse.json({ error: "Invalid analytics event" }, { status: 400 });
     }
-    const response = await fetch(`${supabase.url}/rest/v1/rpc/cnr_record_page_view`, {
+    const response = await fetch(\`\${supabase.url}/rest/v1/rpc/cnr_record_page_view\`, {
       method: "POST",
       headers: headers(supabase.key),
       body: JSON.stringify({ p_path: path, p_session_id: sessionId }),
@@ -54,7 +55,7 @@ export async function GET() {
   const supabase = config();
   if (!supabase) return NextResponse.json({ error: "Analytics database is not configured" }, { status: 503 });
   try {
-    const response = await fetch(`${supabase.url}/rest/v1/rpc/cnr_analytics_summary`, {
+    const response = await fetch(\`\${supabase.url}/rest/v1/rpc/cnr_analytics_summary\`, {
       method: "POST",
       headers: headers(supabase.key),
       body: "{}",
