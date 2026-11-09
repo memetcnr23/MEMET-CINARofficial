@@ -21,6 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
   const validAdsenseClient = /^ca-pub-[0-9]+$/.test(adsenseClient);
   return <html lang="tr"><head>
+    <meta name="google-adsense-account" content="ca-pub-6127233618306992" />
     {validAdsenseClient && <Script
       id="google-adsense"
       async
