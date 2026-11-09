@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import AdPlacement from "@/components/ad-placement";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -953,6 +954,7 @@ export default function BroadcastApp() {
           <div className="live-status-grid"><div><span>Yayın durumu</span><b><i /> {current ? "AKTİF" : "BEKLEMEDE"}</b></div><div><span>Oynatıcı</span><b>{playerReady ? "HAZIR" : HLS_ONLY && !currentHlsUrl ? "KAYNAK BEKLENİYOR" : "BAĞLANIYOR"}</b></div></div>
           <div className="panel-heading upcoming-heading"><div><span className="eyebrow">SIRADAKİ</span><h2>Yayın Akışı</h2></div><Link href="/yayin-akisi">Tümü <ChevronRight size={15} /></Link></div>
           <div className="upcoming-list">{(nowPlaying?.upcoming || []).slice(1, 6).map((item) => <div className="upcoming-row" key={item.clip.id + item.startsAt}><Image src={thumb(item.clip.id, "mqdefault")} alt="" width={88} height={50} unoptimized /><span className="upcoming-time">{formatTime(item.startsAt)}</span><div><b>{item.clip.title}</b><small>{getProgramName(item.clip.category)}</small></div></div>)}</div>
+          <AdPlacement className="cnr-ad-live" slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_LIVE || ""} label="Yayın sayfası sponsoru" format="rectangle" />
           
           <button className="secondary-wide" onClick={sharePage}><Share2 size={16} /> YAYINI PAYLAŞ</button>
         </aside>
@@ -1072,7 +1074,9 @@ export default function BroadcastApp() {
           <div className="mini-event-card"><span className="eyebrow">CNR PROGRAMLARI</span><b>EFKAR GECESİ</b><span>Melodik ve duygusal seçki</span><Link href="/programlar">Programları keşfet <ChevronRight size={14} /></Link></div>
         </div>
       </section>
+      <AdPlacement className="cnr-ad-home-top" slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP || ""} label="CNR Müzik TV sponsorlu alanı" format="horizontal" />
       <section className="quick-categories"><div className="section-title-row"><div><span className="eyebrow">TARZINI SEÇ</span><h2>Kategoriler</h2></div><Link href="/muzik-listeleri">Tüm listeler <ChevronRight size={15} /></Link></div><div className="category-grid">{categoryNames.slice(1).map((name, i) => <button className={"category-tile cat-color-" + i} key={name} onClick={() => { setSelectedCategory(name); router.push("/muzik-listeleri"); }}><span>{i === 0 ? <Mic2 /> : i === 1 ? <Activity /> : i === 2 ? <Disc3 /> : i === 3 ? <Heart /> : <Trophy />}</span><b>{name}</b><ChevronRight size={15} /></button>)}</div></section>
+      <AdPlacement className="cnr-ad-home-mid" slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_MID || ""} label="Öne çıkan içerikler arasında" format="horizontal" />
       <section className="home-section"><div className="section-title-row"><div><span className="eyebrow">ŞİMDİ YAYINDA</span><h2>Öne Çıkan Klipler</h2></div><Link href="/klip-arsivi">Klip arşivi <ChevronRight size={15} /></Link></div>{clips.length ? <div className="clip-grid">{clips.slice(0, 4).map(renderClipCard)}</div> : <div className="empty-state compact"><Radio size={28} /><b>{catalogError || "Yayın kataloğu yükleniyor"}</b><span>Son başarılı yayın kataloğu varsa otomatik kullanılacaktır.</span></div>}</section>
       <section className="home-section"><div className="section-title-row"><div><span className="eyebrow">SAHNE IŞIKLARI</span><h2>Sanatçılar</h2></div><Link href="/sanatcilar">Tüm sanatçılar <ChevronRight size={15} /></Link></div><div className="artist-strip">{uniqueArtists.slice(0, 6).map((clip) => <a href={"https://www.youtube.com/results?search_query=" + encodeURIComponent(clip.artist)} target="_blank" rel="noreferrer" key={clip.artist}><Image src={thumb(clip.id, "mqdefault")} alt="" width={90} height={90} unoptimized /><b>{clip.artist}</b><small>{clip.category}</small></a>)}</div></section>
     </>;
