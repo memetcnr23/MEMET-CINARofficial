@@ -4,7 +4,7 @@ import Image from "next/image";
 import AdPlacement from "@/components/ad-placement";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
   Activity, ArrowUpRight, BadgeCheck, Bell, CalendarDays, CalendarRange, Camera, Captions, Check,
   ChevronDown, ChevronRight, Clock3, Disc3, ExternalLink, Expand, Heart,
@@ -920,7 +920,7 @@ export default function BroadcastApp() {
             <div className={"cnr-video-transition " + (videoTransitioning ? "is-active" : "")} aria-hidden="true" />
             {(!current || (Boolean(catalogError) && !playerPlaying)) && <div className="broadcast-empty-overlay" role="status" aria-live="polite"><Radio size={32} /><b>YAKINDA YAYINDAYIZ</b><span>CNR Müzik TV yayın akışı hazırlanıyor.</span><small>Klipler yeniden yüklendiğinde yayın otomatik başlayacak.</small><strong>ÇOK YAKINDA · CNR MÜZİK TV</strong></div>}
             <div className="cnr-screen-snowfield" aria-hidden="true">
-              {Array.from({ length: 18 }, (_, index) => <i key={index} style={{ "--x": ((index * 47) % 96) + "%", "--s": (5 + (index % 4) * 2) + "px", "--d": (8 + (index % 6) * 2.2) + "s", "--delay": "-" + ((index * 1.43) % 17) + "s", "--drift": ((index % 2 ? 1 : -1) * (8 + (index % 5) * 4)) + "px" } as React.CSSProperties} />)}
+              {Array.from({ length: 18 }, (_, index) => <i key={index} style={{ "--x": ((index * 47) % 96) + "%", "--s": (5 + (index % 4) * 2) + "px", "--d": (8 + (index % 6) * 2.2) + "s", "--delay": "-" + ((index * 1.43) % 17) + "s", "--drift": ((index % 2 ? 1 : -1) * (8 + (index % 5) * 4)) + "px" } as CSSProperties} />)}
             </div>
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
