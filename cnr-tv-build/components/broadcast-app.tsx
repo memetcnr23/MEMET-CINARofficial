@@ -108,6 +108,7 @@ const navItems = [
   { label: "Klip Arşivi", href: "/klip-arsivi", icon: Disc3 },
   { label: "Haberler", href: "/haberler", icon: Newspaper },
   { label: "Etkinlikler", href: "/etkinlikler", icon: CalendarRange },
+  { label: "İstatistik Merkezi", href: "/istatistikler", icon: Activity },
   { label: "Hakkımızda", href: "/hakkimizda", icon: Info },
   { label: "Profil & Ayarlar", href: "/profil", icon: UserCircle2 },
 ];
