@@ -108,7 +108,8 @@ const navItems = [
   { label: "Haberler", href: "/haberler", icon: Newspaper },
   { label: "Etkinlikler", href: "/etkinlikler", icon: CalendarRange },
   { label: "Hakkımızda", href: "/hakkimizda", icon: Info },
-  { label: "Profil & Ayarlar", href: "/profil", icon: UserCircle2 }
+  { label: "Profil & Ayarlar", href: "/profil", icon: UserCircle2 },
+  { label: "İstatistik Merkezi", href: "/istatistikler", icon: Activity }
 ];
 function LayersIcon(props: React.ComponentProps<typeof Activity>) { return <Activity {...props} />; }
 
