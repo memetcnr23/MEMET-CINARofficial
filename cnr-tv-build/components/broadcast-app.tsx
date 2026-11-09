@@ -340,13 +340,12 @@ export default function BroadcastApp() {
 
   useEffect(() => {
     try {
-      setFavorites(JSON.parse(localStorage.getItem("cnr-favorites") || "[]"));
-      setDarkMode(localStorage.getItem("cnr-dark-mode") !== "false");
-      setSoundEnabled(localStorage.getItem("cnr-sound") === "true");
-      setSubtitleEnabled(localStorage.getItem("cnr-subtitles-enabled") === "true");
-    } catch {
-      setFavorites([]);
-    }
+      const savedFavorites: unknown = JSON.parse(localStorage.getItem("cnr-favorites") || "[]");
+      setFavorites(Array.isArray(savedFavorites) ? savedFavorites.filter((item): item is string => typeof item === "string") : []);
+    } catch { setFavorites([]); }
+    try { setDarkMode(localStorage.getItem("cnr-dark-mode") !== "false"); } catch {}
+    try { setSoundEnabled(localStorage.getItem("cnr-sound") === "true"); } catch {}
+    try { setSubtitleEnabled(localStorage.getItem("cnr-subtitles-enabled") === "true"); } catch {}
   }, []);
 
   const toggleSubtitles = () => {
@@ -706,6 +705,26 @@ export default function BroadcastApp() {
     try { localStorage.setItem("cnr-sound", String(!nextMuted)); } catch {}
   };
 
+  const toggleSoundPreference = () => {
+    const next = !soundEnabled;
+    const video = currentHlsUrl ? hlsVideoRef.current : null;
+    const player = playerRef.current;
+    if (video) {
+      video.muted = !next;
+      setMuted(!next);
+      if (next && video.paused) void video.play().then(() => setPlayerPlaying(true)).catch(() => notify("Ses tercihi kaydedildi. Oynatmayı başlatmak için ekrana dokunun."));
+    } else if (player && playerReadyRef.current) {
+      if (next) { player.unMute(); player.setVolume?.(100); }
+      else player.mute();
+      setMuted(!next);
+    } else {
+      setMuted(!next);
+      notify(next ? "Ses tercihi kaydedildi. Canlı yayında ses açma tarayıcı izni gerektirebilir." : "Sessiz yayın tercihi kaydedildi.");
+    }
+    setSoundEnabled(next);
+    try { localStorage.setItem("cnr-sound", String(next)); } catch { notify("Ses değişti ancak tarayıcı tercihi kaydedemedi."); }
+  };
+
   const startWithSound = () => {
     const video = currentHlsUrl ? hlsVideoRef.current : null;
     if (video) { video.muted = false; setMuted(false); setSoundEnabled(true); localStorage.setItem("cnr-sound", "true"); void video.play().then(() => setPlayerPlaying(true)).catch(() => notify("Oynatma başlatılamadı. Yeniden deneyin.")); return; }
@@ -790,7 +809,8 @@ export default function BroadcastApp() {
   const toggleDark = () => {
     const next = !darkMode;
     setDarkMode(next);
-    localStorage.setItem("cnr-dark-mode", String(next));
+    try { localStorage.setItem("cnr-dark-mode", String(next)); }
+    catch { notify("Tema değişti ancak tarayıcı tercihi kaydedemedi."); }
   };
 
   const closeMobileMenu = () => setMobileMenu(false);
@@ -992,7 +1012,11 @@ export default function BroadcastApp() {
       <div className="profile-tabs">{["Hesabım", "Listelerim", "Ayarlar"].map((tab) => <button key={tab} className={profileTab === tab ? "active" : ""} onClick={() => setProfileTab(tab)}>{tab}</button>)}</div>
       {profileTab === "Hesabım" && <div className="settings-list"><button onClick={() => router.push("/sanatci/memet-cinar")}><UserCircle2 /><span><b>Sanatçı profilim</b><small>Herkese açık profilini görüntüle</small></span><ChevronRight /></button><button onClick={() => notify("Hesap ayrıntıları CNR üyelik sistemi bağlandığında açılacak.")}><Settings /><span><b>Hesap bilgileri</b><small>Üyelik ve iletişim ayarları</small></span><ChevronRight /></button></div>}
       {profileTab === "Listelerim" && <><div className="section-title-row"><div><span className="eyebrow">KİŞİSEL KOLEKSİYON</span><h2>Favori Kliplerim</h2></div><span className="result-count">{favorites.length} KAYIT</span></div><div className="clip-grid">{clips.filter((clip) => favorites.includes(clip.id)).map(renderClipCard)}</div>{favorites.length === 0 && <div className="empty-state compact"><Heart size={30} /><b>Henüz favorin yok</b><span>Klip arşivinden beğendiğin kayıtları favorilerine ekle.</span><Link href="/klip-arsivi">Klip arşivine git</Link></div>}</>}
-      {profileTab === "Ayarlar" && <div className="settings-list"><button onClick={toggleDark}><span className="settings-icon"><Sparkles /></span><span><b>Karanlık Mod</b><small>Arayüz temasını değiştir</small></span><span className={darkMode ? "toggle on" : "toggle"} /></button><button onClick={() => { const n = !soundEnabled; setSoundEnabled(n); localStorage.setItem("cnr-sound", String(n)); if (playerRef.current) n ? playerRef.current.unMute() : playerRef.current.mute(); setMuted(!n); }}><span className="settings-icon"><Volume2 /></span><span><b>Ses Tercihi</b><small>Yayın sesini aç veya kapat</small></span><span className={soundEnabled ? "toggle on" : "toggle"} /></button><button onClick={() => notify("Bildirim tercihleri kaydedildi.")}><span className="settings-icon"><Bell /></span><span><b>Bildirimler</b><small>Program ve yayın duyuruları</small></span><span className="toggle on" /></button></div>}
+      {profileTab === "Ayarlar" && <div className="settings-list">
+        <button type="button" role="switch" aria-checked={darkMode} onClick={toggleDark}><span className="settings-icon"><Sparkles /></span><span><b>Karanlık Mod</b><small>Arayüz temasını değiştir ve tercihini kaydet</small></span><span className={darkMode ? "toggle on" : "toggle"} /></button>
+        <button type="button" role="switch" aria-checked={soundEnabled} onClick={toggleSoundPreference}><span className="settings-icon"><Volume2 /></span><span><b>Ses Tercihi</b><small>Canlı yayının sesini aç veya sessize al</small></span><span className={soundEnabled ? "toggle on" : "toggle"} /></button>
+        <button type="button" role="switch" aria-checked={subtitleEnabled} onClick={toggleSubtitles}><span className="settings-icon"><Captions /></span><span><b>Altyazılar</b><small>Desteklenen videolarda altyazıyı aç veya kapat</small></span><span className={subtitleEnabled ? "toggle on" : "toggle"} /></button>
+      </div>}
     </>;
   } else {
     const heroClip = current || clips[0];
