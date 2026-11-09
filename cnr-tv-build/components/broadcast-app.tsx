@@ -906,7 +906,7 @@ export default function BroadcastApp() {
               />
             </div>}
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
-            {!current && <div className="broadcast-empty-overlay" role="status" aria-live="polite"><Radio size={32} /><b>YAKINDA YAYINDAYIZ</b><span>CNR Müzik TV yayın akışı hazırlanıyor.</span><small>Klipler yeniden yüklendiğinde bu ekran otomatik olarak yayına geçecek.</small><strong>ÇOK YAKINDA · CNR MÜZİK TV</strong></div>}
+            {(!current || (Boolean(catalogError) && !playerPlaying)) && <div className="broadcast-empty-overlay" role="status" aria-live="polite"><Radio size={32} /><b>YAKINDA YAYINDAYIZ</b><span>CNR Müzik TV yayın akışı hazırlanıyor.</span><small>Klipler yeniden yüklendiğinde yayın otomatik başlayacak.</small><strong>ÇOK YAKINDA · CNR MÜZİK TV</strong></div>}
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
@@ -917,7 +917,7 @@ export default function BroadcastApp() {
                 
               </div>
             </div>
-            {!playerPlaying && (currentHlsUrl || !HLS_ONLY) && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
+            {current && !playerPlaying && (currentHlsUrl || !HLS_ONLY) && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
             <div className="screen-bottom"><span>● {currentHlsUrl ? "CNR HLS YAYINI" : HLS_ONLY ? "HLS KAYNAĞI BEKLENİYOR" : "YOUTUBE YEDEK YAYIN"}</span><span>{h}</span></div>
             <div className={"cnr-lower-third " + (lowerActive ? "show" : "")} key={lowerKey} aria-live="polite">
               <div className="cnr-lt-logo">
