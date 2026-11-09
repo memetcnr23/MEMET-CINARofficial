@@ -326,3 +326,24 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid rgba(
 @keyframes cnrSnowCrystalFloat{0%{opacity:0;transform:translate3d(-13px,-22px,0) rotate(-35deg) scale(.55)}14%{opacity:.9}34%{opacity:1;transform:translate3d(9px,-5px,0) rotate(75deg) scale(1.06)}57%{opacity:.88;transform:translate3d(20px,12px,0) rotate(195deg) scale(.88)}78%{opacity:.72;transform:translate3d(-10px,25px,0) rotate(300deg) scale(1.12)}92%{opacity:.25}100%{opacity:0;transform:translate3d(-13px,-22px,0) rotate(420deg) scale(.55)}}
 .cnr-logo-metallic-shine::before{animation-duration:22s!important;animation-timing-function:cubic-bezier(.36,0,.2,1)!important;}
 @media(prefers-reduced-motion:reduce){.cnr-logo-snow i,.cnr-logo-snow::before,.cnr-logo-snow::after,.cnr-logo-metallic-shine::before{animation-duration:0.01ms!important;animation-iteration-count:1!important;}}
+
+
+/* CNR BROADCAST CONSOLE — angular premium broadcast surfaces */
+:root{--cnr-accent:#d91f43;--cnr-chrome:#c7cbd3;--cnr-cut:14px}
+.top-header{border-bottom:1px solid rgba(224,230,240,.12);background:linear-gradient(100deg,rgba(8,8,12,.97),rgba(20,9,15,.94),rgba(8,8,12,.97));backdrop-filter:blur(22px)}
+.nav-link{position:relative;isolation:isolate;overflow:hidden;border-radius:2px;transition:background .24s ease,color .24s ease,transform .24s cubic-bezier(.2,.8,.2,1)}
+.nav-link:before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,rgba(210,25,62,.22),transparent 70%);opacity:0;transition:opacity .24s ease}
+.nav-link:hover:before,.nav-link.active:before{opacity:1}
+.nav-link.active{box-shadow:inset 2px 0 0 #f14b68;color:#fff}
+.home-hero,.live-screen,.hero-main,.live-side-panel,.lower-third-panel,.now-playing-card,.program-card,.artist-card,.clip-card,.category-tile,.mini-event-card,.profile-card{border-radius:2px!important;clip-path:polygon(0 0,calc(100% - var(--cnr-cut)) 0,100% var(--cnr-cut),100% 100%,var(--cnr-cut) 100%,0 calc(100% - var(--cnr-cut)))}
+.clip-card,.program-card,.artist-card,.mini-event-card,.profile-card{position:relative;border:1px solid rgba(210,218,230,.12);background:linear-gradient(145deg,rgba(24,22,29,.98),rgba(9,9,13,.99));transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s ease,box-shadow .3s ease}
+.clip-card:hover,.program-card:hover,.artist-card:hover,.mini-event-card:hover{transform:translateY(-4px);border-color:rgba(225,53,84,.55);box-shadow:0 18px 38px rgba(0,0,0,.32),inset 0 1px rgba(255,255,255,.04)}
+.category-tile{border:1px solid rgba(200,207,220,.12)!important;background:linear-gradient(140deg,rgba(34,25,32,.9),rgba(12,12,17,.98))!important}
+.category-tile:hover{border-color:rgba(230,60,90,.6)!important;box-shadow:0 10px 28px rgba(180,20,55,.12)}
+.hero-play,.player-button,.control-live,.secondary-wide{border-radius:2px!important;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.panel-heading,.section-title-row{border-bottom:1px solid rgba(213,220,230,.11)}
+.live-screen{outline:1px solid rgba(217,31,67,.26);box-shadow:0 0 0 1px rgba(255,255,255,.025),0 24px 70px rgba(0,0,0,.48)}
+.screen-top,.screen-bottom{backdrop-filter:blur(14px)}
+.header-icon{border-radius:2px!important;border:1px solid rgba(220,225,235,.12)}
+button:focus-visible,a:focus-visible{outline:2px solid rgba(255,82,112,.95);outline-offset:3px}
+@media(max-width:760px){:root{--cnr-cut:10px}.home-hero,.live-screen,.hero-main{clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px))}}
