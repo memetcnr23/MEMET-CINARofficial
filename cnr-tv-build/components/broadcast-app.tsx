@@ -257,20 +257,57 @@ export default function BroadcastApp() {
 
   useEffect(() => {
     let cancelled = false;
+    let hasLiveData = false;
+    const restoreLastGoodCatalog = () => {
+      if (hasLiveData) return;
+      try {
+        const saved = localStorage.getItem("cnr-last-good-catalog");
+        if (!saved) return;
+        const parsed = JSON.parse(saved) as { clips?: Clip[] };
+        const clips = Array.isArray(parsed.clips) ? parsed.clips.filter((clip) => clip && typeof clip.id === "string" && typeof clip.durationSeconds === "number") : [];
+        if (!clips.length) return;
+        const now = Date.now();
+        const upcoming: TimedClip[] = [];
+        let cursor = now;
+        for (let index = 0; index < Math.min(12, clips.length); index += 1) {
+          const clip = clips[index];
+          const duration = Math.max(60, clip.durationSeconds || 180);
+          upcoming.push({
+            clip,
+            startsAt: new Date(cursor).toISOString(),
+            endsAt: new Date(cursor + duration * 1000).toISOString(),
+            offsetSeconds: 0
+          });
+          cursor += duration * 1000;
+        }
+        setNowPlaying({
+          source: "CNR saved catalog fallback",
+          serverTime: new Date(now).toISOString(),
+          current: upcoming[0],
+          upcoming,
+          clips,
+          playlistDurationSeconds: clips.reduce((sum, clip) => sum + Math.max(60, clip.durationSeconds || 180), 0)
+        });
+        setCatalogError("Yayın kataloğu geçici olarak yenilenemiyor. Son başarılı klip listesiyle devam ediliyor.");
+      } catch { /* A damaged local cache must never break the broadcast UI. */ }
+    };
     const update = async () => {
       try {
         const response = await fetch("/api/now-playing", { cache: "no-store" });
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "Yayın bilgisi alınamadı.");
         if (cancelled) return;
+        hasLiveData = true;
         setNowPlaying(data as NowPlaying);
         setCatalogError("");
-      } catch (error) {
-        if (!cancelled) setCatalogError(error instanceof Error ? error.message : "Yayın sunucusuna bağlanılamadı.");
+        try { localStorage.setItem("cnr-last-good-catalog", JSON.stringify({ clips: data.clips })); } catch {}
+      } catch {
+        if (!cancelled) restoreLastGoodCatalog();
+        if (!cancelled && !hasLiveData) setCatalogError((current) => current || "Yayın kataloğuna şu anda ulaşılamıyor. Bir süre sonra yeniden denenecek.");
       }
     };
     void update();
-    const timer = window.setInterval(update, 12000);
+    const timer = window.setInterval(update, 5 * 60 * 1000);
     return () => { cancelled = true; window.clearInterval(timer); };
   }, []);
 
@@ -1034,7 +1071,7 @@ export default function BroadcastApp() {
         </div>
       </section>
       <section className="quick-categories"><div className="section-title-row"><div><span className="eyebrow">TARZINI SEÇ</span><h2>Kategoriler</h2></div><Link href="/muzik-listeleri">Tüm listeler <ChevronRight size={15} /></Link></div><div className="category-grid">{categoryNames.slice(1).map((name, i) => <button className={"category-tile cat-color-" + i} key={name} onClick={() => { setSelectedCategory(name); router.push("/muzik-listeleri"); }}><span>{i === 0 ? <Mic2 /> : i === 1 ? <Activity /> : i === 2 ? <Disc3 /> : i === 3 ? <Heart /> : <Trophy />}</span><b>{name}</b><ChevronRight size={15} /></button>)}</div></section>
-      <section className="home-section"><div className="section-title-row"><div><span className="eyebrow">ŞİMDİ YAYINDA</span><h2>Öne Çıkan Klipler</h2></div><Link href="/klip-arsivi">Klip arşivi <ChevronRight size={15} /></Link></div>{clips.length ? <div className="clip-grid">{clips.slice(0, 4).map(renderClipCard)}</div> : <div className="empty-state compact"><Radio size={28} /><b>{catalogError || "Yayın kataloğu yükleniyor"}</b><span>YouTube müzik kataloğu hazırlanıyor.</span></div>}</section>
+      <section className="home-section"><div className="section-title-row"><div><span className="eyebrow">ŞİMDİ YAYINDA</span><h2>Öne Çıkan Klipler</h2></div><Link href="/klip-arsivi">Klip arşivi <ChevronRight size={15} /></Link></div>{clips.length ? <div className="clip-grid">{clips.slice(0, 4).map(renderClipCard)}</div> : <div className="empty-state compact"><Radio size={28} /><b>{catalogError || "Yayın kataloğu yükleniyor"}</b><span>Son başarılı yayın kataloğu varsa otomatik kullanılacaktır.</span></div>}</section>
       <section className="home-section"><div className="section-title-row"><div><span className="eyebrow">SAHNE IŞIKLARI</span><h2>Sanatçılar</h2></div><Link href="/sanatcilar">Tüm sanatçılar <ChevronRight size={15} /></Link></div><div className="artist-strip">{uniqueArtists.slice(0, 6).map((clip) => <a href={"https://www.youtube.com/results?search_query=" + encodeURIComponent(clip.artist)} target="_blank" rel="noreferrer" key={clip.artist}><Image src={thumb(clip.id, "mqdefault")} alt="" width={90} height={90} unoptimized /><b>{clip.artist}</b><small>{clip.category}</small></a>)}</div></section>
     </>;
   }
