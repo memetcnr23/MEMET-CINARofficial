@@ -919,12 +919,12 @@ export default function BroadcastApp() {
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
             <div className={"cnr-video-transition " + (videoTransitioning ? "is-active" : "")} aria-hidden="true" />
             {(!current || (Boolean(catalogError) && !playerPlaying)) && <div className="broadcast-empty-overlay" role="status" aria-live="polite"><Radio size={32} /><b>YAKINDA YAYINDAYIZ</b><span>CNR Müzik TV yayın akışı hazırlanıyor.</span><small>Klipler yeniden yüklendiğinde yayın otomatik başlayacak.</small><strong>ÇOK YAKINDA · CNR MÜZİK TV</strong></div>}
+            <div className="cnr-screen-snowfield" aria-hidden="true">
+              {Array.from({ length: 18 }, (_, index) => <i key={index} style={{ "--x": ((index * 47) % 96) + "%", "--s": (5 + (index % 4) * 2) + "px", "--d": (8 + (index % 6) * 2.2) + "s", "--delay": "-" + ((index * 1.43) % 17) + "s", "--drift": ((index % 2 ? 1 : -1) * (8 + (index % 5) * 4)) + "px" } as React.CSSProperties} />)}
+            </div>
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
-                <span className="cnr-logo-snow" aria-hidden="true">
-                  {Array.from({ length: 22 }, (_, index) => <i key={index} className={index % 7 === 0 ? "snow-near" : index % 3 === 0 ? "snow-crystal" : "snow-soft"} style={{ left: ((index * 43) % 94 + 3) + "%", top: ((index * 61) % 84 + 8) + "%", animationDelay: "-" + ((index * 1.17) % 19).toFixed(2) + "s", animationDuration: (15 + (index % 7) * 2.4) + "s", width: (index % 7 === 0 ? 18 : 9 + (index % 4) * 3) + "px", height: (index % 7 === 0 ? 18 : 9 + (index % 4) * 3) + "px" }}><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 5V95 M11 27L89 73 M11 73L89 27 M50 5L39 18 M50 5L61 18 M50 95L39 82 M50 95L61 82 M11 27L27 29 M11 27L17 43 M89 73L73 71 M89 73L83 57 M11 73L27 71 M11 73L17 57 M89 27L73 29 M89 27L83 43 M50 35L41 44 M50 35L59 44 M50 65L41 56 M50 65L59 56" /></svg></i>)}
-                </span>
                 <span className="cnr-logo-metallic-shine" aria-hidden="true" />
                 
               </div>
