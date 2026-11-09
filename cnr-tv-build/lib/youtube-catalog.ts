@@ -1,3 +1,5 @@
+import { getSupabaseRestConfig } from "@/lib/supabase-server";
+
 export type YouTubeClip = {
   id: string;
   title: string;
@@ -59,7 +61,7 @@ async function youtube<T>(endpoint: string, params: Record<string, string>, apiK
   return data;
 }
 
-export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeClip[]> {
+async function getYouTubeCatalogFromYouTube(searchQuery?: string): Promise<YouTubeClip[]> {
   const apiKey = process.env.YOUTUBE_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey) throw new Error("YOUTUBE_API_KEY sunucu ortamında tanımlı değil.");
 
@@ -206,4 +208,55 @@ export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeCl
     throw new Error("YouTube'da yayınlanabilir uzun formatlı müzik videosu bulunamadı.");
   }
   return clips;
+}
+
+
+type StoredClip = {
+  youtube_video_id: string;
+  title: string;
+  artist: string;
+  category: string;
+};
+
+async function getStoredCatalog(searchQuery?: string): Promise<YouTubeClip[]> {
+  const config = getSupabaseRestConfig();
+  if (!config) return [];
+  const params = new URLSearchParams({
+    select: "youtube_video_id,title,artist,category",
+    is_active: "eq.true",
+    order: "position.asc",
+    limit: "50"
+  });
+  const query = searchQuery?.trim();
+  if (query) {
+    const safeQuery = query.replace(/[%,()]/g, " ").trim();
+    if (!safeQuery) return [];
+    params.set("or", `(title.ilike.*${safeQuery}*,artist.ilike.*${safeQuery}*,category.ilike.*${safeQuery}*)`);
+  }
+  const response = await fetch(`${config.baseUrl}/tv_clips?${params.toString()}`, {
+    headers: config.headers,
+    next: { revalidate: 300 }
+  });
+  if (!response.ok) return [];
+  const rows = await response.json() as StoredClip[];
+  return rows.filter((row) => /^[A-Za-z0-9_-]{11}$/.test(row.youtube_video_id)).map((row) => ({
+    id: row.youtube_video_id,
+    title: row.title,
+    artist: row.artist,
+    category: row.category || "Türkçe Pop",
+    videoType: "Müzik Videosu",
+    durationSeconds: 240
+  }));
+}
+
+export async function getYouTubeCatalog(searchQuery?: string): Promise<YouTubeClip[]> {
+  try {
+    return await getYouTubeCatalogFromYouTube(searchQuery);
+  } catch (error) {
+    const isQuotaError = error instanceof Error && /quotaExceeded|dailyLimitExceeded|Search Queries per day|günlük kotası doldu/i.test(error.message);
+    if (!isQuotaError) throw error;
+    const stored = await getStoredCatalog(searchQuery);
+    if (stored.length) return stored;
+    throw new Error("YouTube arama kotası doldu ve kayıtlı CNR klip kataloğuna erişilemedi.");
+  }
 }
