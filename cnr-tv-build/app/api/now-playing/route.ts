@@ -38,8 +38,29 @@ function programFor(category: string) {
   return "Türkçe Pop Hits";
 }
 
+function dailyShuffle<T>(items: T[], nowMs: number): T[] {
+  const date = new Date(nowMs);
+  const seedText = date.getUTCFullYear() + "-" + date.getUTCMonth() + "-" + date.getUTCDate();
+  let seed = 2166136261;
+  for (let index = 0; index < seedText.length; index += 1) {
+    seed ^= seedText.charCodeAt(index);
+    seed = Math.imul(seed, 16777619);
+  }
+  const result = [...items];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    const target = seed % (index + 1);
+    [result[index], result[target]] = [result[target], result[index]];
+  }
+  return result;
+}
+
 function getTimeline(clips: YouTubeClip[], nowMs: number) {
-  const startEpoch = Date.UTC(2026, 10, 7, 0, 0, 0) / 1000;
+  const startEpoch = Date.UTC(
+    new Date(nowMs).getUTCFullYear(),
+    new Date(nowMs).getUTCMonth(),
+    new Date(nowMs).getUTCDate()
+  ) / 1000;
   const durations = clips.map((clip) => Math.max(60, clip.durationSeconds || 180));
   const total = durations.reduce((sum, duration) => sum + duration, 0);
   const elapsed = Math.max(0, nowMs / 1000 - startEpoch);
@@ -84,19 +105,22 @@ export async function GET() {
     const clips = sourceClips.map((clip) => ({ ...clip, hlsUrl: hlsMap[clip.id] || null }));
     const hlsConfiguredCount = clips.filter((clip) => Boolean(clip.hlsUrl)).length;
     const now = Date.now();
-    const timeline = getTimeline(clips, now);
+    // Same shuffled order for every viewer during the day; a new random order
+    // starts the next day, and every catalog item is played before the loop.
+    const shuffledClips = dailyShuffle(clips, now);
+    const timeline = getTimeline(shuffledClips, now);
     return NextResponse.json({
       source: "CNR synchronized HLS-first playlist",
       hls: {
         mode: process.env.NEXT_PUBLIC_CNR_HLS_URL ? "continuous" : "per-clip",
         configuredClips: hlsConfiguredCount,
-        totalClips: clips.length,
-        fallbackClips: clips.length - hlsConfiguredCount
+        totalClips: shuffledClips.length,
+        fallbackClips: shuffledClips.length - hlsConfiguredCount
       },
       serverTime: new Date(now).toISOString(),
       current: timeline.upcoming[0],
       upcoming: timeline.upcoming,
-      clips,
+      clips: shuffledClips,
       playlistDurationSeconds: timeline.total
     }, { headers: { "Cache-Control": "no-store, max-age=0" } });
   } catch (error) {
