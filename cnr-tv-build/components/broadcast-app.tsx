@@ -258,8 +258,9 @@ export default function BroadcastApp() {
   useEffect(() => {
     let cancelled = false;
     let hasLiveData = false;
+    let hasRestoredCache = false;
     const restoreLastGoodCatalog = () => {
-      if (hasLiveData) return;
+      if (hasLiveData || hasRestoredCache) return;
       try {
         const saved = localStorage.getItem("cnr-last-good-catalog");
         if (!saved) return;
@@ -280,6 +281,7 @@ export default function BroadcastApp() {
           });
           cursor += duration * 1000;
         }
+        hasRestoredCache = true;
         setNowPlaying({
           source: "CNR saved catalog fallback",
           serverTime: new Date(now).toISOString(),
