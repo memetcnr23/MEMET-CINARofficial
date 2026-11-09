@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import AnalyticsTracker from "@/components/analytics-tracker";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,8 +19,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
-  const validAdsenseClient = /^ca-pub-\d+$/.test(adsenseClient);
+  const validAdsenseClient = /^ca-pub-\\d+$/.test(adsenseClient);
   return <html lang="tr"><body>
+    <AnalyticsTracker />
     {children}
     {validAdsenseClient && <Script
       id="google-adsense"
