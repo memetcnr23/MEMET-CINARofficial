@@ -20,15 +20,16 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "";
   const validAdsenseClient = /^ca-pub-[0-9]+$/.test(adsenseClient);
-  return <html lang="tr"><body>
-    <AnalyticsTracker />
-    {children}
+  return <html lang="tr"><head>
     {validAdsenseClient && <Script
       id="google-adsense"
       async
-      strategy="afterInteractive"
+      strategy="beforeInteractive"
       crossOrigin="anonymous"
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
     />}
+  </head><body>
+    <AnalyticsTracker />
+    {children}
   </body></html>;
 }
