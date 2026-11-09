@@ -136,6 +136,28 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid rgba(
 .search-artist-avatar{width:44px;height:44px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;border:1px solid rgba(255,48,68,.55);border-radius:50%;background:#1a1117;color:#fff;font-size:13px;font-weight:900;}
 .modal-results a{display:flex;align-items:center;gap:12px;}
 .modal-results a>span:not(.search-artist-avatar){display:flex;flex-direction:column;min-width:0;flex:1;}
+/* Mobil canlı TV: yayın bilgisi tekrar eden büyük küçük resim yerine kompakt bilgi bandı olur. */
+@media(max-width:720px){
+  .live-broadcast-layout{gap:9px}
+  .live-primary{display:flex;flex-direction:column;gap:0}
+  .live-screen{aspect-ratio:16/9;border-radius:7px!important;box-shadow:0 0 24px rgba(210,0,34,.12)}
+  .screen-top{top:7px;left:8px;right:8px}
+  .screen-quality{font-size:7px;letter-spacing:.7px}
+  .screen-bottom{font-size:6px;letter-spacing:.7px}
+  .live-side-panel{padding:10px;border-radius:7px!important}
+  .live-side-panel>.panel-heading:first-child{margin-bottom:7px}
+  .live-side-panel>.panel-heading:first-child h2{font-size:19px}
+  .now-playing-card{display:grid;grid-template-columns:minmax(0,1fr);border-radius:6px}
+  .now-playing-card>img{display:none!important}
+  .now-playing-card>div{padding:9px 10px;gap:3px}
+  .now-playing-card small{font-size:7px}
+  .now-playing-card b{font-size:11px;line-height:1.35;white-space:normal}
+  .now-playing-card span{font-size:9px}
+  .live-status-grid{margin:8px 0 13px}
+  .upcoming-heading{margin-top:5px}
+  .upcoming-list{gap:0}
+  .broadcast-disclaimer{margin-top:8px}
+}
 @media(max-width:720px){.live-channel-bug{top:42px;left:8.2%;width:clamp(88px,24%,128px);}.lower-third-panel{left:7px;right:7px;bottom:34px;grid-template-columns:1fr auto;gap:7px;padding:7px 9px!important;min-height:52px;}.lower-live-label{font-size:8px;}.lower-track{grid-column:1;grid-row:2;gap:8px;}.lower-track img{width:65px;}.lower-track b{font-size:11px;}.lower-track small{font-size:9px;}.lower-bars{grid-column:2;grid-row:1/3;width:42px;}.artist-directory-search{padding:10px 11px;}.artist-card-image{width:76px;height:76px;}}
 
 /* National-day corner animation: scheduled from three days before through three days after. */
