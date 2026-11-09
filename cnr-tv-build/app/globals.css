@@ -362,3 +362,28 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid rgba(
 .header-icon{border-radius:2px!important;border:1px solid rgba(220,225,235,.12)}
 button:focus-visible,a:focus-visible{outline:2px solid rgba(255,82,112,.95);outline-offset:3px}
 @media(max-width:760px){:root{--cnr-cut:10px}.home-hero,.live-screen,.hero-main{clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px))}}
+
+
+/* CNR Müzik TV — on-air “İyi Yayınlar” ident */
+.cnr-good-wishes{position:absolute;z-index:14;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,1.5vw,16px);overflow:hidden;padding:24px;text-align:center;color:#fff;background:radial-gradient(ellipse at 50% 42%,rgba(150,20,48,.42),transparent 42%),linear-gradient(125deg,rgba(4,5,9,.985),rgba(19,8,15,.97) 52%,rgba(4,5,9,.99));opacity:0;visibility:hidden;pointer-events:none;clip-path:inset(0 0 100% 0);transition:opacity .55s ease,visibility .55s ease,clip-path .8s cubic-bezier(.2,.8,.2,1)}
+.cnr-good-wishes.is-visible{opacity:1;visibility:visible;clip-path:inset(0);pointer-events:auto}
+.cnr-good-wishes:before,.cnr-good-wishes:after{content:"";position:absolute;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(224,190,135,.7),rgba(215,35,69,.75),transparent)}
+.cnr-good-wishes:before{top:12%}.cnr-good-wishes:after{bottom:12%}
+.cnr-good-wishes-brand{position:relative;z-index:1;width:min(35%,240px);padding:8px 18px;border:1px solid rgba(225,195,145,.2);background:rgba(0,0,0,.22);box-shadow:0 0 45px rgba(190,30,65,.13);animation:cnrWishRise .75s .12s both}
+.cnr-good-wishes-brand img{display:block;width:100%;height:auto;object-fit:contain}
+.cnr-good-wishes-kicker{position:relative;z-index:1;color:#e3c48f;font-size:clamp(8px,1vw,12px);font-weight:850;letter-spacing:.34em;animation:cnrWishRise .65s .35s both}
+.cnr-good-wishes strong{position:relative;z-index:1;font:900 clamp(36px,8vw,100px)/.98 var(--display);letter-spacing:.045em;color:#fff;text-shadow:0 5px 32px rgba(222,35,73,.38);animation:cnrWishTitle .9s .48s both}
+.cnr-good-wishes-line{position:relative;z-index:1;color:rgba(255,255,255,.78);font-size:clamp(11px,1.5vw,17px);letter-spacing:.12em;animation:cnrWishRise .65s .72s both}
+.cnr-good-wishes-rule{position:relative;z-index:1;width:min(36%,260px);height:2px;margin-top:6px;background:linear-gradient(90deg,transparent,#e7c68f,#c61d42,transparent);box-shadow:0 0 18px rgba(220,40,80,.5);animation:cnrWishRule 1.1s .7s both}
+.cnr-good-wishes-orbit{position:absolute;width:min(75vw,680px);aspect-ratio:1;border:1px solid rgba(222,190,139,.08);border-radius:50%;animation:cnrWishSpin 22s linear infinite}
+.cnr-good-wishes-orbit:before,.cnr-good-wishes-orbit:after{content:"";position:absolute;inset:9%;border:1px solid rgba(207,34,68,.13);border-radius:50%}
+.cnr-good-wishes-orbit:after{inset:19%;border-color:rgba(222,190,139,.1)}
+.cnr-good-wishes-orbit i{position:absolute;top:8%;left:50%;width:5px;height:5px;border-radius:50%;background:#e7c68f;box-shadow:0 0 16px #e7c68f}
+.cnr-good-wishes-orbit i:nth-child(2){top:50%;left:4%;background:#cf294d}.cnr-good-wishes-orbit i:nth-child(3){top:85%;left:76%;width:3px;height:3px}
+@keyframes cnrWishRise{from{opacity:0;transform:translateY(18px);filter:blur(5px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes cnrWishTitle{from{opacity:0;transform:translateY(22px) scale(.96);letter-spacing:.22em;filter:blur(9px)}to{opacity:1;transform:translateY(0) scale(1);letter-spacing:.045em;filter:blur(0)}}
+@keyframes cnrWishRule{from{transform:scaleX(0);opacity:0}to{transform:scaleX(1);opacity:1}}
+@keyframes cnrWishSpin{to{transform:rotate(360deg)}}
+.good-wishes-trigger{white-space:nowrap}
+@media(max-width:760px){.cnr-good-wishes{gap:10px;padding:14px}.cnr-good-wishes-brand{width:min(54%,190px)}.cnr-good-wishes strong{font-size:clamp(30px,10vw,56px);letter-spacing:.025em}.cnr-good-wishes-line{max-width:90%;font-size:10px;letter-spacing:.04em}.cnr-good-wishes-orbit{width:120vw}.good-wishes-trigger{font-size:8px;padding-inline:7px}}
+@media(prefers-reduced-motion:reduce){.cnr-good-wishes,.cnr-good-wishes *{animation:none!important;transition:none!important}}
