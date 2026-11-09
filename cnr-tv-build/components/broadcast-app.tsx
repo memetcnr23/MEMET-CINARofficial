@@ -232,6 +232,24 @@ export default function BroadcastApp() {
   const activeArtistSlug = pathname.startsWith("/sanatci/") ? decodeURIComponent(pathname.slice("/sanatci/".length).split("/")[0] || "") : "";
   nowRef.current = nowPlaying;
 
+  useEffect(() => {
+    try {
+      const key = "cnr-tv-analytics-v1";
+      const raw = localStorage.getItem(key);
+      const stats = raw ? JSON.parse(raw) as { total?: number; days?: Record<string, number>; routes?: Record<string, number>; startedAt?: string } : {};
+      const day = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Istanbul" });
+      stats.total = (stats.total || 0) + 1;
+      stats.days = stats.days || {};
+      stats.routes = stats.routes || {};
+      stats.days[day] = (stats.days[day] || 0) + 1;
+      stats.routes[pathname] = (stats.routes[pathname] || 0) + 1;
+      stats.startedAt = stats.startedAt || new Date().toISOString();
+      const cutoff = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+      for (const savedDay of Object.keys(stats.days)) if (savedDay < cutoff) delete stats.days[savedDay];
+      localStorage.setItem(key, JSON.stringify(stats));
+    } catch { /* Local analytics is optional when storage is unavailable. */ }
+  }, [pathname]);
+
   const notify = useCallback((message: string) => {
     setToast(message);
     window.setTimeout(() => setToast(""), 2600);
