@@ -235,7 +235,7 @@ async function getStoredCatalog(searchQuery?: string): Promise<YouTubeClip[]> {
   }
   const response = await fetch(`${config.baseUrl}/tv_clips?${params.toString()}`, {
     headers: config.headers,
-    next: { revalidate: 300 }
+    cache: "no-store"
   });
   if (!response.ok) return [];
   const rows = await response.json() as StoredClip[];
