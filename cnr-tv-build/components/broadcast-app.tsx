@@ -92,7 +92,7 @@ declare global {
   }
 }
 
-const LOGO = "/cnr-logo.webp";
+const LOGO = "/cnr-logo.svg";
 const HLS_STREAM = process.env.NEXT_PUBLIC_CNR_HLS_URL || "";
 // Default: HLS per-clip when available, YouTube embed fallback otherwise.
 // Set NEXT_PUBLIC_CNR_PLAYER_MODE=hls to enforce HLS-only mode.
@@ -927,7 +927,6 @@ export default function BroadcastApp() {
                 <div className="cnr-logo-snowfield" aria-hidden="true">
                   {Array.from({ length: 16 }, (_, index) => <i key={index} className={index % 4 === 0 ? "flake" : "snow-dot"} style={{ "--x": ((index * 31) % 96) + "%", "--s": (index % 4 === 0 ? 7 + (index % 3) * 2 : 2 + (index % 2)) + "px", "--d": (4.8 + (index % 5) * 1.1) + "s", "--delay": "-" + ((index * 0.83) % 9) + "s", "--drift": ((index % 2 ? 1 : -1) * (4 + (index % 4) * 2)) + "px" } as CSSProperties} />)}
                 </div>
-                <span className="cnr-logo-santa-hat" aria-hidden="true"><svg viewBox="0 0 120 100"><defs><linearGradient id="hatRed" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ff5148"/><stop offset=".55" stopColor="#d90819"/><stop offset="1" stopColor="#8e0010"/></linearGradient><linearGradient id="hatFur" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#fff"/><stop offset="1" stopColor="#cbd0d8"/></linearGradient></defs><path d="M12 70C28 31 57 8 94 8c-9 16-7 39 13 56-26 2-57 9-83 22Z" fill="url(#hatRed)" stroke="#970b16" strokeWidth="2"/><path d="M11 69c27-13 63-19 97-7l-8 20c-30-5-59 2-82 14Z" fill="url(#hatFur)" stroke="#c8cbd1" strokeWidth="2"/><circle cx="95" cy="10" r="13" fill="#fff" stroke="#d5d8de" strokeWidth="2"/></svg></span>
                 
               </div>
             </div>
