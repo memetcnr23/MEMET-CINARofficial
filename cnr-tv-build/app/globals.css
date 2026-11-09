@@ -81,13 +81,18 @@
 .cnr-logo-metallic-shine{position:absolute;inset:0;z-index:3;overflow:hidden;pointer-events:none;-webkit-mask-image:url("/cnr-logo.webp");mask-image:url("/cnr-logo.webp");-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:100% 100%;mask-size:100% 100%;opacity:1;transform:none;animation:none;isolation:isolate;}
 .cnr-logo-metallic-shine::before{content:"";position:absolute;top:-8%;bottom:-8%;left:0;width:42%;pointer-events:none;background:linear-gradient(108deg,transparent 0%,rgba(255,255,255,0) 28%,rgba(223,239,255,.08) 40%,rgba(255,255,255,.28) 46%,rgba(255,255,255,.72) 50%,rgba(255,255,255,.3) 54%,rgba(213,232,255,.08) 62%,transparent 74%);filter:blur(.45px);transform:translate3d(-140%,0,0) skewX(-18deg);animation:cnrMetallicSweep 22s cubic-bezier(.4,0,.2,1) infinite;will-change:transform,opacity;}
 @keyframes cnrMetallicSweep{0%,24%{opacity:0;transform:translate3d(-140%,0,0) skewX(-18deg)}31%{opacity:.58}59%{opacity:0;transform:translate3d(355%,0,0) skewX(-18deg)}100%{opacity:0;transform:translate3d(355%,0,0) skewX(-18deg)}}
-.cnr-screen-snowfield{position:absolute;z-index:11;top:25px;left:5.8%;width:22%;height:112px;pointer-events:none;overflow:hidden;mask-image:radial-gradient(ellipse 52% 43% at 50% 50%,transparent 0 67%,#000 80%);-webkit-mask-image:radial-gradient(ellipse 52% 43% at 50% 50%,transparent 0 67%,#000 80%);}
-.cnr-screen-snowfield i{position:absolute;top:-18px;left:var(--x);width:var(--s);height:var(--s);color:rgba(235,247,255,.78);font-style:normal;filter:drop-shadow(0 0 5px rgba(205,231,255,.75));animation:cnrScreenSnowFall var(--d) linear var(--delay) infinite;will-change:transform,opacity;}
-.cnr-screen-snowfield i::before{content:"✳";font-size:var(--s);line-height:1;}
-@keyframes cnrScreenSnowFall{0%{transform:translate3d(0,-15px,0) rotate(0deg);opacity:0}12%{opacity:.82}55%{transform:translate3d(var(--drift),62px,0) rotate(180deg);opacity:.72}100%{transform:translate3d(calc(var(--drift) * -.45),130px,0) rotate(360deg);opacity:0}}
+.cnr-screen-snowfield{position:absolute;z-index:11;inset:0;pointer-events:none;overflow:hidden;mask-image:radial-gradient(ellipse 20% 12% at 16% 12%,transparent 0 62%,#000 86%);-webkit-mask-image:radial-gradient(ellipse 20% 12% at 16% 12%,transparent 0 62%,#000 86%);}
+.cnr-screen-snowfield i{position:absolute;top:-22px;left:var(--x);width:var(--s);height:var(--s);opacity:0;color:rgba(244,248,255,.88);filter:drop-shadow(0 0 3px rgba(220,235,255,.7));animation:cnrScreenSnowFall var(--d) linear var(--delay) infinite;will-change:transform,opacity;}
+.cnr-screen-snowfield i.flake::before{content:"❄";display:block;font-size:var(--s);line-height:1;font-weight:300;}
+.cnr-screen-snowfield i.snow-dot{border-radius:50%;background:rgba(255,255,255,.9);box-shadow:0 0 5px rgba(226,239,255,.8);}
+@keyframes cnrScreenSnowFall{0%{transform:translate3d(0,-16px,0) rotate(0deg);opacity:0}10%{opacity:.78}48%{transform:translate3d(var(--drift),48vh,0) rotate(150deg);opacity:.7}100%{transform:translate3d(calc(var(--drift) * -.35),105vh,0) rotate(330deg);opacity:0}}
 .cnr-logo-effects{overflow:visible;}
 .cnr-logo-effects>img{z-index:2;}
 .cnr-logo-metallic-shine{z-index:3;}
+.cnr-logo-santa-hat{position:absolute;z-index:5;top:-21px;right:13%;width:54px;height:46px;pointer-events:none;transform:rotate(13deg);transform-origin:70% 85%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45));animation:cnrHatBob 5.5s ease-in-out infinite;}
+.cnr-logo-santa-hat svg{display:block;width:100%;height:100%;overflow:visible;}
+@keyframes cnrHatBob{0%,100%{transform:rotate(11deg) translateY(0)}50%{transform:rotate(15deg) translateY(-2px)}}
+@media(max-width:600px){.cnr-logo-santa-hat{width:46px;height:39px;top:-17px;right:12%;}}
 /* Gentle, consistent motion without changing layout or player behavior. */
 .nav-link,.header-icon,.category-tile,.clip-card,.artist-strip>a,.player-button,.control-live,.secondary-wide,.hero-play,.filter-chips button,.settings-list button,.footer-social a{transition:transform .28s cubic-bezier(.2,.75,.25,1),border-color .28s ease,background-color .28s ease,box-shadow .28s ease,color .22s ease,opacity .22s ease;}
 .nav-link:hover,.header-icon:hover,.player-button:hover,.footer-social a:hover{transform:translateY(-1px);}
