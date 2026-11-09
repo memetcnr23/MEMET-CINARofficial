@@ -100,7 +100,16 @@ export async function GET() {
       playlistDurationSeconds: timeline.total
     }, { headers: { "Cache-Control": "no-store, max-age=0" } });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Canlı yayın bilgisi alınamadı.";
-    return NextResponse.json({ error: message }, { status: message.includes("tanımlı") ? 503 : 502 });
+    const detail = error instanceof Error ? error.message : "";
+    const quotaLimited = /quotaExceeded|dailyLimitExceeded|Search Queries per day|günlük kotası doldu/i.test(detail);
+    const message = quotaLimited
+      ? "YouTube katalog kotası geçici olarak doldu. Son kayıtlı klip listesi kullanılacak; katalog kota yenilendiğinde tekrar güncellenecek."
+      : detail.includes("tanımlı")
+        ? "Yayın kataloğu sunucu ayarı eksik."
+        : "Yayın kataloğu şu anda yenilenemiyor. Lütfen daha sonra tekrar deneyin.";
+    return NextResponse.json({ error: message, code: quotaLimited ? "YOUTUBE_QUOTA_LIMIT" : "CATALOG_UNAVAILABLE" }, {
+      status: detail.includes("tanımlı") ? 503 : quotaLimited ? 503 : 502,
+      headers: { "Cache-Control": "no-store, max-age=0" }
+    });
   }
 }
