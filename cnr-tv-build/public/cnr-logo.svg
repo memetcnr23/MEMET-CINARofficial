@@ -14,54 +14,8 @@
 <g fill="url(#silver)" stroke="#111" stroke-width="7" paint-order="stroke fill" filter="url(#shadow)" font-family="Arial,Helvetica,sans-serif" font-weight="900">
   <text x="62" y="290" font-size="278" letter-spacing="-20">CNR</text>
 </g>
-<!-- Santa cap fitted to the upper arc of the C: this is part of the master logo, not a floating sticker. -->
-<g id="cnr-santa-hat" filter="url(#cnrHatShadow)">
-  <defs>
-    <linearGradient id="cnrHatRed" x1="0" y1="0" x2=".86" y2="1">
-      <stop offset="0" stop-color="#ff7378"/>
-      <stop offset=".28" stop-color="#ec1b2b"/>
-      <stop offset=".68" stop-color="#b60019"/>
-      <stop offset="1" stop-color="#76000f"/>
-    </linearGradient>
-    <linearGradient id="cnrHatFur" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fff"/>
-      <stop offset=".42" stop-color="#f5f7f8"/>
-      <stop offset=".78" stop-color="#dce2e7"/>
-      <stop offset="1" stop-color="#aeb9c2"/>
-    </linearGradient>
-    <radialGradient id="cnrHatPom" cx=".32" cy=".22" r=".78">
-      <stop offset="0" stop-color="#fff"/>
-      <stop offset=".62" stop-color="#f8fafb"/>
-      <stop offset="1" stop-color="#bec8cf"/>
-    </radialGradient>
-    <filter id="cnrHatShadow" x="-20%" y="-50%" width="150%" height="190%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="2.4" result="blur"/>
-      <feOffset dy="2.5" result="offset"/>
-      <feComponentTransfer><feFuncA type="linear" slope=".45"/></feComponentTransfer>
-      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <path d="M115 102 C130 74 147 44 180 25 C173 51 190 75 236 105 C198 85 151 83 115 102 Z"
-        fill="url(#cnrHatRed)" stroke="#790515" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M132 79 C146 52 159 42 177 34" fill="none" stroke="#ff9da0" stroke-width="4.5" stroke-linecap="round" opacity=".56"/>
-  <path d="M115 104 C150 82 193 80 236 111" fill="none" stroke="#7c0715" stroke-width="22" stroke-linecap="round" opacity=".42"/>
-  <path d="M115 104 C150 82 193 80 236 111" fill="none" stroke="url(#cnrHatFur)" stroke-width="15" stroke-linecap="round"/>
-  <path d="M120 101 C153 86 193 85 232 108" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="1.5 5" opacity=".88"/>
-  <path d="M123 109 C155 96 196 95 229 115" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".35"/>
-  <g fill="url(#cnrHatPom)">
-    <circle cx="178" cy="32" r="13"/>
-    <circle cx="168" cy="32" r="8.5"/>
-    <circle cx="181" cy="22" r="8"/>
-    <circle cx="189" cy="32" r="8"/>
-    <circle cx="176" cy="42" r="8"/>
-    <circle cx="165" cy="40" r="6"/>
-  </g>
-  <g fill="#fff" opacity=".58">
-    <circle cx="126" cy="99" r="2.5"/><circle cx="136" cy="94" r="2"/><circle cx="148" cy="89" r="2.1"/>
-    <circle cx="162" cy="86" r="1.7"/><circle cx="177" cy="85" r="1.8"/><circle cx="193" cy="87" r="1.6"/>
-    <circle cx="207" cy="91" r="1.8"/><circle cx="221" cy="97" r="2.2"/>
-  </g>
-</g>
+<!-- Supplied Santa hat artwork, fitted over the C. -->
+<image id="cnr-santa-hat" href="data:image/png;base64,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" x="70" y="0" width="270" height="211" preserveAspectRatio="xMidYMid meet"/>
 <path d="M192 190 L192 252 L249 221 Z" fill="url(#red)" stroke="#151515" stroke-width="6"/>
 <g fill="url(#silver)" stroke="#171717" stroke-width="3">
   <rect x="385" y="74" width="18" height="83" rx="3"/>
