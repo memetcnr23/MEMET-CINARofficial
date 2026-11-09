@@ -90,11 +90,6 @@
 .cnr-logo-snowfield i.flake::before{content:"❄";display:block;font-size:var(--s);line-height:1;font-weight:300;}
 .cnr-logo-snowfield i.snow-dot{border-radius:50%;background:#fff;box-shadow:0 0 5px rgba(226,239,255,.9);}
 @keyframes cnrLogoSnowFall{0%{transform:translate3d(0,-8px,0) rotate(0deg);opacity:0}12%{opacity:.82}78%{opacity:.72}100%{transform:translate3d(var(--drift),62px,0) rotate(210deg);opacity:0}}
-.cnr-logo-santa-hat{position:absolute;z-index:6;top:-12px;left:5%;right:auto;width:44px;height:38px;pointer-events:none;transform-origin:78% 88%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45));animation:cnrHatSettle 4.8s ease-in-out infinite;}
-.cnr-logo-santa-hat svg{display:block;width:100%;height:100%;overflow:visible;}
-@keyframes cnrHatSettle{0%,100%{transform:rotate(10deg) translate3d(0,0,0)}50%{transform:rotate(13deg) translate3d(0,-2px,0)}}
-@media(max-width:600px){.cnr-logo-santa-hat{width:39px;height:34px;top:-10px;left:4%;right:auto;}}
-@media(prefers-reduced-motion:reduce){.cnr-logo-snowfield i,.cnr-logo-santa-hat{animation:none!important;}}
 /* Gentle, consistent motion without changing layout or player behavior. */
 .nav-link,.header-icon,.category-tile,.clip-card,.artist-strip>a,.player-button,.control-live,.secondary-wide,.hero-play,.filter-chips button,.settings-list button,.footer-social a{transition:transform .28s cubic-bezier(.2,.75,.25,1),border-color .28s ease,background-color .28s ease,box-shadow .28s ease,color .22s ease,opacity .22s ease;}
 .nav-link:hover,.header-icon:hover,.player-button:hover,.footer-social a:hover{transform:translateY(-1px);}
