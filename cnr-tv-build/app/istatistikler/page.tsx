@@ -1,84 +1,101 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { Activity, ArrowLeft, BarChart3, Clock3, Disc3, Radio, RefreshCw, Users, Eye, Globe2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Activity, ArrowLeft, BarChart3, CalendarDays, CheckCircle2, Clock3, Disc3, Eye, Globe2, Headphones, Radio, RefreshCw, Signal, Sparkles, Users } from "lucide-react";
 
-type Clip = { id:string; title:string; artist:string; category:string; durationSeconds:number };
-type Feed = { current?:{clip:Clip}; upcoming?:Array<{clip:Clip}>; clips?:Clip[]; playlistDurationSeconds?:number };
-type Day = {day:string;views:number;sessions:number};
-type Page = {path:string;views:number};
-type Summary = {totalViews:number;uniqueSessions:number;todayViews:number;last7Days:Day[];topPages:Page[]};
+type Clip={id:string;title:string;artist:string;category:string;durationSeconds:number};
+type Feed={current?:{clip:Clip};clips?:Clip[];playlistDurationSeconds?:number};
+type Day={day:string;views:number;sessions:number};
+type Page={path:string;views:number};
+type Summary={totalViews:number;uniqueSessions:number;todayViews:number;last7Days:Day[];topPages:Page[]};
+const fmt=(n:number)=>new Intl.NumberFormat("tr-TR").format(n||0);
+const dateLabel=(s:string)=>{const m=s.match(/(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+"."+m[2]:s};
+const pct=(a:number,b:number)=>b?Math.round(a/b*100):0;
 
-function fmt(value:number){return new Intl.NumberFormat("tr-TR").format(value||0);}
-function Stat({icon,label,value,sub}:{icon:React.ReactNode;label:string;value:string;sub:string}) {
-  return <div className="rounded-2xl border border-white/10 bg-[#111015] p-5"><div className="flex items-center justify-between text-[#d4ad7b]"><span className="text-xs text-zinc-400">{label}</span>{icon}</div><strong className="mt-4 block text-2xl font-black tracking-tight">{value}</strong><p className="mt-2 text-[11px] text-zinc-500">{sub}</p></div>;
+function Metric({label,value,detail,icon,loading}:{label:string;value:string;detail:string;icon:React.ReactNode;loading:boolean}){
+ return <div className="group relative overflow-hidden rounded-[20px] border border-white/[.08] bg-[#111116] p-5 transition duration-300 hover:-translate-y-1 hover:border-[#c7a276]/30">
+  <div className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-[#9d2544]/20 blur-3xl transition group-hover:bg-[#bd8055]/20"/>
+  <div className="relative flex items-center justify-between"><span className="text-[10px] font-bold tracking-wide text-zinc-400">{label}</span><span className="grid h-9 w-9 place-items-center rounded-xl border border-white/[.07] bg-white/[.035] text-[#d7b488]">{icon}</span></div>
+  {loading?<div className="mt-5 h-9 w-28 animate-pulse rounded-lg bg-white/[.07]"/>:<strong className="relative mt-4 block text-3xl font-black tracking-[-1.5px]">{value}</strong>}
+  <p className="relative mt-2 text-[10px] leading-5 text-zinc-500">{detail}</p>
+ </div>
+}
+function Panel({children,className=""}:{children:React.ReactNode;className?:string}){
+ return <section className={"rounded-[22px] border border-white/[.075] bg-[#101014]/95 shadow-[0_18px_55px_rgba(0,0,0,.22)] "+className}>{children}</section>
+}
+function Empty({title,detail,icon}:{title:string;detail:string;icon:React.ReactNode}){
+ return <div className="flex min-h-[145px] flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 bg-white/[.015] px-5 text-center"><span className="mb-3 grid h-11 w-11 place-items-center rounded-2xl bg-white/[.045] text-zinc-500">{icon}</span><b className="text-sm text-zinc-300">{title}</b><p className="mt-1 max-w-sm text-xs leading-5 text-zinc-500">{detail}</p></div>
 }
 
 export default function AnalyticsPage(){
-  const [summary,setSummary]=useState<Summary|null>(null);
-  const [feed,setFeed]=useState<Feed|null>(null);
-  const [loading,setLoading]=useState(true);
-  const [error,setError]=useState("");
-  const [updated,setUpdated]=useState("");
-  const [localViews,setLocalViews]=useState(0);
-
-  async function refresh(){
-    setLoading(true);
-    try{
-      const [analyticsResponse,feedResponse]=await Promise.all([
-        fetch("/api/analytics",{cache:"no-store"}),
-        fetch("/api/now-playing",{cache:"no-store"})
-      ]);
-      const analytics=await analyticsResponse.json();
-      const feedData=await feedResponse.json();
-      if(!analyticsResponse.ok)throw new Error(analytics.error||"Merkezi istatistikler alınamadı.");
-      setSummary(analytics as Summary);
-      if(feedResponse.ok)setFeed(feedData as Feed);
-      setError("");
-      setUpdated(new Date().toLocaleTimeString("tr-TR"));
-    }catch(e){setError(e instanceof Error?e.message:"İstatistik verisi alınamadı.");}
-    finally{setLoading(false);}
-  }
-
-  useEffect(()=>{
-    try{
-      const raw=localStorage.getItem("cnr-tv-analytics-v1");
-      if(raw)setLocalViews((JSON.parse(raw) as {total?:number}).total||0);
-    }catch{}
-    void refresh();
-    const timer=window.setInterval(()=>void refresh(),30000);
-    return()=>window.clearInterval(timer);
-  },[]);
-
-  const clips=feed?.clips||[];
-  const categories=useMemo(()=>Object.entries(clips.reduce<Record<string,number>>((acc,clip)=>{acc[clip.category]=(acc[clip.category]||0)+1;return acc;},{})).sort((a,b)=>b[1]-a[1]),[clips]);
-  const artists=useMemo(()=>{const counts=new Map<string,number>();for(const clip of clips)counts.set(clip.artist,(counts.get(clip.artist)||0)+1);return [...counts].sort((a,b)=>b[1]-a[1]).slice(0,6)},[clips]);
-  const days=summary?.last7Days||[];
-  const maxDay=Math.max(1,...days.map(day=>day.views));
-
-  return <main className="min-h-screen bg-[#08070a] px-4 py-6 text-white md:px-8 md:py-10"><div className="mx-auto max-w-7xl">
-    <div className="mb-8 flex flex-wrap items-center justify-between gap-4"><div><Link href="/" className="mb-4 inline-flex items-center gap-2 text-xs text-[#c7a77c] hover:text-white"><ArrowLeft size={15}/> CNR Müzik TV'ye dön</Link><div className="flex items-center gap-3"><div className="grid h-12 w-12 place-items-center rounded-xl border border-[#b88b55]/40 bg-[#b88b55]/10 text-[#e5c18f]"><BarChart3 size={24}/></div><div><p className="text-[10px] font-bold tracking-[.28em] text-[#d3ae7d]">CNR MÜZİK TV®</p><h1 className="text-2xl font-black tracking-tight md:text-3xl">İstatistik Merkezi</h1></div></div><p className="mt-3 text-sm text-zinc-400">Merkezi ziyaretçi analitiği ve canlı yayın kataloğu.</p></div><button onClick={()=>void refresh()} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[.04] px-4 py-2.5 text-xs font-bold hover:bg-white/10"><RefreshCw size={14}/> Yenile</button></div>
-
-    {error&&<div className="mb-6 rounded-xl border border-red-500/30 bg-red-950/30 p-4 text-sm text-red-200">{error}</div>}
-    <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <Stat icon={<Eye size={18}/>} label="Toplam sayfa görüntüleme" value={summary?fmt(summary.totalViews):"—"} sub="Merkezi veritabanındaki kayıtlar"/>
-      <Stat icon={<Users size={18}/>} label="Tekil tarayıcı oturumu" value={summary?fmt(summary.uniqueSessions):"—"} sub="Rastgele oturum kimliğine göre"/>
-      <Stat icon={<Activity size={18}/>} label="Bugünkü görüntüleme" value={summary?fmt(summary.todayViews):"—"} sub="Türkiye saatiyle günlük toplam"/>
-      <Stat icon={<Radio size={18}/>} label="Yayın durumu" value={feed?.current?.clip?"AKIŞ VAR":"BEKLEMEDE"} sub={feed?.current?.clip?.title||"Aktif klip bilgisi alınamadı"}/>
+ const [summary,setSummary]=useState<Summary|null>(null);
+ const [feed,setFeed]=useState<Feed|null>(null);
+ const [loading,setLoading]=useState(true);
+ const [refreshing,setRefreshing]=useState(false);
+ const [error,setError]=useState("");
+ const [updated,setUpdated]=useState("");
+ const refresh=useCallback(async(quiet=false)=>{
+  if(quiet)setRefreshing(true);else setLoading(true);
+  try{
+   const [ar,fr]=await Promise.all([fetch("/api/analytics",{cache:"no-store"}),fetch("/api/now-playing",{cache:"no-store"})]);
+   const a=await ar.json(),f=await fr.json();
+   if(!ar.ok)throw new Error(a.error||"Merkezi istatistikler alınamadı.");
+   setSummary(a as Summary);if(fr.ok)setFeed(f as Feed);setError("");
+   setUpdated(new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",second:"2-digit"}));
+  }catch(e){setError(e instanceof Error?e.message:"İstatistik verisi alınamadı.");}
+  finally{setLoading(false);setRefreshing(false);}
+ },[]);
+ useEffect(()=>{void refresh();const t=window.setInterval(()=>void refresh(true),30000);return()=>window.clearInterval(t)},[refresh]);
+ const clips=feed?.clips||[],days=summary?.last7Days||[];
+ const categories=useMemo(()=>Object.entries(clips.reduce<Record<string,number>>((a,c)=>{const k=c.category||"Diğer";a[k]=(a[k]||0)+1;return a},{})).sort((a,b)=>b[1]-a[1]),[clips]);
+ const artists=useMemo(()=>{const m=new Map<string,number>();clips.forEach(c=>m.set(c.artist,(m.get(c.artist)||0)+1));return [...m].sort((a,b)=>b[1]-a[1]).slice(0,6)},[clips]);
+ const totalWeek=days.reduce((a,d)=>a+d.views,0),max=Math.max(1,...days.map(d=>d.views)),current=feed?.current?.clip;
+ const duration=feed?.playlistDurationSeconds?Math.floor(feed.playlistDurationSeconds/3600)+" sa "+Math.floor(feed.playlistDurationSeconds%3600/60)+" dk":"—";
+ return <main className="relative min-h-screen overflow-hidden bg-[#08080b] px-4 pb-12 pt-5 text-white sm:px-6 lg:px-9 lg:pt-8">
+  <div className="pointer-events-none fixed inset-0 -z-0"><div className="absolute -top-56 left-[28%] h-[480px] w-[480px] rounded-full bg-[#9b1534]/[.12] blur-[130px]"/><div className="absolute right-[-180px] top-[42%] h-[420px] w-[420px] rounded-full bg-[#9b713c]/[.055] blur-[130px]"/><div className="absolute inset-0 opacity-[.025]" style={{backgroundImage:"linear-gradient(rgba(255,255,255,.45) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.45) 1px,transparent 1px)",backgroundSize:"48px 48px"}}/></div>
+  <div className="relative z-10 mx-auto max-w-[1440px]">
+   <header className="mb-7 flex flex-wrap items-center justify-between gap-4">
+    <div className="flex items-center gap-3"><Link href="/" aria-label="Ana sayfa" className="grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/[.04] text-zinc-300 transition hover:border-[#c18d5d]/50 hover:text-white"><ArrowLeft size={17}/></Link><div><div className="flex items-center gap-2 text-[9px] font-bold tracking-[.28em] text-[#d5ad7c]"><span className="h-1.5 w-1.5 rounded-full bg-[#d5ad7c] shadow-[0_0_10px_#d5ad7c]"/> CNR MÜZİK YAPIM®</div><div className="mt-1 text-xs text-zinc-500">Yönetim paneli <span className="mx-1 text-zinc-700">/</span><span className="text-zinc-300">İstatistik Merkezi</span></div></div></div>
+    <div className="flex items-center gap-2"><div className="hidden items-center gap-2 rounded-full border border-emerald-400/15 bg-emerald-400/[.055] px-3 py-2 text-[10px] font-semibold text-emerald-300 sm:flex"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400"/> MERKEZİ SİSTEM AKTİF</div><button onClick={()=>void refresh(true)} disabled={refreshing} className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/[.045] px-4 text-xs font-bold text-zinc-200 transition hover:border-[#c18d5d]/40 hover:bg-white/[.08] disabled:opacity-50"><RefreshCw size={14} className={refreshing?"animate-spin":""}/>{refreshing?"Güncelleniyor":"Verileri yenile"}</button></div>
+   </header>
+   <section className="relative mb-6 overflow-hidden rounded-[26px] border border-[#bd8b5b]/20 bg-[linear-gradient(112deg,#1a1115_0%,#151116_46%,#101014_100%)] p-6 shadow-[0_25px_80px_rgba(0,0,0,.3)] sm:p-8">
+    <div className="absolute -right-12 -top-28 h-72 w-72 rounded-full border border-[#d4ad7b]/10"/><div className="absolute -right-2 -top-16 h-52 w-52 rounded-full border border-[#d4ad7b]/[.07]"/><div className="absolute bottom-[-90px] right-[18%] h-52 w-52 rounded-full bg-[#a31d3c]/20 blur-[75px]"/>
+    <div className="relative flex flex-col justify-between gap-7 lg:flex-row lg:items-end"><div className="max-w-2xl"><span className="inline-flex items-center gap-2 rounded-full border border-[#d3ae7d]/20 bg-[#d3ae7d]/[.07] px-3 py-1.5 text-[9px] font-bold tracking-[.2em] text-[#e2c59e]"><Sparkles size={12}/> CNR BROADCAST INTELLIGENCE</span><h1 className="mt-4 text-3xl font-black tracking-[-1.5px] sm:text-4xl lg:text-[46px]">İstatistik Merkezi<span className="text-[#c69b6b]">.</span></h1><p className="mt-3 max-w-xl text-sm leading-6 text-zinc-400">CNR Müzik TV'nin ziyaretçi trafiğini, yayın performansını ve müzik kataloğunu tek ekrandan takip et.</p></div>
+     <div className="grid grid-cols-2 gap-3 sm:min-w-[310px]"><div className="rounded-2xl border border-white/[.08] bg-black/20 p-4 backdrop-blur"><div className="flex items-center gap-2 text-[10px] text-zinc-500"><Clock3 size={13}/> SON SENKRON</div><div className="mt-2 text-lg font-bold">{updated||"—"}</div><div className="mt-1 text-[9px] text-zinc-600">30 saniyede otomatik yenileme</div></div><div className="rounded-2xl border border-white/[.08] bg-black/20 p-4 backdrop-blur"><div className="flex items-center gap-2 text-[10px] text-zinc-500"><Signal size={13}/> YAYIN DURUMU</div><div className={"mt-2 text-lg font-bold "+(current?"text-emerald-300":"text-amber-200")}>{current?"AKIŞTA":"BEKLEMEDE"}</div><div className="mt-1 text-[9px] text-zinc-600">Canlı katalog bağlantısı</div></div></div>
     </div>
-
-    <div className="grid gap-5 lg:grid-cols-[1.35fr_.85fr]">
-      <section className="rounded-2xl border border-white/10 bg-[#111015] p-5 md:p-6"><div className="mb-5 flex items-center justify-between"><div><h2 className="font-bold">Son 7 günün trafiği</h2><p className="mt-1 text-xs text-zinc-500">Tüm ziyaretçilerin merkezi kayıtları</p></div><BarChart3 className="text-[#d4ad7b]"/></div><div className="flex h-48 items-end gap-3 border-b border-white/10 pb-2">{days.length?days.map(day=><div key={day.day} className="flex h-full flex-1 flex-col items-center justify-end gap-2"><span className="text-[10px] text-zinc-400">{fmt(day.views)}</span><div className="w-full max-w-12 rounded-t-md bg-gradient-to-t from-[#8f1731] to-[#e1b981]" style={{height:Math.max(5,day.views/maxDay*125)}}/><span className="text-[9px] text-zinc-500">{day.day.slice(5).replace("-","/")}</span></div>):<p className="m-auto text-sm text-zinc-500">{loading?"Veriler yükleniyor…":"Henüz ziyaret kaydı yok."}</p>}</div></section>
-      <section className="rounded-2xl border border-white/10 bg-[#111015] p-5 md:p-6"><h2 className="mb-1 font-bold">Canlı yayın kataloğu</h2><p className="mb-4 text-xs text-zinc-500">YouTube yayın API'sinden</p>{feed?.current?.clip?<div className="flex gap-3"><img className="h-20 w-20 rounded-lg bg-black object-cover" src={`https://i.ytimg.com/vi/${feed.current.clip.id}/hqdefault.jpg`} alt="Klip kapağı"/><div className="min-w-0"><p className="truncate text-sm font-bold">{feed.current.clip.title}</p><p className="mt-1 text-xs text-zinc-400">{feed.current.clip.artist}</p><span className="mt-3 inline-block rounded-full bg-red-500/15 px-2 py-1 text-[9px] font-black tracking-wider text-red-300">YAYIN AKIŞI</span></div></div>:<p className="text-sm text-zinc-500">Aktif klip bilgisi yok.</p>}<div className="mt-5 border-t border-white/10 pt-4"><div className="flex justify-between text-xs"><span className="text-zinc-500">Katalogdaki klip</span><b>{fmt(clips.length)}</b></div><div className="mt-3 flex justify-between text-xs"><span className="text-zinc-500">Liste süresi</span><b>{feed?.playlistDurationSeconds?Math.floor(feed.playlistDurationSeconds/60)+" dk":"—"}</b></div><div className="mt-3 flex justify-between text-xs"><span className="text-zinc-500">Son güncelleme</span><b>{updated||"—"}</b></div></div></section>
-    </div>
-
-    <div className="mt-5 grid gap-5 md:grid-cols-2">
-      <section className="rounded-2xl border border-white/10 bg-[#111015] p-5"><h2 className="mb-4 font-bold">En çok ziyaret edilen sayfalar · 30 gün</h2>{summary?.topPages?.length?summary.topPages.map(page=><div key={page.path} className="flex items-center gap-3 border-b border-white/[.06] py-3 last:border-0"><span className="flex-1 truncate text-sm">{page.path}</span><b className="text-xs text-zinc-400">{fmt(page.views)}</b></div>):<p className="text-sm text-zinc-500">Henüz sayfa verisi yok.</p>}</section>
-      <section className="rounded-2xl border border-white/10 bg-[#111015] p-5"><h2 className="mb-4 font-bold">Kategori dağılımı</h2>{categories.length?categories.map(([name,count])=><div key={name} className="mb-4"><div className="mb-2 flex justify-between text-xs"><span>{name}</span><b>{count} klip</b></div><div className="h-1.5 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-[#94152f] to-[#d7b17d]" style={{width:(count/Math.max(1,clips.length)*100)+"%"}}/></div></div>):<p className="text-sm text-zinc-500">Katalog verisi bekleniyor.</p>}</section>
-      <section className="rounded-2xl border border-white/10 bg-[#111015] p-5 md:col-span-2"><h2 className="mb-4 font-bold">Katalogda öne çıkan sanatçılar</h2><div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">{artists.map(([name,count],i)=><div key={name} className="flex items-center gap-3 rounded-lg bg-white/[.03] p-3"><span className="grid h-7 w-7 place-items-center rounded-lg bg-white/[.06] text-xs text-[#d9b783]">{i+1}</span><span className="flex-1 truncate text-sm font-semibold">{name}</span><span className="text-xs text-zinc-400">{count} klip</span></div>)}</div>{!artists.length&&<p className="text-sm text-zinc-500">Sanatçı verisi bekleniyor.</p>}</section>
-    </div>
-    <div className="mt-6 rounded-xl border border-[#b88b55]/20 bg-[#b88b55]/[.05] p-4 text-xs leading-6 text-zinc-400"><Globe2 className="mr-2 inline text-[#d4ad7b]" size={15}/>Merkezi ölçüm; IP adresi, ad-soyad veya e-posta toplamaz. Tekil oturum sayısı, tarayıcıda tutulan rastgele kimlikle hesaplanır; aynı kişi farklı cihazlarda ayrı oturum sayılabilir. Yerel sayaç ({fmt(localViews)}) yalnızca eski tarayıcı verisidir ve merkezi toplamın parçası değildir.</div>
-    <footer className="mt-8 text-center text-[10px] tracking-[.2em] text-zinc-600">CNR MÜZİK YAPIM® · CNR İSTATİSTİK MERKEZİ</footer>
-  </div></main>;
+   </section>
+   {error&&<div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-rose-400/20 bg-rose-500/[.07] p-4 text-sm text-rose-200"><span>{error}</span><button onClick={()=>void refresh()} className="rounded-lg border border-rose-300/20 px-3 py-2 text-xs font-bold hover:bg-rose-300/10">Tekrar dene</button></div>}
+   <section className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <Metric label="TOPLAM GÖRÜNTÜLEME" value={summary?fmt(summary.totalViews):"—"} detail="Veritabanına kaydedilen tüm sayfa görüntülemeleri" icon={<Eye size={17}/>} loading={loading}/>
+    <Metric label="TEKİL OTURUMLAR" value={summary?fmt(summary.uniqueSessions):"—"} detail="Rastgele tarayıcı oturumu kimliğine göre" icon={<Users size={17}/>} loading={loading}/>
+    <Metric label="BUGÜN" value={summary?fmt(summary.todayViews):"—"} detail="Türkiye saat dilimine göre görüntüleme" icon={<Activity size={17}/>} loading={loading}/>
+    <Metric label="SON 7 GÜN" value={summary?fmt(totalWeek):"—"} detail="Günlük trafik toplamı" icon={<CalendarDays size={17}/>} loading={loading}/>
+   </section>
+   <div className="mb-6 grid gap-5 xl:grid-cols-[1.55fr_.85fr]">
+    <Panel className="p-5 sm:p-6"><div className="mb-6 flex flex-wrap items-start justify-between gap-3"><div><div className="flex items-center gap-2 text-[9px] font-bold tracking-[.2em] text-[#d2a878]"><BarChart3 size={14}/> TRAFİK ANALİZİ</div><h2 className="mt-2 text-lg font-bold">Son 7 günün performansı</h2><p className="mt-1 text-xs text-zinc-500">Günlük sayfa görüntüleme ve oturum sayıları</p></div><span className="rounded-full border border-white/[.08] bg-white/[.035] px-3 py-1.5 text-[10px] text-zinc-400">Son 7 gün</span></div>
+     {days.length?<><div className="mb-3 flex items-end justify-between"><div><span className="text-[10px] text-zinc-500">Dönem toplamı</span><div className="mt-1 text-2xl font-extrabold">{fmt(totalWeek)} <span className="text-xs font-medium text-zinc-500">görüntüleme</span></div></div><div className="text-right text-[10px] text-zinc-500">En yüksek gün <b className="ml-1 text-zinc-200">{fmt(max)}</b></div></div>
+      <div className="relative flex h-[205px] items-end gap-2 border-b border-white/[.08] px-1 pb-2 sm:gap-4"><div className="pointer-events-none absolute inset-x-0 top-0 flex h-[165px] flex-col justify-between">{[1,2,3,4].map(n=><div key={n} className="border-t border-dashed border-white/[.055]"/>)}</div>
+       {days.map((d,i)=><div key={d.day} className="group relative z-[1] flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-2"><div className="pointer-events-none absolute bottom-[calc(100%-8px)] z-20 hidden min-w-[104px] -translate-y-2 rounded-xl border border-white/10 bg-[#202027] p-2 text-center shadow-xl group-hover:block"><b className="block text-xs">{fmt(d.views)} görüntüleme</b><span className="text-[9px] text-zinc-400">{fmt(d.sessions)} oturum</span></div><span className="text-[9px] font-semibold tabular-nums text-zinc-400">{fmt(d.views)}</span><div className="flex h-[142px] w-full max-w-[54px] items-end overflow-hidden rounded-t-lg bg-white/[.035]"><div className={"w-full rounded-t-lg transition-all duration-700 "+(d.views===max&&d.views>0?"bg-gradient-to-t from-[#8e1838] to-[#e5bd88] shadow-[0_0_24px_rgba(190,86,100,.18)]":"bg-gradient-to-t from-[#571528] to-[#b97868]")} style={{height:Math.max(d.views>0?7:2,d.views/max*142)+"px"}}/></div><span className={"text-[9px] "+(i===days.length-1?"font-bold text-[#dfb985]":"text-zinc-500")}>{dateLabel(d.day)}</span></div>)}
+      </div><div className="mt-4 flex flex-wrap items-center gap-4 text-[10px] text-zinc-500"><span className="inline-flex items-center gap-2"><i className="h-2 w-2 rounded-sm bg-[#b97868]"/> Görüntüleme</span><span className="inline-flex items-center gap-2"><i className="h-2 w-2 rounded-sm bg-[#e5bd88]"/> En yüksek gün</span><span className="ml-auto">Ayrıntı için grafiğin üzerine gel</span></div></>:<Empty icon={<BarChart3 size={19}/>} title={loading?"Trafik verileri yükleniyor":"Henüz trafik verisi yok"} detail={loading?"Merkezi veritabanı sorgulanıyor.":"Ziyaretçiler siteyi kullandıkça günlük grafik burada oluşacak."}/>}
+    </Panel>
+    <Panel className="overflow-hidden"><div className="border-b border-white/[.07] p-5 sm:p-6"><div className="flex items-center gap-2 text-[9px] font-bold tracking-[.2em] text-[#d2a878]"><Radio size={14}/> ON AIR · CNR TV</div><h2 className="mt-2 text-lg font-bold">Yayın kontrolü</h2><p className="mt-1 text-xs text-zinc-500">Canlı katalogdan anlık yayın bilgisi</p></div>
+     {current?<div className="p-5 sm:p-6"><div className="relative mb-4 aspect-video overflow-hidden rounded-xl border border-white/10 bg-black"><img src={"https://i.ytimg.com/vi/"+current.id+"/hqdefault.jpg"} alt={current.title} className="h-full w-full object-cover"/><span className="absolute left-3 top-3 inline-flex items-center gap-2 rounded-md border border-red-300/20 bg-black/75 px-2.5 py-1.5 text-[9px] font-black text-red-300"><i className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-400"/> YAYINDA</span></div><h3 className="line-clamp-2 text-sm font-bold leading-5">{current.title}</h3><p className="mt-1 text-xs text-zinc-400">{current.artist}</p><div className="mt-4 grid grid-cols-2 gap-2"><div className="rounded-xl bg-white/[.035] p-3"><span className="text-[9px] text-zinc-500">KATEGORİ</span><b className="mt-1 block truncate text-xs">{current.category}</b></div><div className="rounded-xl bg-white/[.035] p-3"><span className="text-[9px] text-zinc-500">SÜRE</span><b className="mt-1 block text-xs">{Math.floor(current.durationSeconds/60)}:{String(current.durationSeconds%60).padStart(2,"0")}</b></div></div></div>:<div className="p-5"><Empty icon={<Radio size={19}/>} title="Aktif klip bilgisi yok" detail="Yayın akışı verisi geldiğinde bu alan otomatik güncellenecek."/></div>}
+     <div className="grid grid-cols-2 border-t border-white/[.07]"><div className="p-4"><span className="text-[9px] text-zinc-500">KATALOG</span><b className="mt-1 block text-xl font-extrabold">{fmt(clips.length)}</b><span className="text-[9px] text-zinc-600">klip kaydı</span></div><div className="border-l border-white/[.07] p-4"><span className="text-[9px] text-zinc-500">TOPLAM SÜRE</span><b className="mt-1 block text-base font-extrabold">{duration}</b><span className="text-[9px] text-zinc-600">katalog süresi</span></div></div>
+    </Panel>
+   </div>
+   <div className="mb-6 grid gap-5 lg:grid-cols-2">
+    <Panel className="p-5 sm:p-6"><div className="mb-5 flex items-center justify-between gap-3"><div><div className="flex items-center gap-2 text-[9px] font-bold tracking-[.2em] text-[#d2a878]"><Globe2 size={14}/> SAYFA PERFORMANSI</div><h2 className="mt-2 text-lg font-bold">En çok ziyaret edilenler</h2><p className="mt-1 text-xs text-zinc-500">Son 30 günlük ilk 10 sayfa</p></div><span className="rounded-lg bg-white/[.04] p-2 text-zinc-400"><Eye size={17}/></span></div>
+     {summary?.topPages?.length?<div className="space-y-3">{summary.topPages.map((p,i)=><div key={p.path} className="group"><div className="mb-1.5 flex items-center gap-3"><span className="grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-white/[.045] text-[10px] font-bold text-zinc-400">{String(i+1).padStart(2,"0")}</span><span className="min-w-0 flex-1 truncate text-xs font-medium text-zinc-300">{p.path==="/"?"Ana Sayfa":p.path}</span><b className="text-xs tabular-nums">{fmt(p.views)}</b></div><div className="ml-9 h-1 overflow-hidden rounded-full bg-white/[.055]"><div className="h-full rounded-full bg-gradient-to-r from-[#76203b] to-[#d6ae7c] transition-all duration-700" style={{width:Math.max(2,pct(p.views,summary.topPages[0].views))+"%"}}/></div></div>)}</div>:<Empty icon={<Globe2 size={19}/>} title="Sayfa verisi henüz oluşmadı" detail="Ziyaret kayıtları geldikçe en çok ziyaret edilen sayfalar listelenecek."/>}
+    </Panel>
+    <Panel className="p-5 sm:p-6"><div className="mb-5"><div className="flex items-center gap-2 text-[9px] font-bold tracking-[.2em] text-[#d2a878]"><Disc3 size={14}/> MÜZİK KATALOĞU</div><h2 className="mt-2 text-lg font-bold">Kategori dağılımı</h2><p className="mt-1 text-xs text-zinc-500">Kliplerin türlere göre dağılımı</p></div>
+     {categories.length?<div className="space-y-4">{categories.slice(0,7).map(([name,count],i)=><div key={name}><div className="mb-2 flex items-center justify-between gap-3"><span className="truncate text-xs font-medium text-zinc-300">{name}</span><span className="shrink-0 text-[10px] text-zinc-400">{fmt(count)} <span className="text-zinc-600">· {pct(count,clips.length)}%</span></span></div><div className="h-2 overflow-hidden rounded-full bg-white/[.055]"><div className={"h-full rounded-full transition-all duration-700 "+(i===0?"bg-gradient-to-r from-[#8e1838] to-[#e3b47e]":"bg-gradient-to-r from-[#492033] to-[#aa7b68]")} style={{width:pct(count,clips.length)+"%"}}/></div></div>)}</div>:<Empty icon={<Disc3 size={19}/>} title="Katalog kategorileri bekleniyor" detail="Klip kataloğu yüklendiğinde tür dağılımı otomatik hazırlanacak."/>}
+    </Panel>
+   </div>
+   <Panel className="mb-6 p-5 sm:p-6"><div className="mb-5 flex flex-wrap items-center justify-between gap-3"><div><div className="flex items-center gap-2 text-[9px] font-bold tracking-[.2em] text-[#d2a878]"><Headphones size={14}/> ARTIST INSIGHTS</div><h2 className="mt-2 text-lg font-bold">Öne çıkan sanatçılar</h2><p className="mt-1 text-xs text-zinc-500">Katalogda en fazla klibi bulunan isimler</p></div><span className="rounded-full border border-white/[.08] px-3 py-1.5 text-[9px] text-zinc-500">İLK 6 SANATÇI</span></div>
+    {artists.length?<div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">{artists.map(([name,count],i)=><div key={name} className="flex items-center gap-3 rounded-2xl border border-white/[.055] bg-white/[.02] p-3 transition hover:border-[#c18d5d]/25 hover:bg-white/[.04]"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-[#c18d5d]/15 bg-[#c18d5d]/[.07] text-xs font-extrabold text-[#d7b488]">{String(i+1).padStart(2,"0")}</span><span className="min-w-0 flex-1"><b className="block truncate text-xs">{name}</b><span className="mt-1 block text-[10px] text-zinc-500">Klip kataloğu sanatçısı</span></span><span className="rounded-lg bg-white/[.045] px-2.5 py-1.5 text-[10px] font-bold tabular-nums text-zinc-300">{count} klip</span></div>)}</div>:<Empty icon={<Users size={19}/>} title="Sanatçı listesi hazırlanıyor" detail="Katalog verisi geldiğinde sanatçı sıralaması burada görünecek."/>}
+   </Panel>
+   <footer className="flex flex-col items-center justify-between gap-3 border-t border-white/[.07] pt-5 text-center sm:flex-row sm:text-left"><div><div className="text-[9px] font-black tracking-[.24em] text-[#c7a276]">CNR MÜZİK YAPIM®</div><p className="mt-1 text-[10px] text-zinc-600">CNR Müzik TV · Broadcast Intelligence</p></div><div className="max-w-xl text-[10px] leading-5 text-zinc-600"><CheckCircle2 size={12} className="mr-1 inline text-emerald-500/70"/> Merkezi ölçüm IP adresi, ad-soyad veya e-posta toplamaz. Tekil oturumlar tarayıcıdaki rastgele kimlikle hesaplanır.</div></footer>
+  </div>
+ </main>
 }
