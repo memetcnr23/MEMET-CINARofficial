@@ -14,49 +14,7 @@
 <g fill="url(#silver)" stroke="#111" stroke-width="7" paint-order="stroke fill" filter="url(#shadow)" font-family="Arial,Helvetica,sans-serif" font-weight="900">
   <text x="62" y="290" font-size="278" letter-spacing="-20">CNR</text>
 </g>
-<!-- Santa cap fitted to the upper arc of the C: this is part of the master logo, not a floating sticker. -->
-<g id="cnr-santa-hat" filter="url(#cnrHatShadow)">
-  <defs>
-    <linearGradient id="cnrHatRed" x1="0" y1="0" x2=".86" y2="1">
-      <stop offset="0" stop-color="#ff7378"/>
-      <stop offset=".28" stop-color="#ec1b2b"/>
-      <stop offset=".68" stop-color="#b60019"/>
-      <stop offset="1" stop-color="#76000f"/>
-    </linearGradient>
-    <linearGradient id="cnrHatFur" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#fff"/>
-      <stop offset=".42" stop-color="#f5f7f8"/>
-      <stop offset=".78" stop-color="#dce2e7"/>
-      <stop offset="1" stop-color="#aeb9c2"/>
-    </linearGradient>
-    <radialGradient id="cnrHatPom" cx=".32" cy=".22" r=".78">
-      <stop offset="0" stop-color="#fff"/>
-      <stop offset=".62" stop-color="#f8fafb"/>
-      <stop offset="1" stop-color="#bec8cf"/>
-    </radialGradient>
-    <filter id="cnrHatShadow" x="-20%" y="-50%" width="150%" height="190%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="2.4" result="blur"/>
-      <feOffset dy="2.5" result="offset"/>
-      <feComponentTransfer><feFuncA type="linear" slope=".45"/></feComponentTransfer>
-      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
-  </defs>
-  <path d="M115 102 C130 74 147 44 180 25 C173 51 190 75 236 105 C198 85 151 83 115 102 Z"
-        fill="url(#cnrHatRed)" stroke="#790515" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M132 79 C146 52 159 42 177 34" fill="none" stroke="#ff9da0" stroke-width="4.5" stroke-linecap="round" opacity=".56"/>
-  <path d="M115 104 C150 82 193 80 236 111" fill="none" stroke="#7c0715" stroke-width="22" stroke-linecap="round" opacity=".42"/>
-  <path d="M115 104 C150 82 193 80 236 111" fill="none" stroke="url(#cnrHatFur)" stroke-width="15" stroke-linecap="round"/>
-  <path d="M120 101 C153 86 193 85 232 108" fill="none" stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-dasharray="1.5 5" opacity=".88"/>
-  <path d="M123 109 C155 96 196 95 229 115" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".35"/>
-  <g fill="url(#cnrHatPom)">
-    <circle cx="178" cy="32" r="13"/>
-    <circle cx="168" cy="32" r="8.5"/>
-    <circle cx="181" cy="22" r="8"/>
-    <circle cx="189" cy="32" r="8"/>
-    <circle cx="176" cy="42" r="8"/>
-    <circle cx="165" cy="40" r="6"/>
-  </g>
-  <g fill="#fff" opacity=".58">
+<g fill="#fff" opacity=".58">
     <circle cx="126" cy="99" r="2.5"/><circle cx="136" cy="94" r="2"/><circle cx="148" cy="89" r="2.1"/>
     <circle cx="162" cy="86" r="1.7"/><circle cx="177" cy="85" r="1.8"/><circle cx="193" cy="87" r="1.6"/>
     <circle cx="207" cy="91" r="1.8"/><circle cx="221" cy="97" r="2.2"/>
