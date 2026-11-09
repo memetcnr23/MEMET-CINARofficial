@@ -226,6 +226,8 @@ export default function BroadcastApp() {
   const [lowerKey, setLowerKey] = useState(0);
   const [lowerActive, setLowerActive] = useState(false);
   const [subtitleEnabled, setSubtitleEnabled] = useState(false);
+  const [goodWishesVisible, setGoodWishesVisible] = useState(false);
+  const goodWishesTimerRef = useRef<number | null>(null);
   const [clock, setClock] = useState(new Date());
 
   const activeNationalDay = getActiveNationalDay(clock);
@@ -865,6 +867,16 @@ export default function BroadcastApp() {
   };
 
   const closeMobileMenu = () => setMobileMenu(false);
+  const showGoodWishes = () => {
+    setGoodWishesVisible(true);
+    if (goodWishesTimerRef.current !== null) window.clearTimeout(goodWishesTimerRef.current);
+    goodWishesTimerRef.current = window.setTimeout(() => setGoodWishesVisible(false), 5600);
+  };
+  useEffect(() => {
+    if (pathname !== "/canli-yayin") { setGoodWishesVisible(false); return; }
+    showGoodWishes();
+    return () => { if (goodWishesTimerRef.current !== null) window.clearTimeout(goodWishesTimerRef.current); };
+  }, [pathname]);
   const h = clock.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 
   const renderClipCard = (clip: Clip, index: number) => (
@@ -919,6 +931,14 @@ export default function BroadcastApp() {
             </div>}
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
             <div className={"cnr-video-transition " + (videoTransitioning ? "is-active" : "")} aria-hidden="true" />
+            <div className={"cnr-good-wishes " + (goodWishesVisible ? "is-visible" : "")} aria-hidden={!goodWishesVisible}>
+              <div className="cnr-good-wishes-orbit" aria-hidden="true"><i /><i /><i /></div>
+              <div className="cnr-good-wishes-brand"><Image src={LOGO} alt="" width={220} height={74} unoptimized /></div>
+              <span className="cnr-good-wishes-kicker">CNR MÜZİK TV · ON AIR</span>
+              <strong>İYİ YAYINLAR</strong>
+              <span className="cnr-good-wishes-line">Müziğin ritmi, gününüze eşlik etsin.</span>
+              <i className="cnr-good-wishes-rule" />
+            </div>
             {(!current || (Boolean(catalogError) && !playerPlaying)) && <div className="broadcast-empty-overlay" role="status" aria-live="polite"><Radio size={32} /><b>YAKINDA YAYINDAYIZ</b><span>CNR Müzik TV yayın akışı hazırlanıyor.</span><small>Klipler yeniden yüklendiğinde yayın otomatik başlayacak.</small><strong>ÇOK YAKINDA · CNR MÜZİK TV</strong></div>}
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
@@ -954,6 +974,7 @@ export default function BroadcastApp() {
           <div className="broadcast-controls">
             <button className="player-button" onClick={togglePlayPause} aria-label={playerPlaying ? "Yayını duraklat" : "Yayını oynat"}>{playerPlaying ? <Pause /> : <Play fill="currentColor" />}</button>
             <button className="control-live" onClick={returnToLive}><Radio size={16} /> CANLIYA DÖN</button>
+            <button className="control-live good-wishes-trigger" onClick={showGoodWishes} title="İyi yayınlar ekranını göster"><Sparkles size={15} /> İYİ YAYINLAR</button>
             <div className="control-spacer" />
             <span className="sync-label"><span /> {currentHlsUrl ? "HLS YAYIN" : HLS_ONLY ? "HLS KAYNAĞI BEKLENİYOR" : "YOUTUBE YEDEK"}</span>
             <button className={"player-button " + (muted ? "" : "is-active")} onClick={toggleMute} aria-label={muted ? "Sesi aç" : "Sesi kapat"} title={muted ? "Sesi aç" : "Sesi kapat"}>{muted ? <VolumeX /> : <Volume2 />}</button>
