@@ -923,7 +923,7 @@ export default function BroadcastApp() {
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
                 <span className="cnr-logo-snow" aria-hidden="true">
-                  {Array.from({ length: 34 }, (_, index) => <i key={index} className={index % 9 === 0 ? "snow-near" : index % 4 === 0 ? "snow-crystal" : "snow-soft"} style={{ left: ((index * 37) % 96 + 2) + "%", top: ((index * 53) % 88 + 4) + "%", animationDelay: "-" + ((index * 0.73) % 15).toFixed(2) + "s", animationDuration: (10 + (index % 8) * 1.8) + "s", fontSize: (index % 9 === 0 ? 18 : 9 + (index % 5) * 3) + "px", opacity: 0.72 }} >❄</i>)}
+                  {Array.from({ length: 22 }, (_, index) => <i key={index} className={index % 7 === 0 ? "snow-near" : index % 3 === 0 ? "snow-crystal" : "snow-soft"} style={{ left: ((index * 43) % 94 + 3) + "%", top: ((index * 61) % 84 + 8) + "%", animationDelay: "-" + ((index * 1.17) % 19).toFixed(2) + "s", animationDuration: (15 + (index % 7) * 2.4) + "s", width: (index % 7 === 0 ? 18 : 9 + (index % 4) * 3) + "px", height: (index % 7 === 0 ? 18 : 9 + (index % 4) * 3) + "px" }}><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 5V95 M11 27L89 73 M11 73L89 27 M50 5L39 18 M50 5L61 18 M50 95L39 82 M50 95L61 82 M11 27L27 29 M11 27L17 43 M89 73L73 71 M89 73L83 57 M11 73L27 71 M11 73L17 57 M89 27L73 29 M89 27L83 43 M50 35L41 44 M50 35L59 44 M50 65L41 56 M50 65L59 56" /></svg></i>)}
                 </span>
                 <span className="cnr-logo-metallic-shine" aria-hidden="true" />
                 
