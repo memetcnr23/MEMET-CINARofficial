@@ -920,13 +920,13 @@ export default function BroadcastApp() {
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
             <div className={"cnr-video-transition " + (videoTransitioning ? "is-active" : "")} aria-hidden="true" />
             {(!current || (Boolean(catalogError) && !playerPlaying)) && <div className="broadcast-empty-overlay" role="status" aria-live="polite"><Radio size={32} /><b>YAKINDA YAYINDAYIZ</b><span>CNR Müzik TV yayın akışı hazırlanıyor.</span><small>Klipler yeniden yüklendiğinde yayın otomatik başlayacak.</small><strong>ÇOK YAKINDA · CNR MÜZİK TV</strong></div>}
-            <div className="cnr-screen-snowfield" aria-hidden="true">
-              {Array.from({ length: 34 }, (_, index) => <i key={index} className={index % 5 === 0 ? "flake" : "snow-dot"} style={{ "--x": ((index * 37) % 100) + "%", "--s": (index % 5 === 0 ? 8 + (index % 3) * 3 : 2 + (index % 3)) + "px", "--d": (7 + (index % 8) * 1.8) + "s", "--delay": "-" + ((index * 1.19) % 21) + "s", "--drift": ((index % 2 ? 1 : -1) * (10 + (index % 6) * 5)) + "px" } as CSSProperties} />)}
-            </div>
             <div className="live-channel-bug" aria-label="CNR Müzik TV kanal logosu">
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
                 <span className="cnr-logo-metallic-shine" aria-hidden="true" />
+                <div className="cnr-logo-snowfield" aria-hidden="true">
+                  {Array.from({ length: 16 }, (_, index) => <i key={index} className={index % 4 === 0 ? "flake" : "snow-dot"} style={{ "--x": ((index * 31) % 96) + "%", "--s": (index % 4 === 0 ? 7 + (index % 3) * 2 : 2 + (index % 2)) + "px", "--d": (4.8 + (index % 5) * 1.1) + "s", "--delay": "-" + ((index * 0.83) % 9) + "s", "--drift": ((index % 2 ? 1 : -1) * (4 + (index % 4) * 2)) + "px" } as CSSProperties} />)}
+                </div>
                 <span className="cnr-logo-santa-hat" aria-hidden="true"><svg viewBox="0 0 120 100"><defs><linearGradient id="hatRed" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ff5148"/><stop offset=".55" stopColor="#d90819"/><stop offset="1" stopColor="#8e0010"/></linearGradient><linearGradient id="hatFur" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#fff"/><stop offset="1" stopColor="#cbd0d8"/></linearGradient></defs><path d="M12 70C28 31 57 8 94 8c-9 16-7 39 13 56-26 2-57 9-83 22Z" fill="url(#hatRed)" stroke="#970b16" strokeWidth="2"/><path d="M11 69c27-13 63-19 97-7l-8 20c-30-5-59 2-82 14Z" fill="url(#hatFur)" stroke="#c8cbd1" strokeWidth="2"/><circle cx="95" cy="10" r="13" fill="#fff" stroke="#d5d8de" strokeWidth="2"/></svg></span>
                 
               </div>
