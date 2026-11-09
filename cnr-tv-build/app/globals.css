@@ -311,3 +311,5 @@
 .cnr-ad-live .cnr-ad-placeholder-size{margin:0}
 @media(max-width:900px){.cnr-ad-placement{margin:16px 0;padding:9px 10px}.cnr-ad-placeholder{min-height:88px;gap:10px;padding:11px}.cnr-ad-placeholder-mark{width:36px;height:36px}.cnr-ad-placeholder b{font-size:14px}}
 @media(max-width:560px){.cnr-ad-placeholder{justify-content:flex-start;min-height:82px;padding:10px}.cnr-ad-placeholder small{font-size:8px}.cnr-ad-placeholder-size{display:none}.cnr-ad-live .cnr-ad-placeholder{min-height:120px}.cnr-ad-heading{font-size:8px}}
+
+.cnr-video-transition{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center,rgba(7,7,10,.72),rgba(0,0,0,.96));opacity:0;visibility:hidden;transition:opacity .38s ease,visibility .38s ease;backdrop-filter:blur(5px)}.cnr-video-transition.is-active{opacity:1;visibility:visible}.live-screen:has(.cnr-video-transition.is-active) .screen-top,.live-screen:has(.cnr-video-transition.is-active) .screen-bottom{opacity:.45;transition:opacity .3s ease}@media(prefers-reduced-motion:reduce){.cnr-video-transition{transition:none}}
