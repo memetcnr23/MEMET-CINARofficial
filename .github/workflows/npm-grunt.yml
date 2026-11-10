@@ -1,28 +1,29 @@
-name: NodeJS with Grunt
+name: CNR Müzik TV build
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-
+    defaults:
+      run:
+        working-directory: cnr-tv-build
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: cnr-tv-build/package-lock.json
 
-    - name: Build
-      run: |
-        npm install
-        grunt
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build CNR Müzik TV
+        run: npm run build

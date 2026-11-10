@@ -1,0 +1,126 @@
+/* CNR PREMIUM PLAYER INTERACTION LAYER — additive, layout-preserving */
+:root{
+  --cnr-cut-sm:8px;
+  --cnr-cut-md:14px;
+  --cnr-motion-fast:160ms;
+  --cnr-motion-ui:240ms;
+  --cnr-motion-slow:420ms;
+  --cnr-ease:cubic-bezier(.2,.75,.25,1);
+}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+body{overflow-x:hidden}
+.tv-app{isolation:isolate}
+.top-header{position:sticky;top:0;z-index:50}
+.top-header,.side-nav,.page-area{backdrop-filter:saturate(1.12)}
+/* Broadcast geometry: precise clipped corners without changing component dimensions */
+.hero-main,.mini-live-card,.mini-event-card,.live-side-panel,.live-screen,
+.now-playing-card,.clip-card,.program-card,.artist-card,.profile-card,
+.category-tile,.cnr-ad-placement,.lower-third-panel,.broadcast-controls,
+.heading-mark,.header-icon,.notification-popover,.sidebar-live,.screen-start,
+.hero-play,.control-live,.player-button,.secondary-wide,.nav-link{
+  border-radius:2px!important;
+  clip-path:polygon(0 0,calc(100% - var(--cnr-cut-sm)) 0,100% var(--cnr-cut-sm),100% 100%,var(--cnr-cut-sm) 100%,0 calc(100% - var(--cnr-cut-sm)));
+}
+.hero-main,.mini-live-card,.mini-event-card,.live-screen,.live-side-panel,
+.now-playing-card,.clip-card,.program-card,.artist-card,.profile-card,
+.category-tile,.cnr-ad-placement,.lower-third-panel,.broadcast-controls{
+  position:relative;
+  transition:transform var(--cnr-motion-ui) var(--cnr-ease),border-color var(--cnr-motion-ui) ease,box-shadow var(--cnr-motion-ui) ease,background-color var(--cnr-motion-ui) ease;
+}
+.clip-card:hover,.program-card:hover,.artist-card:hover,.profile-card:hover,
+.mini-live-card:hover,.mini-event-card:hover,.category-tile:hover{
+  transform:translate3d(0,-3px,0);
+  border-color:rgba(255,54,83,.56)!important;
+  box-shadow:0 14px 34px rgba(0,0,0,.28),0 0 22px rgba(220,20,55,.07);
+}
+button,a,[role="button"],input,select,textarea{
+  -webkit-tap-highlight-color:transparent;
+}
+button,a,[role="button"]{
+  transition:color var(--cnr-motion-fast) ease,background-color var(--cnr-motion-fast) ease,
+    border-color var(--cnr-motion-fast) ease,box-shadow var(--cnr-motion-fast) ease,
+    transform var(--cnr-motion-fast) var(--cnr-ease),filter var(--cnr-motion-fast) ease;
+}
+button:active,.hero-play:active,.control-live:active,.player-button:active,.header-icon:active{
+  transform:translateY(1px) scale(.975);
+  filter:brightness(1.12);
+}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid #ff667d!important;outline-offset:3px!important;
+  box-shadow:0 0 0 5px rgba(255,48,78,.13);
+}
+.nav-link{overflow:hidden}
+.nav-link:after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.09) 48%,transparent 72%);
+  transform:translateX(-120%);transition:transform 560ms var(--cnr-ease);
+}
+.nav-link:hover:after{transform:translateX(120%)}
+.hero-main:after,.live-screen:after,.clip-picture:before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:linear-gradient(112deg,transparent 34%,rgba(255,255,255,.065) 48%,transparent 61%);
+  transform:translateX(-125%);transition:transform 850ms var(--cnr-ease);
+}
+.hero-main:hover:after,.live-screen:hover:after,.clip-card:hover .clip-picture:before{transform:translateX(125%)}
+.hero-play,.control-live,.player-button,.header-icon,.secondary-wide,.icon-action{
+  will-change:transform;
+}
+.hero-play:hover,.control-live:hover,.secondary-wide:hover{
+  box-shadow:0 8px 26px rgba(221,12,48,.28);
+  filter:brightness(1.1);
+}
+.player-button:hover,.header-icon:hover{
+  border-color:rgba(255,82,112,.72)!important;
+  color:#fff;box-shadow:0 0 18px rgba(255,31,65,.15);
+}
+.clip-picture img,.artist-strip img,.now-playing-card>img{
+  transition:transform 420ms var(--cnr-ease),filter 420ms ease;
+}
+.clip-card:hover .clip-picture img{transform:scale(1.045)}
+.artist-strip>a:hover img{transform:scale(1.045);filter:saturate(1.15)}
+/* Soft entrance for existing page sections; no JS dependency */
+.page-area>*{animation:cnrRiseIn 460ms var(--cnr-ease) both}
+.page-area>*:nth-child(2){animation-delay:35ms}
+.page-area>*:nth-child(3){animation-delay:70ms}
+.page-area>*:nth-child(4){animation-delay:105ms}
+@keyframes cnrRiseIn{from{opacity:0;transform:translate3d(0,9px,0)}to{opacity:1;transform:translate3d(0,0,0)}}
+@keyframes cnrEdgeGlow{0%,100%{box-shadow:0 0 0 rgba(255,35,67,0)}50%{box-shadow:0 0 22px rgba(255,35,67,.13)}}
+.live-chip,.hero-tag{animation:cnrEdgeGlow 3.8s ease-in-out infinite}
+.live-dot i,.live-chip i{animation:livePulse 1.6s ease-in-out infinite}
+/* Ads remain clearly labeled, reserve space, and stay visually subordinate */
+.cnr-ad-placement{
+  min-height:132px;
+  margin-block:18px;
+  border:1px solid rgba(216,183,122,.22);
+  background:linear-gradient(115deg,rgba(24,20,18,.9),rgba(12,12,16,.96) 60%,rgba(34,11,17,.7));
+  box-shadow:0 8px 24px rgba(0,0,0,.14);
+}
+.cnr-ad-heading{min-height:18px}
+.cnr-ad-unit{min-height:90px;max-width:100%}
+.cnr-ad-placeholder{min-height:96px}
+.cnr-ad-placement:focus-within{border-color:rgba(216,183,122,.5)}
+/* Avoid hover-only effects on touch screens and keep all controls reachable */
+@media(hover:none){
+  .clip-card:hover,.program-card:hover,.artist-card:hover,.profile-card:hover,
+  .mini-live-card:hover,.mini-event-card:hover,.category-tile:hover{transform:none;box-shadow:none}
+  .nav-link:after,.hero-main:after,.live-screen:after,.clip-picture:before{display:none}
+}
+@media(max-width:900px){
+  .top-header{position:relative}
+  .page-area{padding-inline:clamp(12px,3vw,22px)}
+  .cnr-ad-placement{margin-block:14px}
+}
+@media(max-width:560px){
+  :root{--cnr-cut-sm:7px}
+  .cnr-ad-placement{min-height:112px;margin-block:12px;padding:8px}
+  .cnr-ad-unit{min-height:76px}
+  .page-area>*{animation-duration:340ms}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:.01ms!important;animation-iteration-count:1!important;
+    scroll-behavior:auto!important;transition-duration:.01ms!important;
+  }
+  .page-area>*{animation:none!important}
+}
