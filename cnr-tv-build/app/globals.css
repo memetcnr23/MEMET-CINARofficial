@@ -417,3 +417,43 @@ button:focus-visible,a:focus-visible{outline:2px solid rgba(255,82,112,.95);outl
   .broadcast-controls{grid-template-columns:32px minmax(0,1fr) minmax(0,1fr) 32px 32px;gap:4px;padding-inline:5px}
   .broadcast-controls > .control-live:nth-child(2),.broadcast-controls > .good-wishes-trigger{font-size:7px;padding-inline:3px}
 }
+
+
+/* CNR unified navigation — matches the News section across broadcast pages */
+.app-frame{display:flex;flex-direction:column;min-height:calc(100vh - 104px)}
+.side-nav{min-height:0;height:auto;position:relative;z-index:6;flex-direction:row;align-items:center;gap:4px;padding:9px 20px;background:rgba(8,7,10,.97);border-right:0;border-bottom:1px solid rgba(255,255,255,.12);overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#8d1025 #09090b}
+.sidebar-top{display:none}
+.side-nav .nav-link{height:42px;min-width:max-content;margin:0;padding:0 13px;border-radius:8px;gap:8px;font-size:10px}
+.side-nav .nav-link.active{background:#b50925;border:1px solid rgba(255,75,95,.7);box-shadow:0 0 18px rgba(220,0,35,.22)}
+.side-nav .nav-link.active i{display:none}
+.side-nav .sidebar-live,.side-nav .sidebar-footer{display:none}
+.page-area{max-width:none;padding:18px clamp(14px,2vw,28px) 26px}
+.mobile-titlebar{display:none}
+@media(max-width:760px){
+ .top-header{height:76px;grid-template-columns:minmax(0,1fr) auto;padding:7px 13px;gap:8px}
+ .brand-lockup img{width:165px;height:56px}
+ .brand-lockup span{font-size:6px;letter-spacing:1px;margin-top:-5px}
+ .republic-banner{display:none}
+ .header-tools{gap:6px}
+ .digital-clock{display:none}
+ .header-icon{width:34px;height:34px}
+ .mobile-titlebar{display:flex;align-items:center;justify-content:space-between;height:52px;padding:4px 13px;background:#09090c;border-bottom:1px solid rgba(255,255,255,.1)}
+ .mobile-titlebar button{display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(255,255,255,.14);border-radius:8px;background:#151116}
+ .mobile-titlebar img{width:142px;height:46px;object-fit:contain}
+ .side-nav{padding:8px 10px;gap:5px}
+ .side-nav .nav-link{height:39px;padding:0 11px;font-size:10px}
+ .page-area{padding:13px 12px 86px}
+ .page-topline{margin-bottom:10px}
+ .topline-right>span{display:none}
+ .page-heading h1{font-size:29px}
+ .home-hero,.live-broadcast-layout{grid-template-columns:minmax(0,1fr)}
+ .category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .clip-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .artist-strip{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .site-footer{flex-wrap:wrap}
+ .mobile-dock{display:flex}
+}
+@media(min-width:761px){
+ .side-nav{justify-content:flex-start}
+ .mobile-dock{display:none}
+}
