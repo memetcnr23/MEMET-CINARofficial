@@ -1,5 +1,7 @@
 "use client";
 
+import "./sponsor-band.css";
+
 const sponsors = [
   { name: "CNR MÜZİK TV", sub: "TELEVİZYON", tone: "tv" },
   { name: "CNR TECHNOLOGY", sub: "DIGITAL SYSTEMS", tone: "tech" },
