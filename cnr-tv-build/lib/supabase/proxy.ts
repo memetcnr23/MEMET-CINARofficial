@@ -6,10 +6,9 @@ export async function updateSession(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return response;
-
   const supabase = createServerClient(url, key, {
     cookies: {
-      getAll() { return request.cookies.getAll(); },
+      getAll: () => request.cookies.getAll(),
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
@@ -17,7 +16,6 @@ export async function updateSession(request: NextRequest) {
       }
     }
   });
-
   await supabase.auth.getClaims();
   return response;
 }
