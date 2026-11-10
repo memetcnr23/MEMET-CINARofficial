@@ -64,7 +64,7 @@ export default function WeatherDashboard(){
  };
  const current=data?.current,daily=data?.daily,hourly=data?.hourly;
  const moonInfo=useMemo(()=>{const cycle=29.530588853,known=Date.UTC(2000,0,6,18,14),age=((Date.now()-known)/86400000%cycle+cycle)%cycle,phase=age/cycle;const names=["Yeni Ay","Hilal","İlk Dördün","Şişkin Ay","Dolunay","Küçülen Ay","Son Dördün","Hilal"];return {name:names[Math.floor(phase*8)%8],illumination:Math.round((1-Math.cos(2*Math.PI*phase))*50)}},[lastUpdated]);
- const hours=useMemo(()=>hourly?hourly.time.map((t,i)=>({time:t,temp:hourly.temperature_2m[i],rain:hourly.precipitation_probability[i],code:hourly.weather_code[i]})).filter(x=>new Date(x.time).getTime()>=Date.now()).slice(0,12):[],[hourly]);
+ const hours=useMemo(()=>hourly?hourly.time.map((t,i)=>({time:t,temp:hourly.temperature_2m[i],rain:hourly.precipitation_probability[i],code:hourly.weather_code[i]})).slice(0,12):[],[hourly]);
  const dailyRows=useMemo(()=>daily?daily.time.map((t,i)=>({date:t,code:daily.weather_code[i],max:daily.temperature_2m_max[i],min:daily.temperature_2m_min[i],sunrise:daily.sunrise[i],sunset:daily.sunset[i],uv:daily.uv_index_max[i],rain:daily.precipitation_probability_max[i]})):[],[daily]);
  return <main className="min-h-screen overflow-hidden bg-[#050507] text-white">
   <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_at_55%_-15%,rgba(205,0,35,.19),transparent_48%),linear-gradient(115deg,transparent,rgba(255,0,30,.018),transparent)]"/>
