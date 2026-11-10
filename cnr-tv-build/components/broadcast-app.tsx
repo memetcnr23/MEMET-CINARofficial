@@ -110,7 +110,7 @@ const navItems = [
   { label: "Etkinlikler", href: "/etkinlikler", icon: CalendarRange },
   { label: "İstatistik Merkezi", href: "/istatistikler", icon: Activity },
   { label: "Hakkımızda", href: "/hakkimizda", icon: Info },
-  { label: "Profil & Ayarlar", href: "/profil", icon: UserCircle2 },
+  { label: "Üye Hesabım", href: "/hesabim", icon: UserCircle2 },
 ];
 function LayersIcon(props: React.ComponentProps<typeof Activity>) { return <Activity {...props} />; }
 
@@ -1099,7 +1099,7 @@ export default function BroadcastApp() {
     <header className="top-header">
       <Link href="/" className="brand-lockup"><Image src={LOGO} alt="CNR Müzik TV" width={230} height={78} priority unoptimized /><span>TÜRKİYE'NİN MÜZİK TELEVİZYONU</span></Link>
       <div className="republic-banner"><Image src="/ataturk-flag.webp" alt="Atatürk ve Türk bayrağı" width={180} height={180} unoptimized priority /><span>CUMHURİYETİN IŞIĞINDA</span></div>
-      <div className="header-tools"><div className="digital-clock"><b>{h}</b><span>{clock.toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric" })}</span></div><button className="header-icon" onClick={() => setSearchOpen(true)} aria-label="Ara"><Search /></button><div className="notification-wrap"><button className="header-icon" onClick={() => setNotificationsOpen((v) => !v)} aria-label="Bildirimler"><Bell /><i /></button>{notificationsOpen && <div className="notification-popover"><b>CNR Bildirimleri</b><p>Yeni program ve klip duyuruları burada görünecek.</p><button onClick={() => setNotificationsOpen(false)}>Tamam</button></div>}</div><Link href="/profil" className="header-icon" aria-label="Profil"><UserCircle2 /></Link></div>
+      <div className="header-tools"><div className="digital-clock"><b>{h}</b><span>{clock.toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric" })}</span></div><button className="header-icon" onClick={() => setSearchOpen(true)} aria-label="Ara"><Search /></button><div className="notification-wrap"><button className="header-icon" onClick={() => setNotificationsOpen((v) => !v)} aria-label="Bildirimler"><Bell /><i /></button>{notificationsOpen && <div className="notification-popover"><b>CNR Bildirimleri</b><p>Yeni program ve klip duyuruları burada görünecek.</p><button onClick={() => setNotificationsOpen(false)}>Tamam</button></div>}</div><Link href="/hesabim" className="header-icon" aria-label="Hesap"><UserCircle2 /></Link></div>
     </header>
     <div className="mobile-titlebar"><button onClick={() => setMobileMenu((v) => !v)} aria-label="Menüyü aç"><Menu /></button><Link href="/"><Image src={LOGO} alt="CNR Müzik TV" width={154} height={52} unoptimized /></Link><button onClick={() => setSearchOpen(true)} aria-label="Ara"><Search /></button></div>
     <div className="app-frame">
