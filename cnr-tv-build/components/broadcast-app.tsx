@@ -944,6 +944,9 @@ export default function BroadcastApp() {
               <div className="cnr-logo-effects">
                 <Image src={LOGO} alt="CNR Müzik TV" width={164} height={55} unoptimized />
                 <span className="cnr-logo-metallic-shine" aria-hidden="true" />
+                <div className="cnr-logo-snowfield" aria-hidden="true">
+                  {Array.from({ length: 16 }, (_, index) => <i key={index} className={index % 4 === 0 ? "flake" : "snow-dot"} style={{ "--x": ((index * 31) % 96) + "%", "--s": (index % 4 === 0 ? 7 + (index % 3) * 2 : 2 + (index % 2)) + "px", "--d": (4.8 + (index % 5) * 1.1) + "s", "--delay": "-" + ((index * 0.83) % 9) + "s", "--drift": ((index % 2 ? 1 : -1) * (4 + (index % 4) * 2)) + "px" } as CSSProperties} />)}
+                </div>
               </div>
             </div>
             {current && !playerPlaying && (currentHlsUrl || !HLS_ONLY) && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
