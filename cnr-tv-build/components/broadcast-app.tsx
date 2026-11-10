@@ -1059,6 +1059,9 @@ export default function BroadcastApp() {
       <div className="about-metrics"><div><Radio /><b>7/24</b><span>Yayın hedefi</span></div><div><MonitorPlay /><b>{clips.length || "—"}</b><span>Klip kataloğu</span></div><div><Users /><b>CNR</b><span>Müzik Yapım</span></div><div><Signal /><b>Türkiye</b><span>Dijital yayın</span></div></div>
     </>;
   } else if (pathname === "/profil") {
+    router.replace("/hesabim");
+    content = <div className="empty-state compact">Hesabına yönlendiriliyorsun…</div>;
+  } else if (pathname === "/profil-legacy-disabled") {
     content = <>
       {pageHeading("PERSONAL SPACE", "Profil & Ayarlar", "CNR Müzik TV deneyimini düzenle.")}
       <div className="profile-card"><div className="profile-avatar">MC</div><div><span className="verified">✓ SANATÇI PROFİLİ</span><h2>Memet Çınar</h2><p>@memetcinarofficial · CNR Müzik Yapım®</p></div><Link href="/sanatci/memet-cinar" className="profile-edit">Profili Görüntüle <ChevronRight size={15} /></Link></div>
