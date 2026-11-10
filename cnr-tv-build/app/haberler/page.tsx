@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, CalendarDays, Clock3, ExternalLink, Globe2, Newspaper, Radio, RefreshCw, Search, Signal, Sparkles } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Clock3, ExternalLink, Globe2, Newspaper, Radio, RefreshCw, Search, Signal } from "lucide-react";
 
 type Article={title:string;summary:string;url:string;image:string|null;source:string;category:string;publishedAt:string};
 type Feed={articles:Article[];updatedAt:string;sources:number;totalSources:number;live:boolean};
