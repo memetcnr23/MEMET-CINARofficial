@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
+@source "../**/*.{js,ts,jsx,tsx,mdx}";
 :root{color-scheme:dark;--bg:#070709;--surface:#0c0c10;--surface2:#121217;--surface3:#19191f;--line:rgba(255,255,255,.09);--line-red:rgba(255,32,54,.40);--red:#ff1d35;--red2:#a80019;--text:#f8f8fb;--muted:#a4a4af;--soft:#72727d;--font:Inter,Arial,sans-serif;--display:"Barlow Condensed",Impact,sans-serif}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#050507;color:var(--text);font:14px/1.5 var(--font)}button,input{font:inherit}button,a{-webkit-tap-highlight-color:transparent}button{color:inherit;cursor:pointer}a{color:inherit;text-decoration:none}img{max-width:100%}
 .tv-app{min-height:100vh;background:radial-gradient(ellipse at 55% -20%,rgba(179,0,27,.22),transparent 43%),#060608;color:var(--text)}.tv-app:before{content:"";position:fixed;z-index:0;inset:0;pointer-events:none;background:linear-gradient(112deg,transparent 0 28%,rgba(255,18,43,.022) 29%,transparent 55%),radial-gradient(ellipse at 0 50%,rgba(255,0,28,.05),transparent 34%)}
