@@ -1,7 +1,8 @@
 "use client";
 import {useCallback,useEffect,useMemo,useState} from "react";
 import Link from "next/link";
-import {Activity,ArrowLeft,ArrowRight,ArrowUpRight,Bell,CalendarDays,ChevronLeft,ChevronRight,Eye,Globe2,Grid2X2,Home,Menu,Music2,Newspaper,Pause,Play,Radio,Search,Share2,Sparkles,Trophy,Users,Video,Wifi,CloudSun} from "lucide-react";\nimport WeatherWidget from "@/components/weather-widget";
+import {Activity,ArrowLeft,ArrowRight,ArrowUpRight,Bell,CalendarDays,ChevronLeft,ChevronRight,Eye,Globe2,Grid2X2,Home,Menu,Music2,Newspaper,Pause,Play,Radio,Search,Share2,Sparkles,Trophy,Users,Video,Wifi,CloudSun} from "lucide-react";
+import WeatherWidget from "@/components/weather-widget";
 
 type Article={title:string;summary:string;url:string;image:string|null;source:string;category:string;publishedAt:string};
 type Feed={articles:Article[];updatedAt:string;sources:number;totalSources:number;live:boolean};
@@ -16,7 +17,8 @@ export default function HaberlerPage(){
  const [feed,setFeed]=useState<Feed|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(""),[category,setCategory]=useState("Tümü"),[query,setQuery]=useState(""),[slide,setSlide]=useState(0),[tickerPaused,setTickerPaused]=useState(false),[menuOpen,setMenuOpen]=useState(false);
  const refresh=useCallback(async()=>{setLoading(true);setError("");try{const r=await fetch("/api/news",{cache:"no-store"});if(!r.ok)throw new Error("Haber akışı alınamadı.");const d=await r.json();setFeed(d);if(!d.articles?.length)setError("Haber kaynaklarından içerik alınamıyor.");}catch(e){setError(e instanceof Error?e.message:"Haber bağlantısı kurulamadı.");}finally{setLoading(false);}},[]);
  useEffect(()=>{void refresh();const id=window.setInterval(()=>void refresh(),300000);return()=>clearInterval(id)},[refresh]);
- const articles=feed?.articles||[];\n useEffect(()=>{setSlide(0)},[category,query]);
+ const articles=feed?.articles||[];
+ useEffect(()=>{setSlide(0)},[category,query]);
  const categorized=useMemo(()=>articles.filter(a=>(category==="Tümü"||a.category.toLocaleLowerCase("tr").includes(category.toLocaleLowerCase("tr")))&&(!query||[a.title,a.summary,a.source,a.category].join(" ").toLocaleLowerCase("tr").includes(query.toLocaleLowerCase("tr")))),[articles,category,query]);
  const feature=categorized.length?categorized[((slide%categorized.length)+categorized.length)%categorized.length]:null;
  const secondary=categorized.filter(a=>a.url!==feature?.url).slice(0,3);
