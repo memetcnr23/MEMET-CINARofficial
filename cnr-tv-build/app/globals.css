@@ -457,3 +457,11 @@ button:focus-visible,a:focus-visible{outline:2px solid rgba(255,82,112,.95);outl
  .side-nav{justify-content:flex-start}
  .mobile-dock{display:none}
 }
+
+@keyframes cnrWeatherFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+@keyframes cnrWeatherGlow{0%,100%{filter:drop-shadow(0 0 5px rgba(255,190,80,.15))}50%{filter:drop-shadow(0 0 13px rgba(255,190,80,.42))}}
+.weather-icon-float{display:inline-flex;align-items:center;justify-content:center;animation:cnrWeatherFloat 4s ease-in-out infinite}
+.weather-icon-float svg{animation:cnrWeatherGlow 4s ease-in-out infinite}
+.weather-panel{position:relative;transition:border-color .22s ease,box-shadow .22s ease}
+.weather-panel:hover{border-color:rgba(255,48,72,.58);box-shadow:0 12px 34px rgba(190,0,30,.10)}
+@media(prefers-reduced-motion:reduce){.weather-icon-float,.weather-icon-float svg{animation:none!important}}
