@@ -1,2 +1,3 @@
 import BroadcastApp from "@/components/broadcast-app";
-export default function HomePage() { return <BroadcastApp />; }
+import SponsorBand from "@/components/sponsor-band";
+export default function HomePage() { return <><BroadcastApp /><SponsorBand /></>; }
