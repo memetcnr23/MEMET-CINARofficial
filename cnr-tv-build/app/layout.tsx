@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import AnalyticsTracker from "@/components/analytics-tracker";
 import "./globals.css";
+import "./cnr-premium-motion.css";
 
 export const metadata: Metadata = {
   title: "CNR Müzik TV® | Türkiye'nin Müzik Televizyonu",
@@ -25,7 +26,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     {validAdsenseClient && <Script
       id="google-adsense"
       async
-      strategy="beforeInteractive"
+      strategy="afterInteractive"
       crossOrigin="anonymous"
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
     />}
