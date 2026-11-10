@@ -41,11 +41,11 @@ function PanelTitle({children}:{children:React.ReactNode}){return <h2 className=
 export default function WeatherDashboard(){
  const [city,setCity]=useState("Malatya"),[query,setQuery]=useState("Malatya"),[data,setData]=useState<WeatherData|null>(null),[regional,setRegional]=useState<Array<{name:string;temperature:number;code:number;lat:number;lon:number}>>([]),[loading,setLoading]=useState(true),[error,setError]=useState(""),[lastUpdated,setLastUpdated]=useState(""),[busy,setBusy]=useState(false),[coords,setCoords]=useState<{lat:number;lon:number}|null>(null);
  const load=useCallback(async(name:string)=>{
-  setLoading(true);setError("");
+  setCoords(null);setLoading(true);setError("");
   try{
    const r=await fetch("/api/weather?city="+encodeURIComponent(name),{cache:"no-store"});
    const d=await r.json();if(!r.ok)throw new Error(d.error||"Hava durumu verisi alınamadı.");
-   setData(d);setCoords({lat:p.coords.latitude,lon:p.coords.longitude});setCity(d.location.name);setQuery(d.location.name);setLastUpdated(new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}));
+   setData(d);setCity(d.location.name);setQuery(d.location.name);setLastUpdated(new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}));
   }catch(e){setError(e instanceof Error?e.message:"Meteoroloji bağlantısı kurulamadı.");}
   finally{setLoading(false);}
  },[]);
@@ -53,12 +53,14 @@ export default function WeatherDashboard(){
   const values=await Promise.all(cities.map(async c=>{try{const r=await fetch("/api/weather?lat="+c.lat+"&lon="+c.lon+"&name="+encodeURIComponent(c.name),{cache:"no-store"});if(!r.ok)return null;const d=await r.json();return {name:c.name,temperature:Math.round(d.current.temperature_2m),code:d.current.weather_code,lat:c.lat,lon:c.lon};}catch{return null;}}));
   setRegional(values.filter(Boolean) as Array<{name:string;temperature:number;code:number;lat:number;lon:number}>);
  },[]);
- useEffect(()=>{void load("Malatya");void loadRegional();const id=window.setInterval(()=>{void load(city);void loadRegional();},600000);return()=>clearInterval(id)},[load,loadRegional]);
- const refresh=()=>{void load(city);void loadRegional();};
+ const refreshMain=useCallback(async()=>{if(!coords){await load(city);return;}setLoading(true);try{const r=await fetch("/api/weather?lat="+coords.lat+"&lon="+coords.lon+"&name="+encodeURIComponent("Konumum"),{cache:"no-store"});const d=await r.json();if(!r.ok)throw new Error(d.error);setData(d);setLastUpdated(new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}));setError("");}catch(e){setError(e instanceof Error?e.message:"Meteoroloji bağlantısı kurulamadı.");}finally{setLoading(false);}},[coords,city,load]);
+ useEffect(()=>{void load("Malatya");void loadRegional();},[load,loadRegional]);
+ useEffect(()=>{const id=window.setInterval(()=>{void refreshMain();void loadRegional();},600000);return()=>clearInterval(id)},[refreshMain,loadRegional]);
+ const refresh=()=>{void refreshMain();void loadRegional();};
  const search=(e:FormEvent)=>{e.preventDefault();if(query.trim())void load(query.trim());};
  const locate=()=>{
   if(!navigator.geolocation){setError("Bu tarayıcı konum özelliğini desteklemiyor.");return;}
-  setBusy(true);navigator.geolocation.getCurrentPosition(async p=>{try{const r=await fetch("/api/weather?lat="+p.coords.latitude+"&lon="+p.coords.longitude+"&name="+encodeURIComponent("Konumum"),{cache:"no-store"});const d=await r.json();if(!r.ok)throw new Error(d.error);setData(d);setCity(d.location.name);setQuery(d.location.name);setLastUpdated(new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}));setError("");}catch(e){setError(e instanceof Error?e.message:"Konum hava durumu alınamadı.");}finally{setBusy(false);}},()=>{setError("Konum izni verilmedi veya konum alınamadı.");setBusy(false);},{enableHighAccuracy:false,timeout:9000,maximumAge:300000});
+  setBusy(true);navigator.geolocation.getCurrentPosition(async p=>{try{const r=await fetch("/api/weather?lat="+p.coords.latitude+"&lon="+p.coords.longitude+"&name="+encodeURIComponent("Konumum"),{cache:"no-store"});const d=await r.json();if(!r.ok)throw new Error(d.error);setData(d);setCoords({lat:p.coords.latitude,lon:p.coords.longitude});setCity(d.location.name);setQuery(d.location.name);setLastUpdated(new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}));setError("");}catch(e){setError(e instanceof Error?e.message:"Konum hava durumu alınamadı.");}finally{setBusy(false);}},()=>{setError("Konum izni verilmedi veya konum alınamadı.");setBusy(false);},{enableHighAccuracy:false,timeout:9000,maximumAge:300000});
  };
  const current=data?.current,daily=data?.daily,hourly=data?.hourly;\n const moonInfo=useMemo(()=>{const cycle=29.530588853,known=Date.UTC(2000,0,6,18,14),age=((Date.now()-known)/86400000%cycle+cycle)%cycle,phase=age/cycle;const names=["Yeni Ay","Hilal","İlk Dördün","Şişkin Ay","Dolunay","Küçülen Ay","Son Dördün","Hilal"];return {name:names[Math.floor(phase*8)%8],illumination:Math.round((1-Math.cos(2*Math.PI*phase))*50)}},[lastUpdated]);
  const hours=useMemo(()=>hourly?hourly.time.map((t,i)=>({time:t,temp:hourly.temperature_2m[i],rain:hourly.precipitation_probability[i],code:hourly.weather_code[i]})).filter(x=>new Date(x.time).getTime()>=Date.now()).slice(0,12):[],[hourly]);
