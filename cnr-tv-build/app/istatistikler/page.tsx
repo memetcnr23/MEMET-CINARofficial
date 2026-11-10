@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Activity, ArrowUpRight, BarChart3, Bell, CheckCircle2, Clock3, Eye, Globe2, Headphones, LockKeyhole, LogOut, Music2, Newspaper, Radio, RefreshCw, Search, ShieldCheck, Signal, Users, Video } from "lucide-react";
+import { Activity, ArrowUpRight, BarChart3, CheckCircle2, Clock3, Eye, Globe2, Headphones, LockKeyhole, LogOut, Music2, Newspaper, Radio, RefreshCw, Search, ShieldCheck, Signal, Users, Video } from "lucide-react";
 
 type Day={day:string;views:number;sessions:number};
 type Page={path:string;views:number};
