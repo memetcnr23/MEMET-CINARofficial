@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import AnalyticsTracker from "@/components/analytics-tracker";
+import SiteAdSlots from "@/components/site-ad-slots";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     />}
   </head><body>
     <AnalyticsTracker />
+    <SiteAdSlots />
     {children}
   </body></html>;
 }
