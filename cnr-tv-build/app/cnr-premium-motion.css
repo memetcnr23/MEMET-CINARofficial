@@ -124,3 +124,78 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,input:focus-v
   }
   .page-area>*{animation:none!important}
 }
+
+
+/* CNR VISUAL RESTORE — reference-led premium broadcast UI */
+/* Keep the supplied red/black identity, but remove the aggressive polygon clipping that was cutting cards and controls. */
+.hero-main,.mini-live-card,.mini-event-card,.live-side-panel,.live-screen,
+.now-playing-card,.clip-card,.program-card,.artist-card,.profile-card,
+.category-tile,.cnr-ad-placement,.lower-third-panel,.broadcast-controls,
+.heading-mark,.header-icon,.notification-popover,.sidebar-live,.screen-start,
+.hero-play,.control-live,.player-button,.secondary-wide,.nav-link{
+  clip-path:none!important;
+  border-radius:14px!important;
+}
+.tv-app{overflow-x:clip}
+.app-frame,.page-area,.home-hero,.hero-side,.clip-grid,.artist-strip,.category-grid{min-width:0}
+.page-area{overflow-x:clip}
+.hero-main,.mini-live-card,.mini-event-card,.clip-card,.program-card,.artist-card,.profile-card,.category-tile{
+  border:1px solid rgba(255,54,77,.28)!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.035);
+}
+.nav-link{border:1px solid transparent!important}
+.nav-link.active{border-color:rgba(255,89,111,.34)!important}
+.header-icon,.player-button,.secondary-wide{border-radius:999px!important}
+.hero-play,.control-live{border-radius:999px!important}
+/* Responsive grid safeguards: no squeezed columns, overlapping cards or clipped content. */
+@media(max-width:1100px){
+  .app-frame{grid-template-columns:190px minmax(0,1fr)}
+  .page-area{padding-inline:18px}
+  .category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .clip-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .artist-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:900px){
+  .top-header{height:auto;min-height:82px;grid-template-columns:minmax(0,1fr) auto;padding:9px 16px}
+  .republic-banner{display:none}
+  .app-frame{display:block;min-height:calc(100vh - 82px)}
+  .side-nav{min-height:0;height:auto;position:relative;display:flex;flex-direction:row;gap:6px;padding:9px 12px;overflow-x:auto;overflow-y:hidden;white-space:nowrap;border-right:0;border-bottom:1px solid rgba(255,50,70,.22)}
+  .side-nav .sidebar-top,.side-nav .sidebar-live,.side-nav .sidebar-footer{display:none}
+  .side-nav .nav-link{flex:0 0 auto;width:auto;height:40px;padding:0 12px;margin:0;gap:8px}
+  .page-area{max-width:none;padding:16px 14px 110px}
+  .home-hero{grid-template-columns:minmax(0,1.5fr) minmax(220px,.8fr)}
+  .clip-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:640px){
+  .top-header{min-height:70px;padding:7px 11px}
+  .brand-lockup img{width:174px;height:56px}
+  .header-tools{gap:6px}.digital-clock{display:none}
+  .app-frame{min-height:calc(100vh - 70px)}
+  .page-area{padding:12px 10px 108px}
+  .page-topline{margin-bottom:10px}
+  .page-heading{margin:6px 0 16px}
+  .page-heading h1{font-size:29px}
+  .home-hero{grid-template-columns:minmax(0,1fr);gap:10px}
+  .hero-main{min-height:255px}
+  .hero-content{left:17px;right:17px;bottom:17px;max-width:92%}
+  .hero-content h1{font-size:34px}
+  .hero-side{grid-template-columns:1fr 1fr;grid-template-rows:auto;gap:8px}
+  .mini-live-art{height:82px}
+  .category-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .category-tile{height:60px;padding-inline:8px}
+  .clip-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .artist-strip{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .artist-strip img{width:58px;height:58px}
+  .news-feed-grid{grid-template-columns:minmax(0,1fr)!important}
+  .news-feed-card.featured{grid-column:auto!important;display:block!important}
+  .news-feed-card.featured .news-feed-image{min-height:0;aspect-ratio:16/9}
+  .weather-details{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .weather-details article{padding:9px 7px}
+  .weather-details article>b{font-size:18px}
+  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:380px){
+  .side-nav .nav-link{height:36px;padding-inline:9px;font-size:9px}
+  .clip-grid{grid-template-columns:minmax(0,1fr)}
+  .hero-side{grid-template-columns:minmax(0,1fr)}
+}
