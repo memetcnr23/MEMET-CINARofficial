@@ -404,3 +404,32 @@ button:focus-visible,a:focus-visible{outline:2px solid rgba(255,82,112,.95);outl
 }
 @media screen and (min-width:901px){.mobile-dock{display:none!important}}
 @media screen and (max-width:390px){.mobile-dock{left:7px;right:7px;height:65px!important}.mobile-dock .dock-label{font-size:8px!important}}
+
+
+/* CNR MOBILE SIDE QUICK ACCESS — keep the vertical menu accessible at the top */
+@media screen and (max-width:760px){
+  .app-frame{display:flex!important;flex-direction:column!important}
+  .side-nav{
+    order:0!important;position:relative!important;inset:auto!important;
+    transform:none!important;width:100%!important;min-height:0!important;height:auto!important;
+    display:flex!important;flex-direction:row!important;align-items:center!important;
+    gap:6px!important;padding:9px 12px!important;margin:0!important;
+    overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;
+    background:linear-gradient(90deg,rgba(12,10,15,.98),rgba(25,9,16,.97))!important;
+    border-right:0!important;border-bottom:1px solid rgba(235,65,95,.2)!important;
+    box-shadow:0 8px 22px rgba(0,0,0,.24)!important;
+    scrollbar-width:none!important;-webkit-overflow-scrolling:touch;
+  }
+  .side-nav::-webkit-scrollbar{display:none!important}
+  .side-nav .sidebar-top,.side-nav .sidebar-live,.side-nav .sidebar-footer{display:none!important}
+  .side-nav .nav-link{
+    flex:0 0 auto!important;width:auto!important;height:40px!important;
+    display:inline-flex!important;flex-direction:row!important;gap:8px!important;
+    margin:0!important;padding:0 12px!important;border:1px solid rgba(255,255,255,.09)!important;
+    border-radius:10px!important;background:rgba(255,255,255,.035)!important;
+    font-size:10px!important;color:#c4c1ca!important;
+  }
+  .side-nav .nav-link svg{width:16px!important;height:16px!important}
+  .side-nav .nav-link.active{background:linear-gradient(110deg,rgba(220,24,60,.3),rgba(125,0,22,.16))!important;border-color:rgba(244,67,100,.4)!important;color:#fff!important}
+  .page-area{order:1!important}
+}
