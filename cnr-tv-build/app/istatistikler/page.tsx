@@ -1,2 +1,2 @@
-import CnrStudio from "@/components/cnr-studio";
-export default function Page() { return <CnrStudio />; }
+import BroadcastApp from "@/components/broadcast-app";
+export default function Page() { return <BroadcastApp />; }
