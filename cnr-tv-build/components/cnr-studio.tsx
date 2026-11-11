@@ -7,7 +7,6 @@ type Clip={id:string;title:string;artist:string;category:string;durationSeconds:
 type Feed={clips?:Clip[];current?:{clip:Clip};upcoming?:Array<{clip:Clip}>;error?:string};
 const links=[["/","Ana Sayfa",Home],["/canli-yayin","Canlı Yayın",Radio],["/yayin-akisi","Yayın Akışı",CalendarDays],["/programlar","Programlar",MonitorPlay],["/muzik-listeleri","Müzik Listeleri",ListMusic],["/sanatcilar","Sanatçılar",Users],["/klip-arsivi","Klip Arşivi",Disc3],["/haberler","Haber Merkezi",Newspaper],["/hava-durumu","Hava Durumu",CloudSun],["/etkinlikler","Etkinlikler",Activity],["/istatistikler","İstatistikler",Activity],["/hakkimizda","Hakkımızda",Info]] as const;
 const schedule=[["08:00","Güne Müzikle Başla","Sabah kuşağı"],["10:00","CNR Türkçe Pop","Günün hitleri"],["13:00","Ritmi Yakala","Pop & dans"],["16:00","CNR Top 20","Haftanın favorileri"],["18:00","Yeni Nesil","Yeni çıkanlar"],["20:00","Efkar Gecesi","Duygulara dokunanlar"],["22:00","Gece Frekansı","Gece seçkisi"]];
-function Heading({k,title,d}:{k:string;title:string;d:string}){return <div className="studio-heading"><small>{k}</small><h1>{title}</h1><p>{d}</p></div>}
 export default function CnrStudio(){
  const path=(usePathname()||"/").replace(/\/$/,"")||"/";const [feed,setFeed]=useState<Feed|null>(null);const [q,setQ]=useState("");const [menu,setMenu]=useState(false);const [muted,setMuted]=useState(true);const [time,setTime]=useState(new Date());
  useEffect(()=>{const t=setInterval(()=>setTime(new Date()),1000);return()=>clearInterval(t)},[]);
