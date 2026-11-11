@@ -379,3 +379,28 @@ button:focus-visible,a:focus-visible{outline:2px solid rgba(255,82,112,.95);outl
  .mobile-dock .dock-icon{height:29px}
 }
 @media(prefers-reduced-motion:reduce){.mobile-dock .dock-link,.mobile-dock .dock-icon{transition:none!important}}
+
+
+/* CNR QUICK MENU — final responsive visibility and stacking fix */
+.mobile-dock{display:none!important}
+@media screen and (max-width:900px){
+  .mobile-dock{
+    display:block!important;position:fixed!important;z-index:99999!important;
+    left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));
+    bottom:calc(10px + env(safe-area-inset-bottom))!important;
+    height:70px!important;padding:5px!important;
+    visibility:visible!important;opacity:1!important;pointer-events:auto!important;
+    background:linear-gradient(145deg,rgba(28,24,31,.97),rgba(7,7,11,.98))!important;
+    border:1px solid rgba(255,255,255,.2)!important;border-radius:21px!important;
+    box-shadow:0 14px 40px rgba(0,0,0,.58),0 0 25px rgba(220,25,62,.16)!important;
+    -webkit-backdrop-filter:blur(22px) saturate(1.4)!important;backdrop-filter:blur(22px) saturate(1.4)!important;
+  }
+  .mobile-dock-inner{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important;height:100%!important}
+  .mobile-dock .dock-link{display:flex!important;min-width:0!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;color:#aaa8b2!important;text-decoration:none!important;border-radius:15px!important}
+  .mobile-dock .dock-link.active{color:#ff617a!important;background:linear-gradient(180deg,rgba(211,22,58,.16),rgba(211,22,58,.04))!important}
+  .mobile-dock .dock-icon{display:grid!important;place-items:center!important;width:35px!important;height:31px!important}
+  .mobile-dock .dock-label{display:block!important;font-size:9px!important;font-weight:700!important;line-height:1!important;white-space:nowrap!important}
+  .page-area{padding-bottom:calc(112px + env(safe-area-inset-bottom))!important}
+}
+@media screen and (min-width:901px){.mobile-dock{display:none!important}}
+@media screen and (max-width:390px){.mobile-dock{left:7px;right:7px;height:65px!important}.mobile-dock .dock-label{font-size:8px!important}}
