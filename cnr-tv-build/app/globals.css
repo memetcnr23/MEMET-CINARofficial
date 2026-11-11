@@ -358,10 +358,10 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid rgba(
 button:focus-visible,a:focus-visible{outline:2px solid rgba(255,82,112,.95);outline-offset:3px}
 @media(max-width:760px){:root{--cnr-cut:10px}.home-hero,.live-screen,.hero-main{clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px))}}
 
-/* Logo visibility fix: dark artwork must remain legible on the dark broadcast UI */
+/* Preserve the original red-and-silver CNR logo artwork; never invert it to a flat white mark. */
 .brand-lockup img,.mobile-titlebar img,.mini-live-art img,.live-channel-bug img,
 .cnr-lt-logo img,.site-footer>div:first-child img,.cnr-sponsor-image,.cnr-sponsor-footer img{
-  filter:brightness(0) invert(1) drop-shadow(0 0 9px rgba(255,28,55,.42))!important;
+  filter:drop-shadow(0 2px 9px rgba(0,0,0,.62)) drop-shadow(0 0 7px rgba(255,28,55,.24))!important;
 }
 .cnr-sponsor-band{margin:18px 0 24px!important}
 .cnr-sponsor-logo{min-height:100px!important}
