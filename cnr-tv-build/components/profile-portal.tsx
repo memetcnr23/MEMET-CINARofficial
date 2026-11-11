@@ -90,9 +90,9 @@ export default function ProfilePortal() {
     <div className="pointer-events-none absolute right-8 top-0 h-64 w-64 rounded-full bg-red-600/10 blur-[100px]"/>
     <div className="relative grid gap-6 lg:grid-cols-[.85fr_1.15fr]">
       <section className="border border-red-500/20 bg-gradient-to-br from-[#241017] via-[#111116] to-[#09090d] p-7 sm:p-9">
-        <span className="inline-flex items-center gap-2 text-[10px] font-black tracking-[.22em] text-rose-300"><Sparkles size={14}/> CNR MEMBER AREA</span>
+        <span className="inline-flex items-center gap-2 text-[10px] font-black tracking-[.22em] text-rose-300"><Sparkles size={14}/> CNR MÜZİK TV® ÜYE ALANI</span>
         <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">Müziğin<br/><span className="text-rose-400">bir parçası ol.</span></h1>
-        <p className="mt-5 max-w-sm text-sm leading-7 text-zinc-400">CNR Müzik TV hesabınla profilini oluştur, sanatçı kimliğini düzenle ve topluluğa katıl.</p>
+        <p className="mt-5 max-w-sm text-sm leading-7 text-zinc-400">CNR Müzik TV® hesabınla profilini oluştur, sanatçı kimliğini düzenle ve topluluğa katıl.</p>
         <div className="mt-10 space-y-4 text-xs text-zinc-300">
           <div className="flex items-center gap-3"><ShieldCheck className="text-rose-400" size={18}/> E-posta doğrulamalı hesap sistemi</div>
           <div className="flex items-center gap-3"><CircleUserRound className="text-rose-400" size={18}/> Kişisel profil ve biyografi</div>
