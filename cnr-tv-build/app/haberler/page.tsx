@@ -13,7 +13,7 @@ export default function HaberlerPage(){
  return <main className="min-h-screen bg-[#08080c] text-white">
   <div className="mx-auto max-w-[1440px] px-4 pb-20 pt-5 sm:px-8">
    <header className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
-    <Link href="/" className="flex items-center gap-3 text-sm font-black tracking-[.2em]"><span className="grid h-10 w-10 place-items-center border border-rose-500/40 bg-rose-950/40 text-rose-300 [clip-path:polygon(0_0,100%_0,100%_75%,75%_100%,0_100%)]">CNR</span>CNR MÜZİK TV <span className="text-zinc-500">/ HABER MERKEZİ</span></Link>
+    <Link href="/" className="flex items-center gap-3 text-sm font-black tracking-[.2em]"><span className="grid h-10 w-10 place-items-center border border-rose-500/40 bg-rose-950/40 text-rose-300 [clip-path:polygon(0_0,100%_0,100%_75%,75%_100%,0_100%)]">CNR</span>CNR MÜZİK TV® <span className="text-zinc-500">/ HABER MERKEZİ</span></Link>
     <div className="flex items-center gap-3 text-[10px] font-bold tracking-[.16em] text-zinc-400"><span className="flex items-center gap-2 text-emerald-300"><i className="h-2 w-2 animate-pulse rounded-full bg-emerald-400"/> CANLI KAYNAK</span><button onClick={()=>void refresh()} className="flex items-center gap-2 border border-white/15 px-3 py-2 hover:border-rose-400"><RefreshCw size={13}/> YENİLE</button></div>
    </header>
    <section className="relative mb-8 overflow-hidden border border-white/10 bg-[radial-gradient(ellipse_at_80%_10%,rgba(190,20,55,.24),transparent_48%),linear-gradient(120deg,#181117,#0b0b10_65%)] p-6 sm:p-10 [clip-path:polygon(0_0,100%_0,100%_calc(100%-22px),calc(100%-22px)_100%,0_100%)]">
