@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { ArrowRight, CheckCircle2, CircleUserRound, KeyRound, LoaderCircle, LogOut, Mail, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 
 type Profile = { username: string | null; full_name: string; bio: string; role: string; avatar_url: string | null; is_public: boolean };
@@ -36,7 +37,7 @@ export default function ProfilePortal() {
     try {
       const supabase = createClient();
       void loadProfile();
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
         if (session) void loadProfile(); else { setUser(null); setProfile(null); }
       });
       return () => subscription.unsubscribe();
