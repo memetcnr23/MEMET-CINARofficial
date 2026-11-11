@@ -92,7 +92,7 @@ declare global {
   }
 }
 
-const LOGO = "/cnr-logo.webp";
+const LOGO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3BSfttb3qRIKdXTZL8MopavFapy/c5d31ee2-237c-4735-9fe0-5fc7f7d2232d.png";
 const HLS_STREAM = process.env.NEXT_PUBLIC_CNR_HLS_URL || "";
 // Default: HLS per-clip when available, YouTube embed fallback otherwise.
 // Set NEXT_PUBLIC_CNR_PLAYER_MODE=hls to enforce HLS-only mode.
