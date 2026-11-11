@@ -3,7 +3,7 @@ import BroadcastApp from "@/components/broadcast-app";
 
 const allowed = new Set([
   "canli-yayin", "yayin-akisi", "programlar", "muzik-listeleri",
-  "sanatcilar", "klip-arsivi", "haberler", "etkinlikler", "hakkimizda", "profil", "istatistikler"
+  "sanatcilar", "klip-arsivi", "haberler", "hava-durumu", "etkinlikler", "hakkimizda", "profil", "istatistikler"
 ]);
 
 export default async function SectionPage({ params }: { params: Promise<{ slug: string[] }> }) {
