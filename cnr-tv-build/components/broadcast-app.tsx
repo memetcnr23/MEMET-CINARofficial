@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
-  Activity, ArrowUpRight, BadgeCheck, Bell, CalendarDays, CalendarRange, Camera, Captions, Check,
+  Activity, ArrowUpRight, BadgeCheck, Bell, CalendarDays, CalendarRange, Camera, Captions, Check, CloudSun,
   ChevronDown, ChevronRight, Clock3, Disc3, ExternalLink, Expand, Heart,
   Home, Info, ListMusic, Menu, Mic2, MonitorPlay, Music2, Newspaper, Pause, Play,
   Radio, Search, Settings, Share2, Signal, Sparkles, Trophy, UserCircle2,
@@ -107,6 +107,7 @@ const navItems = [
   { label: "Sanatçılar", href: "/sanatcilar", icon: Users },
   { label: "Klip Arşivi", href: "/klip-arsivi", icon: Disc3 },
   { label: "Haberler", href: "/haberler", icon: Newspaper },
+  { label: "Hava Durumu", href: "/hava-durumu", icon: CloudSun },
   { label: "Etkinlikler", href: "/etkinlikler", icon: CalendarRange },
   { label: "İstatistik Merkezi", href: "/istatistikler", icon: Activity },
   { label: "Hakkımızda", href: "/hakkimizda", icon: Info },
@@ -227,6 +228,9 @@ export default function BroadcastApp() {
   const [lowerActive, setLowerActive] = useState(false);
   const [subtitleEnabled, setSubtitleEnabled] = useState(false);
   const [clock, setClock] = useState(new Date());
+  const [weatherData, setWeatherData] = useState<{temperature:number;apparent:number;humidity:number;wind:number;code:number;high:number;low:number}|null>(null);
+  const [weatherError, setWeatherError] = useState("");
+  const [localVisitTotal, setLocalVisitTotal] = useState(0);
 
   const activeNationalDay = getActiveNationalDay(clock);
   const clips = nowPlaying?.clips || [];
@@ -1040,11 +1044,45 @@ export default function BroadcastApp() {
       <div className="filter-chips">{["Tümü", "Resmî Klip", "Şarkı Sözleri", "Audio", "Visualizer", "Müzik Videosu"].map((name) => <button key={name} className={selectedFormat === name ? "active" : ""} onClick={() => setSelectedFormat(name)}>{name}</button>)}</div>
       {filteredClips.length ? <div className="clip-grid archive-grid">{filteredClips.map(renderClipCard)}</div> : <div className="empty-state"><Search size={34} /><b>Aradığın klip bulunamadı</b><span>Başka bir sanatçı veya kategori deneyebilirsin.</span><button onClick={() => { setSearchQuery(""); setSelectedCategory("Tümü"); setSelectedFormat("Tümü"); }}>Filtreleri temizle</button></div>}
     </>;
+  } else if (pathname === "/istatistikler") {
+    const dayKey = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Istanbul" });
+    let todayVisits = 0;
+    try { const saved = JSON.parse(localStorage.getItem("cnr-tv-analytics-v1") || "{}"); todayVisits = Number(saved.days?.[dayKey] || 0); } catch {}
+    content = <>
+      {pageHeading("CNR DATA CENTER", "İstatistik Merkezi", "CNR Müzik TV platformunun bu tarayıcıda ölçülen kullanım verileri.")}
+      <div className="stats-live-strip"><span><i /> VERİ AKIŞI AKTİF</span><small>Son güncelleme: {clock.toLocaleTimeString("tr-TR")}</small></div>
+      <div className="stats-grid">
+        <article className="stats-card stats-primary"><span>TOPLAM ZİYARET</span><b>{localVisitTotal.toLocaleString("tr-TR")}</b><small>Bu tarayıcıda kaydedilen toplam sayfa ziyareti</small><Activity /></article>
+        <article className="stats-card"><span>BUGÜNKÜ ZİYARET</span><b>{todayVisits.toLocaleString("tr-TR")}</b><small>Türkiye saatiyle bugün</small><Clock3 /></article>
+        <article className="stats-card"><span>KLİP KATALOĞU</span><b>{clips.length.toLocaleString("tr-TR")}</b><small>Yayın kataloğundaki kayıt</small><Disc3 /></article>
+        <article className="stats-card"><span>SANATÇI DİZİNİ</span><b>{artists.length.toLocaleString("tr-TR")}</b><small>Yüklenen sanatçı profili</small><Users /></article>
+      </div>
+      <div className="stats-panel"><div className="stats-panel-head"><div><span className="eyebrow">SİSTEM DURUMU</span><h2>Platform göstergeleri</h2></div><span className="stats-status">CANLI</span></div>
+        <div className="stats-row"><span>Yayın kataloğu</span><b>{nowPlaying ? "Bağlı" : "Veri bekleniyor"}</b><i className={nowPlaying ? "ok" : ""}/></div>
+        <div className="stats-row"><span>Sanatçı veritabanı</span><b>{artists.length ? "Veri alındı" : "Veri bekleniyor"}</b><i className={artists.length ? "ok" : ""}/></div>
+        <div className="stats-row"><span>Site analitiği</span><b>Tarayıcı içi ölçüm</b><i className="ok"/></div>
+        <p className="stats-disclaimer">Not: Bu ekrandaki ziyaret sayıları yalnızca bu cihazın/tarayıcının yerel kayıtlarıdır; tüm ziyaretçileri temsil eden sunucu analitiği değildir.</p>
+      </div>
+    </>;
+  } else if (pathname === "/hava-durumu") {
+    const weatherText = (code:number) => code===0 ? "Açık" : [1,2,3].includes(code) ? "Parçalı bulutlu" : [45,48].includes(code) ? "Sisli" : [51,53,55,56,57].includes(code) ? "Çisenti" : [61,63,65,66,67,80,81,82].includes(code) ? "Yağmurlu" : [71,73,75,77,85,86].includes(code) ? "Karlı" : [95,96,99].includes(code) ? "Gök gürültülü" : "Değişken";
+    content = <>
+      {pageHeading("CNR WEATHER", "Hava Durumu", "Malatya için güncel hava koşulları ve günlük tahmin.")}
+      <section className="weather-hero">
+        <div className="weather-location"><span>MALATYA · YEŞİLYURT</span><small>{clock.toLocaleDateString("tr-TR",{weekday:"long",day:"numeric",month:"long"})}</small></div>
+        {weatherData ? <><div className="weather-main"><CloudSun size={74}/><div><strong>{Math.round(weatherData.temperature)}°</strong><b>{weatherText(weatherData.code)}</b><small>Hissedilen {Math.round(weatherData.apparent)}°</small></div></div>
+        <div className="weather-range"><span>Günün en yükseği <b>{Math.round(weatherData.high)}°</b></span><span>Günün en düşüğü <b>{Math.round(weatherData.low)}°</b></span></div></> : <div className="weather-loading"><CloudSun size={54}/><b>{weatherError || "Hava durumu yükleniyor…"}</b></div>}
+      </section>
+      {weatherData && <div className="weather-details"><article><span>NEM</span><b>%{weatherData.humidity}</b><small>Bağıl nem</small></article><article><span>RÜZGÂR</span><b>{Math.round(weatherData.wind)} <small>km/sa</small></b><small>10 metre yükseklikte</small></article><article><span>HİSSEDİLEN</span><b>{Math.round(weatherData.apparent)}°</b><small>Algılanan sıcaklık</small></article></div>}
+      <div className="weather-source"><span>CANLI METEOROLOJİ VERİSİ</span><small>Kaynak: Open-Meteo · Veriler yaklaşık 10 dakikada bir yenilenir.</small>{weatherError && <b>{weatherError}</b>}</div>
+    </>;
   } else if (pathname === "/haberler") {
     content = <>
       {pageHeading("CNR NEWSROOM", "Haberler", "CNR Müzik TV ve müzik dünyasından duyurular.")}
-      <div className="news-feature"><div className="news-visual"><Image src={LOGO} alt="CNR Müzik TV" width={320} height={108} unoptimized /><span>ÖZEL DUYURU</span></div><div className="news-copy"><span className="eyebrow">CNR MÜZİK TV</span><h2>Türkiye'nin Müzik Televizyonu</h2><p>CNR Müzik TV yayın kataloğu ve program akışı güncelleniyor. Yeni klipler ve özel kuşaklar için bizi takipte kal.</p><Link href="/canli-yayin" className="red-link">Canlı yayına geç <ChevronRight size={16} /></Link></div></div>
-      <div className="news-note"><Bell size={20} /><div><b>Yeni duyurular burada yayınlanacak</b><span>Resmî haberler eklendiğinde bu bölüm güncel içerikle yenilenecek.</span></div></div>
+      <div className="newsroom-masthead"><div><span className="eyebrow">CNR NEWSROOM · RESMÎ KANAL</span><h2>Müzik dünyasından<br/><em>haber ve duyurular.</em></h2><p>Yalnızca doğrulanmış CNR Müzik TV açıklamaları ve yayın güncellemeleri.</p></div><div className="newsroom-mark"><Newspaper size={62}/><b>CNR<br/>NEWS</b></div></div>
+      <div className="newsroom-grid"><article className="newsroom-main"><span className="news-tag">YAYIN DUYURUSU</span><h3>CNR Müzik TV yayın merkezi</h3><p>Canlı yayın, program akışı ve klip kataloğundaki güncel içeriklere tek merkezden ulaş.</p><div className="newsroom-actions"><Link href="/canli-yayin" className="red-link">Canlı yayına geç <ChevronRight size={16}/></Link><Link href="/yayin-akisi" className="red-link">Yayın akışını gör <ChevronRight size={16}/></Link></div></article>
+      <aside className="newsroom-side"><span className="eyebrow">HIZLI BAĞLANTILAR</span><Link href="/programlar">Program duyuruları <ChevronRight size={15}/></Link><Link href="/klip-arsivi">Yeni klipler <ChevronRight size={15}/></Link><Link href="/etkinlikler">Etkinlik takvimi <ChevronRight size={15}/></Link></aside></div>
+      <div className="newsroom-foot"><Bell size={20}/><div><b>Resmî haber akışı</b><span>Henüz doğrulanmış yeni bir haber yayımlanmadı. Burada örnek veya doğrulanmamış başlık gösterilmez.</span></div><span className="newsroom-live">EDİTORYAL</span></div>
     </>;
   } else if (pathname === "/etkinlikler") {
     content = <>
