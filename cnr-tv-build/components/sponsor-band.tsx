@@ -20,7 +20,7 @@ export default function SponsorBand() {
     <div className="cnr-sponsor-heading"><span /> <b>SPONSORLARIMIZ & İŞ ORTAKLARIMIZ</b> <span /></div>
     <div className="cnr-sponsor-grid">
       {sponsors.map((sponsor) => <div className={"cnr-sponsor-logo " + sponsor.tone} key={sponsor.tone} aria-label={sponsor.name}>
-        {sponsor.tone === "tv" || sponsor.tone === "label" ? <img className="cnr-sponsor-image" src="/cnr-logo.svg" alt={sponsor.name + " logosu"} /> :
+        {sponsor.tone === "tv" || sponsor.tone === "label" ? <img className="cnr-sponsor-image" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3BSfttb3qRIKdXTZL8MopavFapy/e805eeb4-e806-4f04-a963-902a43efb92b.png" alt={sponsor.name + " logosu"} /> :
           <div className={"cnr-partner-mark mark-" + sponsor.tone}>
             <span className="cnr-partner-symbol">{sponsor.mark}</span>
             <span className="cnr-partner-word">{sponsor.accent}</span>
@@ -29,7 +29,7 @@ export default function SponsorBand() {
       </div>)}
     </div>
     <div className="cnr-sponsor-footer">
-      <img src="/cnr-logo.svg" alt="CNR Müzik TV ana kanal logosu" />
+      <img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3BSfttb3qRIKdXTZL8MopavFapy/e805eeb4-e806-4f04-a963-902a43efb92b.png" alt="CNR Müzik TV ana kanal logosu" />
       <span>© CNR Müzik Yapım® · CNR Müzik TV®</span>
       <b>MÜZİK <i>•</i> HABER <i>•</i> MAGAZİN <i>•</i> KONSER <i>•</i> KLİP</b>
     </div>
