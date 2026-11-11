@@ -352,3 +352,127 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible,input:focus-v
  .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
  .stats-card{padding:12px;min-height:115px}
 }
+
+
+/* CNR TV MASTER REDESIGN — horizontal national-broadcast layout */
+.tv-app{background:#050507!important;color:#f8f6f7!important}
+.tv-app:before{background:
+  radial-gradient(ellipse at 12% 0%,rgba(255,0,40,.12),transparent 35%),
+  radial-gradient(ellipse at 88% 22%,rgba(130,0,24,.10),transparent 32%),
+  repeating-linear-gradient(118deg,transparent 0 160px,rgba(255,255,255,.009) 161px 162px,transparent 163px 300px)!important}
+.top-header{height:88px!important;max-width:none!important;width:100%!important;margin:0!important;padding:7px clamp(16px,3vw,48px)!important;display:grid!important;grid-template-columns:260px minmax(0,1fr) auto!important;gap:22px!important;border-bottom:1px solid rgba(255,30,55,.55)!important;background:linear-gradient(90deg,#070609,#16080d 48%,#08070a)!important}
+.brand-lockup img{width:250px!important;height:72px!important}
+.republic-banner{height:70px!important;opacity:.65}
+.republic-banner img{width:140px!important;height:140px!important;top:-35px!important}
+.republic-banner span{font-size:8px!important}
+.header-tools{gap:9px!important}
+.digital-clock{display:none!important}
+.header-icon{width:40px!important;height:40px!important;border-radius:50%!important;background:linear-gradient(145deg,#21151b,#09080b)!important;border:1px solid rgba(255,255,255,.18)!important}
+.app-frame{display:flex!important;flex-direction:column!important;max-width:none!important;width:100%!important;min-height:0!important}
+.side-nav{order:0!important;position:relative!important;top:auto!important;min-height:0!important;height:60px!important;width:100%!important;padding:7px clamp(10px,2vw,34px)!important;display:flex!important;flex-direction:row!important;align-items:center!important;gap:5px!important;overflow-x:auto!important;overflow-y:hidden!important;white-space:nowrap!important;background:linear-gradient(90deg,#0a090c,#121014 50%,#09080b)!important;border-right:0!important;border-bottom:1px solid rgba(255,255,255,.12)!important;scrollbar-width:none}
+.side-nav::-webkit-scrollbar{display:none}
+.sidebar-top,.sidebar-live,.sidebar-footer{display:none!important}
+.nav-link{height:42px!important;min-width:max-content!important;margin:0 1px!important;padding:0 13px!important;gap:8px!important;border-radius:8px!important;font-size:11px!important;color:#c8c1c5!important;border:1px solid transparent!important}
+.nav-link svg{width:16px!important;height:16px!important}
+.nav-link.active{background:linear-gradient(180deg,#f10c32,#a90022)!important;border-color:#ff536c!important;box-shadow:0 4px 18px rgba(240,0,42,.35)!important}
+.page-area{order:1!important;width:100%!important;max-width:1600px!important;margin:0 auto!important;padding:18px clamp(14px,2.2vw,34px) 40px!important;background:transparent!important;color:#fff!important}
+.page-topline{height:30px!important;margin-bottom:15px!important}
+.page-content{width:100%!important;max-width:none!important}
+.page-heading{display:flex!important;align-items:flex-end!important;justify-content:space-between!important;gap:20px!important;margin:12px 0 22px!important;padding:0 0 15px!important;border-bottom:1px solid rgba(255,255,255,.13)!important;position:relative}
+.page-heading:after{content:"";position:absolute;left:0;bottom:-1px;width:100px;height:2px;background:#ff183a;box-shadow:0 0 12px #ff183a}
+.page-heading h1{font-size:clamp(32px,3vw,46px)!important;line-height:1!important;letter-spacing:.3px!important}
+.page-heading p{font-size:12px!important;color:#aaa!important}
+.eyebrow{color:#ff6479!important;letter-spacing:2px!important;font-size:9px!important}
+.heading-mark{width:52px!important;height:52px!important;border-radius:12px!important;background:linear-gradient(145deg,#ed1033,#710018)!important;box-shadow:0 0 24px rgba(255,0,40,.22)!important}
+.home-hero{display:grid!important;grid-template-columns:minmax(0,1.8fr) minmax(280px,.8fr)!important;gap:14px!important;min-height:340px!important}
+.hero-main{min-height:340px!important;border:1px solid rgba(255,39,66,.55)!important;border-radius:15px!important;overflow:hidden!important;box-shadow:0 18px 50px rgba(0,0,0,.45)!important}
+.hero-image img{object-fit:cover!important;object-position:center 30%!important}
+.hero-shade{background:linear-gradient(90deg,rgba(4,3,7,.92),rgba(4,3,7,.55) 48%,rgba(4,3,7,.08)),linear-gradient(0deg,rgba(4,3,7,.88),transparent 62%)!important}
+.hero-content{left:clamp(18px,3vw,38px)!important;bottom:28px!important;max-width:72%!important}
+.hero-content h1{font-size:clamp(36px,4vw,58px)!important}
+.hero-content p{font-size:clamp(18px,2vw,27px)!important}
+.hero-play{border-radius:30px!important;padding:12px 20px!important;background:linear-gradient(100deg,#fa1739,#b60024)!important}
+.hero-side{display:grid!important;grid-template-columns:1fr!important;grid-template-rows:1fr 1fr!important;gap:12px!important}
+.mini-live-card,.mini-event-card{border-radius:13px!important;overflow:hidden!important;border:1px solid rgba(255,35,60,.35)!important;background:linear-gradient(145deg,#1b1016,#09090d)!important}
+.mini-live-art{height:115px!important}
+.quick-categories,.home-section{margin-top:26px!important}
+.section-title-row{margin-bottom:13px!important}
+.section-title-row h2{font-size:25px!important}
+.category-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:10px!important}
+.category-tile{height:68px!important;border-radius:10px!important;background:linear-gradient(145deg,#1a151a,#0b0a0e)!important;border:1px solid rgba(255,255,255,.12)!important}
+.clip-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:13px!important}
+.clip-card{border-radius:12px!important;overflow:hidden!important;background:linear-gradient(145deg,#171219,#09090d)!important;border:1px solid rgba(255,255,255,.12)!important}
+.clip-picture{aspect-ratio:16/9!important}
+.clip-info{padding:11px!important}
+.artist-strip{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:12px!important}
+.artist-strip>a{border:1px solid rgba(255,255,255,.12)!important;border-radius:12px!important;background:#100d12!important;padding:12px!important}
+.cnr-ad-placement{min-height:80px!important;margin:14px 0!important;border-radius:10px!important}
+
+/* News becomes a real three-column newsroom with a dominant lead story */
+.newsroom-masthead{min-height:190px!important;padding:28px 34px!important;border:1px solid rgba(255,36,60,.48)!important;border-radius:14px!important;background:radial-gradient(ellipse at 82% 50%,rgba(255,0,43,.26),transparent 42%),linear-gradient(110deg,#260c16,#0b0a0e 65%,#1a080e)!important}
+.newsroom-masthead h2{font-size:clamp(34px,4vw,52px)!important;line-height:1!important}
+.newsroom-mark{width:110px!important;height:110px!important;flex-basis:110px!important;border-radius:50%!important;border:1px solid rgba(255,40,70,.42)!important;background:radial-gradient(circle,rgba(255,0,45,.22),transparent 70%)!important}
+.news-live-meta{display:flex!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important;margin:14px 0!important}
+.news-feed-grid{display:grid!important;grid-template-columns:minmax(0,1.55fr) minmax(250px,.9fr) minmax(220px,.8fr)!important;gap:13px!important;align-items:start!important}
+.news-feed-card{display:flex!important;flex-direction:column!important;grid-column:auto!important;grid-row:auto!important;overflow:hidden!important;border:1px solid rgba(255,255,255,.13)!important;border-radius:12px!important;background:linear-gradient(145deg,#191319,#09090d)!important}
+.news-feed-card.featured{grid-column:1!important;grid-row:span 2!important}
+.news-feed-image,.news-feed-card.featured .news-feed-image{display:block!important;width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:16/9!important;overflow:hidden!important}
+.news-feed-image img{width:100%!important;height:100%!important;object-fit:cover!important;display:block!important}
+.news-feed-body{padding:13px 15px!important}
+.news-feed-body h3{font-size:15px!important;line-height:1.3!important}
+.news-feed-card.featured .news-feed-body h3{font-size:clamp(21px,2vw,28px)!important;line-height:1.13!important}
+.news-feed-body p{font-size:11px!important;line-height:1.55!important;color:#aaa!important}
+.news-feed-body>div{display:flex!important;justify-content:space-between!important;align-items:center!important;margin-top:10px!important}
+.news-feed-body>div a{color:#ff657b!important;font-size:10px!important;font-weight:800!important}
+.news-feed-placeholder{display:grid!important;place-items:center!important;background:radial-gradient(circle,#531021,#100a0e)!important;color:#ff6077!important}
+.news-weather-widget{border-radius:12px!important;clip-path:none!important}
+
+/* Weather dashboard visual hierarchy */
+.weather-hero{min-height:250px!important;padding:25px 30px!important;border-radius:14px!important;border:1px solid rgba(255,37,62,.45)!important;background:radial-gradient(ellipse at 85% 15%,rgba(255,65,80,.23),transparent 42%),linear-gradient(120deg,#270e17,#0d0d12 68%,#17080e)!important}
+.weather-main strong{font-size:clamp(62px,7vw,88px)!important}
+.weather-details{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
+.weather-details article{padding:18px!important;border-radius:12px!important;border:1px solid rgba(255,255,255,.12)!important;background:linear-gradient(145deg,#1a151b,#0a0a0e)!important}
+.stats-grid{gap:12px!important}
+.stats-card,.stats-panel{border-radius:13px!important;border:1px solid rgba(255,255,255,.13)!important;background:linear-gradient(145deg,#19141a,#09090d)!important}
+.site-footer{max-width:none!important;border-top:1px solid rgba(255,30,55,.25)!important;margin-top:32px!important}
+.mobile-dock{z-index:80!important}
+@media(max-width:1150px){
+ .top-header{grid-template-columns:220px minmax(0,1fr) auto!important}
+ .brand-lockup img{width:215px!important}
+ .news-feed-grid{grid-template-columns:minmax(0,1.2fr) minmax(230px,1fr)!important}
+ .news-feed-card.featured{grid-column:1!important;grid-row:span 2!important}
+ .category-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .clip-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+ .top-header{height:68px!important;grid-template-columns:1fr auto!important;padding:5px 10px!important}
+ .brand-lockup img{width:180px!important;height:58px!important}
+ .republic-banner{display:none!important}
+ .app-frame{display:flex!important}
+ .side-nav{height:50px!important;padding:5px 8px!important}
+ .nav-link{height:38px!important;padding:0 10px!important;font-size:10px!important}
+ .page-area{padding:12px 10px 100px!important}
+ .page-topline{display:none!important}
+ .page-heading{margin:8px 0 17px!important}
+ .page-heading h1{font-size:30px!important}
+ .home-hero{grid-template-columns:1fr!important;min-height:0!important}
+ .hero-main{min-height:260px!important}
+ .hero-content{left:16px!important;right:16px!important;bottom:17px!important;max-width:94%!important}
+ .hero-content h1{font-size:35px!important}
+ .hero-side{grid-template-columns:1fr 1fr!important;grid-template-rows:auto!important}
+ .mini-live-art{height:85px!important}
+ .category-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .clip-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .artist-strip{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .newsroom-masthead{min-height:150px!important;padding:17px!important}
+ .newsroom-masthead h2{font-size:32px!important}
+ .newsroom-mark{width:65px!important;height:65px!important;flex-basis:65px!important}
+ .news-live-meta{align-items:flex-start!important;flex-direction:column!important;gap:5px!important}
+ .news-feed-grid{grid-template-columns:1fr!important}
+ .news-feed-card.featured{grid-column:auto!important;grid-row:auto!important}
+ .news-feed-card.featured .news-feed-body h3{font-size:22px!important}
+ .weather-hero{min-height:220px!important;padding:16px!important}
+ .weather-details{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
+ .weather-details article{padding:10px 7px!important}
+ .stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
