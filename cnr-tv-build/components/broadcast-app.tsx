@@ -230,6 +230,11 @@ export default function BroadcastApp() {
   const [clock, setClock] = useState(new Date());
   const [weatherData, setWeatherData] = useState<{temperature:number;apparent:number;humidity:number;wind:number;code:number;high:number;low:number}|null>(null);
   const [weatherError, setWeatherError] = useState("");
+  const [newsArticles, setNewsArticles] = useState<Array<{title:string;summary:string;url:string;image:string|null;source:string;category:string;publishedAt:string}>>([]);
+  const [newsLoading, setNewsLoading] = useState(false);
+  const [newsError, setNewsError] = useState("");
+  const [newsUpdatedAt, setNewsUpdatedAt] = useState("");
+
   const [localVisitTotal, setLocalVisitTotal] = useState(0);
 
   const activeNationalDay = getActiveNationalDay(clock);
@@ -324,6 +329,22 @@ export default function BroadcastApp() {
     const timer = window.setInterval(() => setClock(new Date()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadWeather = async () => {
+      try {
+        const response = await fetch("/api/weather?lat=38.3554&lon=38.3095", { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Meteoroloji verisi alınamadı.");
+        if (!cancelled) { setWeatherData({ temperature:data.current.temperature_2m, apparent:data.current.apparent_temperature, humidity:data.current.relative_humidity_2m, wind:data.current.wind_speed_10m, code:data.current.weather_code, high:data.daily.temperature_2m_max[0], low:data.daily.temperature_2m_min[0] }); setWeatherError(""); }
+      } catch (error) { if (!cancelled) setWeatherError(error instanceof Error ? error.message : "Hava durumu verisine ulaşılamadı."); }
+    };
+    void loadWeather();
+    const timer = window.setInterval(loadWeather, 10 * 60 * 1000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, []);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -713,6 +734,24 @@ export default function BroadcastApp() {
     }).slice(0, 12);
   }, [clips]);
 
+  useEffect(() => {
+    if (pathname !== "/haberler") return;
+    let cancelled = false;
+    const loadNews = async () => {
+      setNewsLoading(true);
+      try {
+        const response = await fetch("/api/news", { cache: "no-store" });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Haber akışı alınamadı.");
+        if (!cancelled) { setNewsArticles(Array.isArray(data.articles) ? data.articles : []); setNewsUpdatedAt(data.updatedAt || ""); setNewsError(data.articles?.length ? "" : "Şu anda haber kaynağından içerik alınamıyor."); }
+      } catch (error) { if (!cancelled) setNewsError(error instanceof Error ? error.message : "Haberler yüklenemedi."); }
+      finally { if (!cancelled) setNewsLoading(false); }
+    };
+    void loadNews();
+    const timer = window.setInterval(loadNews, 5 * 60 * 1000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [pathname]);
+
   const visibleArtists = useMemo(() => {
     const query = directorySearch.trim().toLocaleLowerCase("tr-TR");
     return artists.filter((artist) => !query || (artist.name + " " + (artist.genre || "")).toLocaleLowerCase("tr-TR").includes(query));
@@ -1078,11 +1117,22 @@ export default function BroadcastApp() {
     </>;
   } else if (pathname === "/haberler") {
     content = <>
-      {pageHeading("CNR NEWSROOM", "Haberler", "CNR Müzik TV ve müzik dünyasından duyurular.")}
-      <div className="newsroom-masthead"><div><span className="eyebrow">CNR NEWSROOM · RESMÎ KANAL</span><h2>Müzik dünyasından<br/><em>haber ve duyurular.</em></h2><p>Yalnızca doğrulanmış CNR Müzik TV açıklamaları ve yayın güncellemeleri.</p></div><div className="newsroom-mark"><Newspaper size={62}/><b>CNR<br/>NEWS</b></div></div>
-      <div className="newsroom-grid"><article className="newsroom-main"><span className="news-tag">YAYIN DUYURUSU</span><h3>CNR Müzik TV yayın merkezi</h3><p>Canlı yayın, program akışı ve klip kataloğundaki güncel içeriklere tek merkezden ulaş.</p><div className="newsroom-actions"><Link href="/canli-yayin" className="red-link">Canlı yayına geç <ChevronRight size={16}/></Link><Link href="/yayin-akisi" className="red-link">Yayın akışını gör <ChevronRight size={16}/></Link></div></article>
-      <aside className="newsroom-side"><span className="eyebrow">HIZLI BAĞLANTILAR</span><Link href="/programlar">Program duyuruları <ChevronRight size={15}/></Link><Link href="/klip-arsivi">Yeni klipler <ChevronRight size={15}/></Link><Link href="/etkinlikler">Etkinlik takvimi <ChevronRight size={15}/></Link></aside></div>
-      <div className="newsroom-foot"><Bell size={20}/><div><b>Resmî haber akışı</b><span>Henüz doğrulanmış yeni bir haber yayımlanmadı. Burada örnek veya doğrulanmamış başlık gösterilmez.</span></div><span className="newsroom-live">EDİTORYAL</span></div>
+      {pageHeading("CNR NEWSROOM", "Haberler", "Türkiye'den ve dünyadan güncel haberler; kaynak ve yayın zamanı ile.")}
+      <Link href="/hava-durumu" className="news-weather-widget">
+        <div className="news-weather-icon"><CloudSun size={42}/><span className="weather-orbit"/></div>
+        <div className="news-weather-copy"><span className="eyebrow">CNR WEATHER · MALATYA</span><b>{weatherData ? Math.round(weatherData.temperature)+"°C" : "—°C"} <small>{weatherData ? (weatherData.code===0?"Açık":[1,2,3].includes(weatherData.code)?"Parçalı bulutlu":"Değişken") : weatherError || "Canlı veri yükleniyor"}</small></b><span>{weatherData ? "Hissedilen "+Math.round(weatherData.apparent)+"° · Nem %"+weatherData.humidity : "Meteoroloji verisi güncelleniyor"}</span></div>
+        <div className="news-weather-action"><span>DETAYLI HAVA DURUMU</span><ChevronRight size={20}/></div>
+      </Link>
+      <div className="newsroom-masthead"><div><span className="eyebrow">CNR NEWSROOM · CANLI HABER AKIŞI</span><h2>Gündemden<br/><em>haberdar kal.</em></h2><p>Haber kaynaklarından alınan güncel başlıklar. Her haberin orijinal kaynağına ulaşabilirsin.</p></div><div className="newsroom-mark"><Newspaper size={62}/><b>CNR<br/>NEWS</b></div></div>
+      <div className="news-live-meta"><span><i/> CANLI KAYNAK TARAMASI</span><small>{newsUpdatedAt ? "Son güncelleme: "+new Date(newsUpdatedAt).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}) : "Kaynaklar kontrol ediliyor"} · 5 dakikada yenilenir</small></div>
+      {newsLoading && newsArticles.length===0 && <div className="news-loading"><Activity/> Haber kaynakları yükleniyor…</div>}
+      {newsError && <div className="news-error"><Info size={17}/>{newsError}</div>}
+      <div className="news-feed-grid">{newsArticles.map((article,index)=><article className={index===0?"news-feed-card featured":"news-feed-card"} key={article.url}>
+        {article.image ? <a href={article.url} target="_blank" rel="noopener noreferrer" className="news-feed-image"><img src={article.image} alt="" loading="lazy"/></a> : <a href={article.url} target="_blank" rel="noopener noreferrer" className="news-feed-image news-feed-placeholder"><Newspaper size={34}/></a>}
+        <div className="news-feed-body"><span className="news-tag">{article.category} · {article.source}</span><h3><a href={article.url} target="_blank" rel="noopener noreferrer">{article.title}</a></h3><p>{article.summary}</p><div><small>{new Date(article.publishedAt).toLocaleString("tr-TR",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</small><a href={article.url} target="_blank" rel="noopener noreferrer">Kaynağa git <ExternalLink size={13}/></a></div></div>
+      </article>)}</div>
+      <AdPlacement className="cnr-ad-news-mid" slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_NEWS || ""} label="Sponsorlu içerik" format="horizontal" />
+      <div className="newsroom-foot"><Bell size={20}/><div><b>Haber kaynağı şeffaflığı</b><span>Başlıklar TRT Haber, BBC News Türkçe, Anadolu Ajansı ve NTV RSS akışlarından derlenir; içeriklerin telif ve yayın sorumluluğu ilgili kaynaklara aittir.</span></div><span className="newsroom-live">EDİTORYAL</span></div>
     </>;
   } else if (pathname === "/etkinlikler") {
     content = <>
