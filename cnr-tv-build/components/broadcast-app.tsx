@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import AdPlacement from "@/components/ad-placement";
+import ProfilePortal from "@/components/profile-portal";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -1147,18 +1148,7 @@ export default function BroadcastApp() {
       <div className="about-metrics"><div><Radio /><b>7/24</b><span>Yayın hedefi</span></div><div><MonitorPlay /><b>{clips.length || "—"}</b><span>Klip kataloğu</span></div><div><Users /><b>CNR</b><span>Müzik Yapım</span></div><div><Signal /><b>Türkiye</b><span>Dijital yayın</span></div></div>
     </>;
   } else if (pathname === "/profil") {
-    content = <>
-      {pageHeading("PERSONAL SPACE", "Profil & Ayarlar", "CNR Müzik TV deneyimini düzenle.")}
-      <div className="profile-card"><div className="profile-avatar">MC</div><div><span className="verified">✓ SANATÇI PROFİLİ</span><h2>Memet Çınar</h2><p>@memetcinarofficial · CNR Müzik Yapım®</p></div><Link href="/sanatci/memet-cinar" className="profile-edit">Profili Görüntüle <ChevronRight size={15} /></Link></div>
-      <div className="profile-tabs">{["Hesabım", "Listelerim", "Ayarlar"].map((tab) => <button key={tab} className={profileTab === tab ? "active" : ""} onClick={() => setProfileTab(tab)}>{tab}</button>)}</div>
-      {profileTab === "Hesabım" && <div className="settings-list"><button onClick={() => router.push("/sanatci/memet-cinar")}><UserCircle2 /><span><b>Sanatçı profilim</b><small>Herkese açık profilini görüntüle</small></span><ChevronRight /></button><button onClick={() => notify("Hesap ayrıntıları CNR üyelik sistemi bağlandığında açılacak.")}><Settings /><span><b>Hesap bilgileri</b><small>Üyelik ve iletişim ayarları</small></span><ChevronRight /></button></div>}
-      {profileTab === "Listelerim" && <><div className="section-title-row"><div><span className="eyebrow">KİŞİSEL KOLEKSİYON</span><h2>Favori Kliplerim</h2></div><span className="result-count">{favorites.length} KAYIT</span></div><div className="clip-grid">{clips.filter((clip) => favorites.includes(clip.id)).map(renderClipCard)}</div>{favorites.length === 0 && <div className="empty-state compact"><Heart size={30} /><b>Henüz favorin yok</b><span>Klip arşivinden beğendiğin kayıtları favorilerine ekle.</span><Link href="/klip-arsivi">Klip arşivine git</Link></div>}</>}
-      {profileTab === "Ayarlar" && <div className="settings-list">
-        <button type="button" role="switch" aria-checked={darkMode} onClick={toggleDark}><span className="settings-icon"><Sparkles /></span><span><b>Karanlık Mod</b><small>Arayüz temasını değiştir ve tercihini kaydet</small></span><span className={darkMode ? "toggle on" : "toggle"} /></button>
-        <button type="button" role="switch" aria-checked={soundEnabled} onClick={toggleSoundPreference}><span className="settings-icon"><Volume2 /></span><span><b>Ses Tercihi</b><small>Canlı yayının sesini aç veya sessize al</small></span><span className={soundEnabled ? "toggle on" : "toggle"} /></button>
-        <button type="button" role="switch" aria-checked={subtitleEnabled} onClick={toggleSubtitles}><span className="settings-icon"><Captions /></span><span><b>Altyazılar</b><small>Desteklenen videolarda altyazıyı aç veya kapat</small></span><span className={subtitleEnabled ? "toggle on" : "toggle"} /></button>
-      </div>}
-    </>;
+    content = <ProfilePortal />;
   } else {
     const heroClip = current || clips[0];
     content = <>
