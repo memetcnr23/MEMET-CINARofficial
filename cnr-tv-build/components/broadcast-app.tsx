@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import AdPlacement from "@/components/ad-placement";
+import SponsorBand from "@/components/sponsor-band";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -92,7 +93,7 @@ declare global {
   }
 }
 
-const LOGO = "/cnr-logo.webp";
+const LOGO = "https://d2ol7oe51mr4n9.cloudfront.net/user_3BSfttb3qRIKdXTZL8MopavFapy/e805eeb4-e806-4f04-a963-902a43efb92b.png";
 const HLS_STREAM = process.env.NEXT_PUBLIC_CNR_HLS_URL || "";
 // Default: HLS per-clip when available, YouTube embed fallback otherwise.
 // Set NEXT_PUBLIC_CNR_PLAYER_MODE=hls to enforce HLS-only mode.
@@ -110,7 +111,7 @@ const navItems = [
   { label: "Etkinlikler", href: "/etkinlikler", icon: CalendarRange },
   { label: "İstatistik Merkezi", href: "/istatistikler", icon: Activity },
   { label: "Hakkımızda", href: "/hakkimizda", icon: Info },
-  { label: "Profil & Ayarlar", href: "/profil", icon: UserCircle2 },
+  { label: "Üye Hesabım", href: "/hesabim", icon: UserCircle2 },
 ];
 function LayersIcon(props: React.ComponentProps<typeof Activity>) { return <Activity {...props} />; }
 
@@ -1059,6 +1060,9 @@ export default function BroadcastApp() {
       <div className="about-metrics"><div><Radio /><b>7/24</b><span>Yayın hedefi</span></div><div><MonitorPlay /><b>{clips.length || "—"}</b><span>Klip kataloğu</span></div><div><Users /><b>CNR</b><span>Müzik Yapım</span></div><div><Signal /><b>Türkiye</b><span>Dijital yayın</span></div></div>
     </>;
   } else if (pathname === "/profil") {
+    router.replace("/hesabim");
+    content = <div className="empty-state compact">Hesabına yönlendiriliyorsun…</div>;
+  } else if (pathname === "/profil-legacy-disabled") {
     content = <>
       {pageHeading("PERSONAL SPACE", "Profil & Ayarlar", "CNR Müzik TV deneyimini düzenle.")}
       <div className="profile-card"><div className="profile-avatar">MC</div><div><span className="verified">✓ SANATÇI PROFİLİ</span><h2>Memet Çınar</h2><p>@memetcinarofficial · CNR Müzik Yapım®</p></div><Link href="/sanatci/memet-cinar" className="profile-edit">Profili Görüntüle <ChevronRight size={15} /></Link></div>
@@ -1087,6 +1091,7 @@ export default function BroadcastApp() {
         </div>
       </section>
       <AdPlacement className="cnr-ad-home-top" slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP || ""} label="CNR Müzik TV sponsorlu alanı" format="horizontal" />
+      <SponsorBand />
       <section className="quick-categories"><div className="section-title-row"><div><span className="eyebrow">TARZINI SEÇ</span><h2>Kategoriler</h2></div><Link href="/muzik-listeleri">Tüm listeler <ChevronRight size={15} /></Link></div><div className="category-grid">{categoryNames.slice(1).map((name, i) => <button className={"category-tile cat-color-" + i} key={name} onClick={() => { setSelectedCategory(name); router.push("/muzik-listeleri"); }}><span>{i === 0 ? <Mic2 /> : i === 1 ? <Activity /> : i === 2 ? <Disc3 /> : i === 3 ? <Heart /> : <Trophy />}</span><b>{name}</b><ChevronRight size={15} /></button>)}</div></section>
       <AdPlacement className="cnr-ad-home-mid" slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_MID || ""} label="Öne çıkan içerikler arasında" format="horizontal" />
       <section className="home-section"><div className="section-title-row"><div><span className="eyebrow">ŞİMDİ YAYINDA</span><h2>Öne Çıkan Klipler</h2></div><Link href="/klip-arsivi">Klip arşivi <ChevronRight size={15} /></Link></div>{clips.length ? <div className="clip-grid">{clips.slice(0, 4).map(renderClipCard)}</div> : <div className="empty-state compact"><Radio size={28} /><b>{catalogError || "Yayın kataloğu yükleniyor"}</b><span>Son başarılı yayın kataloğu varsa otomatik kullanılacaktır.</span></div>}</section>
@@ -1099,7 +1104,7 @@ export default function BroadcastApp() {
     <header className="top-header">
       <Link href="/" className="brand-lockup"><Image src={LOGO} alt="CNR Müzik TV" width={230} height={78} priority unoptimized /><span>TÜRKİYE'NİN MÜZİK TELEVİZYONU</span></Link>
       <div className="republic-banner"><Image src="/ataturk-flag.webp" alt="Atatürk ve Türk bayrağı" width={180} height={180} unoptimized priority /><span>CUMHURİYETİN IŞIĞINDA</span></div>
-      <div className="header-tools"><div className="digital-clock"><b>{h}</b><span>{clock.toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric" })}</span></div><button className="header-icon" onClick={() => setSearchOpen(true)} aria-label="Ara"><Search /></button><div className="notification-wrap"><button className="header-icon" onClick={() => setNotificationsOpen((v) => !v)} aria-label="Bildirimler"><Bell /><i /></button>{notificationsOpen && <div className="notification-popover"><b>CNR Bildirimleri</b><p>Yeni program ve klip duyuruları burada görünecek.</p><button onClick={() => setNotificationsOpen(false)}>Tamam</button></div>}</div><Link href="/profil" className="header-icon" aria-label="Profil"><UserCircle2 /></Link></div>
+      <div className="header-tools"><div className="digital-clock"><b>{h}</b><span>{clock.toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric" })}</span></div><button className="header-icon" onClick={() => setSearchOpen(true)} aria-label="Ara"><Search /></button><div className="notification-wrap"><button className="header-icon" onClick={() => setNotificationsOpen((v) => !v)} aria-label="Bildirimler"><Bell /><i /></button>{notificationsOpen && <div className="notification-popover"><b>CNR Bildirimleri</b><p>Yeni program ve klip duyuruları burada görünecek.</p><button onClick={() => setNotificationsOpen(false)}>Tamam</button></div>}</div><Link href="/hesabim" className="header-icon" aria-label="Hesap"><UserCircle2 /></Link></div>
     </header>
     <div className="mobile-titlebar"><button onClick={() => setMobileMenu((v) => !v)} aria-label="Menüyü aç"><Menu /></button><Link href="/"><Image src={LOGO} alt="CNR Müzik TV" width={154} height={52} unoptimized /></Link><button onClick={() => setSearchOpen(true)} aria-label="Ara"><Search /></button></div>
     <div className="app-frame">
