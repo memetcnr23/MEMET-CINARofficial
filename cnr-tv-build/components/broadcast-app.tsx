@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import AdPlacement from "@/components/ad-placement";
+import SponsorBand from "@/components/sponsor-band";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -1090,6 +1091,7 @@ export default function BroadcastApp() {
         </div>
       </section>
       <AdPlacement className="cnr-ad-home-top" slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_TOP || ""} label="CNR Müzik TV sponsorlu alanı" format="horizontal" />
+      <SponsorBand />
       <section className="quick-categories"><div className="section-title-row"><div><span className="eyebrow">TARZINI SEÇ</span><h2>Kategoriler</h2></div><Link href="/muzik-listeleri">Tüm listeler <ChevronRight size={15} /></Link></div><div className="category-grid">{categoryNames.slice(1).map((name, i) => <button className={"category-tile cat-color-" + i} key={name} onClick={() => { setSelectedCategory(name); router.push("/muzik-listeleri"); }}><span>{i === 0 ? <Mic2 /> : i === 1 ? <Activity /> : i === 2 ? <Disc3 /> : i === 3 ? <Heart /> : <Trophy />}</span><b>{name}</b><ChevronRight size={15} /></button>)}</div></section>
       <AdPlacement className="cnr-ad-home-mid" slot={process.env.NEXT_PUBLIC_ADSENSE_SLOT_HOME_MID || ""} label="Öne çıkan içerikler arasında" format="horizontal" />
       <section className="home-section"><div className="section-title-row"><div><span className="eyebrow">ŞİMDİ YAYINDA</span><h2>Öne Çıkan Klipler</h2></div><Link href="/klip-arsivi">Klip arşivi <ChevronRight size={15} /></Link></div>{clips.length ? <div className="clip-grid">{clips.slice(0, 4).map(renderClipCard)}</div> : <div className="empty-state compact"><Radio size={28} /><b>{catalogError || "Yayın kataloğu yükleniyor"}</b><span>Son başarılı yayın kataloğu varsa otomatik kullanılacaktır.</span></div>}</section>
