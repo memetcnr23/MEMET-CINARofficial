@@ -20,7 +20,7 @@ export default function SponsorBand() {
     <div className="cnr-sponsor-heading"><span /> <b>SPONSORLARIMIZ & İŞ ORTAKLARIMIZ</b> <span /></div>
     <div className="cnr-sponsor-grid">
       {sponsors.map((sponsor) => <div className={"cnr-sponsor-logo " + sponsor.tone} key={sponsor.tone}>
-        {sponsor.tone === "tv" && <span className="cnr-sponsor-play">▶</span>}
+        {(sponsor.tone === "tv" || sponsor.tone === "label") && <img className="cnr-sponsor-image" src="/cnr-logo.webp" alt="CNR Müzik Yapım ve CNR Müzik TV logosu" />}
         {sponsor.tone === "label" && <span className="cnr-sponsor-eq">▂▅▇▅▂</span>}
         {sponsor.tone === "association" && <span className="cnr-sponsor-crown">♛</span>}
         {sponsor.tone === "cafe" && <span className="cnr-sponsor-seal">C</span>}
