@@ -14,7 +14,7 @@ export async function GET() {
     .select("id,username,full_name,avatar_url,bio,role,is_public,created_at,updated_at")
     .eq("id", userId).maybeSingle();
   if (error) return NextResponse.json({ error: "Profil yüklenemedi." }, { status: 502 });
-  return NextResponse.json({ user: { id: userId, email: claimsData.claims.email ?? null }, profile }, {
+  return NextResponse.json({ user: { id: userId, email: claimsData?.claims?.email ?? null }, profile }, {
     headers: { "Cache-Control": "private, no-store, max-age=0" }
   });
 }
