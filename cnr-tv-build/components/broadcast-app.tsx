@@ -965,15 +965,21 @@ export default function BroadcastApp() {
           <div className="live-screen">
             <div className="screen-top"><span className="live-dot"><i /> CANLI</span><span className="screen-quality">CNR MÜZİK TV · HD</span></div>
             <div className="special-day-bug cnr-permanent-flag" aria-label="Atatürk 10 Kasım animasyonu">
-              <iframe
-                src="https://giphy.com/embed/Sqs3q0jJuafiJ6FAUn"
-                title="Atatürk 10 Kasım animasyonu"
-                className="cnr-ataturk-giphy"
-                width="480"
-                height="480"
-                frameBorder="0"
-                allowFullScreen
-              />
+              <div className="cnr-giphy-embed">
+                <iframe
+                  src="https://giphy.com/embed/Sqs3q0jJuafiJ6FAUn"
+                  width="100%"
+                  height="100%"
+                  style={{ position: "absolute" }}
+                  frameBorder="0"
+                  className="giphy-embed"
+                  allowFullScreen
+                  title="Atatürk 10 Kasım animasyonu"
+                />
+              </div>
+              <p className="cnr-giphy-credit">
+                <a href="https://giphy.com/stickers/justenglishtr-atatrk-10kasim-kasim-Sqs3q0jJuafiJ6FAUn" target="_blank" rel="noreferrer">via GIPHY</a>
+              </p>
             </div>
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
             <div className={"cnr-video-transition " + (videoTransitioning ? "is-active" : "")} aria-hidden="true" />
