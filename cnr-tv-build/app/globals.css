@@ -775,3 +775,12 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
     width:clamp(58px,12%,76px)!important;
   }
 }
+
+
+/* Optical correction from the latest mobile screenshot: GIF artwork has internal transparent padding, so lift it to visually match the logo. */
+@media(max-width:720px){
+  .live-screen .cnr-permanent-flag{
+    top:4%!important;
+    right:8%!important;
+  }
+}
