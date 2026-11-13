@@ -1,2 +1,2 @@
-import BroadcastApp from "@/components/broadcast-app";
-export default function HomePage() { return <BroadcastApp />; }
+import { redirect } from "next/navigation";
+export default function HomePage() { redirect("/canli-yayin"); }
