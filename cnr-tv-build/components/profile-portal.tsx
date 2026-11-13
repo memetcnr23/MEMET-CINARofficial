@@ -53,7 +53,7 @@ export default function ProfilePortal() {
       if (mode === "signup") {
         const { data, error: authError } = await supabase.auth.signUp({
           email: email.trim(), password,
-          options: { data: { full_name: fullName.trim() }, emailRedirectTo: window.location.origin + "/auth/callback?next=/profil" }
+          options: { data: { full_name: fullName.trim() }, emailRedirectTo: "https://cnr-muzik-tv.vercel.app/auth/callback?next=/profil" }
         });
         if (authError) throw authError;
         if (data.session) await loadProfile();
