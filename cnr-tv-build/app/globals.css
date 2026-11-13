@@ -746,3 +746,32 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
   .live-channel-bug{top:58px!important;left:8.5%!important;}
   .cnr-permanent-flag{top:58px!important;right:10.5%!important;}
 }
+
+
+/* Reference-match: balanced inset channel marks inside the player, aligned across one horizontal row. */
+.live-screen .live-channel-bug{
+  top:9%!important;
+  left:8%!important;
+  right:auto!important;
+  width:clamp(112px,25%,176px)!important;
+}
+.live-screen .cnr-permanent-flag{
+  top:9%!important;
+  right:8%!important;
+  left:auto!important;
+  width:clamp(66px,12%,92px)!important;
+  height:auto!important;
+  aspect-ratio:1/1!important;
+}
+@media(max-width:720px){
+  .live-screen .live-channel-bug{
+    top:9%!important;
+    left:8%!important;
+    width:clamp(104px,27%,150px)!important;
+  }
+  .live-screen .cnr-permanent-flag{
+    top:9%!important;
+    right:8%!important;
+    width:clamp(58px,12%,76px)!important;
+  }
+}
