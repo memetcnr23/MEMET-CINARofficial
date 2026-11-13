@@ -964,12 +964,15 @@ export default function BroadcastApp() {
         <div className="live-primary">
           <div className="live-screen">
             <div className="screen-top"><span className="live-dot"><i /> CANLI</span><span className="screen-quality">CNR MÜZİK TV · HD</span></div>
-            <div className="special-day-bug cnr-permanent-flag" role="img" aria-label="Atatürk ve Türk bayrağı">
-              <img
-                src="/ataturk-flag.webp"
-                alt=""
-                aria-hidden="true"
-                draggable={false}
+            <div className="special-day-bug cnr-permanent-flag" aria-label="Atatürk 10 Kasım animasyonu">
+              <iframe
+                src="https://giphy.com/embed/Sqs3q0jJuafiJ6FAUn"
+                title="Atatürk 10 Kasım animasyonu"
+                className="cnr-ataturk-giphy"
+                width="480"
+                height="480"
+                frameBorder="0"
+                allowFullScreen
               />
             </div>
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
