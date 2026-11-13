@@ -784,3 +784,77 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
     right:8%!important;
   }
 }
+
+
+/* CNR ACCOUNT — complete responsive member portal */
+.cnr-profile-page{position:relative;isolation:isolate;overflow:hidden;min-height:calc(100vh - 190px);padding:clamp(22px,4vw,54px) clamp(14px,3vw,34px) 76px;color:#f7f4f5;background:radial-gradient(ellipse at 12% 8%,rgba(115,9,31,.22),transparent 34%),radial-gradient(ellipse at 92% 88%,rgba(93,8,26,.15),transparent 36%);}
+.cnr-profile-shell{position:relative;z-index:1;width:min(100%,1080px);margin:0 auto;display:grid;grid-template-columns:minmax(0,.92fr) minmax(340px,1.08fr);gap:clamp(18px,3vw,32px);align-items:stretch;}
+.cnr-profile-glow{position:absolute;z-index:-1;width:320px;height:320px;border-radius:50%;filter:blur(100px);pointer-events:none;}
+.cnr-profile-glow-one{top:5%;left:-180px;background:rgba(214,16,54,.13);}
+.cnr-profile-glow-two{right:-180px;bottom:8%;background:rgba(128,15,40,.12);}
+.cnr-profile-hero{position:relative;display:flex;flex-direction:column;min-height:570px;overflow:hidden;padding:clamp(24px,4vw,42px);border:1px solid rgba(239,43,77,.28);border-radius:22px;background:linear-gradient(145deg,rgba(49,12,24,.94),rgba(18,16,22,.98) 56%,rgba(10,10,15,.98));box-shadow:0 20px 60px rgba(0,0,0,.22);}
+.cnr-profile-hero:after{content:"CNR";position:absolute;right:-14px;bottom:34px;color:rgba(255,255,255,.025);font:900 clamp(100px,18vw,190px)/.8 Arial,sans-serif;letter-spacing:-.1em;pointer-events:none;}
+.cnr-profile-brand{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:900;letter-spacing:1.5px;}
+.cnr-profile-brand-icon{display:grid;width:34px;height:34px;place-items:center;border:1px solid rgba(255,70,102,.35);border-radius:10px;background:rgba(230,22,60,.13);color:#ff6a86;}
+.cnr-profile-brand i{display:block;margin-top:4px;color:#a8a0a5;font-size:8px;font-style:normal;letter-spacing:2.2px;}
+.cnr-profile-hero-copy{margin-top:clamp(42px,7vw,82px);}
+.cnr-profile-eyebrow{display:block;color:#fa718a;font-size:10px;font-weight:900;letter-spacing:2.4px;}
+.cnr-profile-hero h1{max-width:480px;margin:15px 0 0;font-size:clamp(34px,4.6vw,55px);font-weight:950;line-height:1.04;letter-spacing:-1.9px;}
+.cnr-profile-hero h1 em{color:#ff607d;font-style:normal;}
+.cnr-profile-hero-copy p{max-width:420px;margin:20px 0 0;color:#b8afb5;font-size:14px;line-height:1.9;}
+.cnr-profile-benefits{display:grid;gap:17px;margin-top:clamp(34px,5vw,58px);}
+.cnr-profile-benefits>div{display:flex;align-items:center;gap:13px;}
+.cnr-profile-benefits svg{width:20px;height:20px;flex:0 0 auto;color:#ff6b86;}
+.cnr-profile-benefits b,.cnr-profile-benefits small{display:block;}
+.cnr-profile-benefits b{font-size:12px;font-weight:800;}
+.cnr-profile-benefits small{margin-top:3px;color:#928991;font-size:10px;}
+.cnr-profile-hero-foot{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:34px;color:#958a91;font-size:8px;font-weight:900;letter-spacing:1.5px;}
+.cnr-profile-live-dot{width:7px;height:7px;border-radius:50%;background:#fa355b;box-shadow:0 0 12px #fa355b;}
+.cnr-account-card{align-self:center;min-width:0;padding:clamp(22px,3.4vw,38px);border:1px solid rgba(255,255,255,.1);border-radius:22px;background:linear-gradient(155deg,rgba(25,24,31,.98),rgba(12,12,17,.99));box-shadow:0 24px 65px rgba(0,0,0,.36),inset 0 1px rgba(255,255,255,.035);}
+.cnr-account-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:27px;}
+.cnr-account-heading h2{margin:9px 0 0;font-size:clamp(23px,3vw,30px);font-weight:900;line-height:1.15;letter-spacing:-.8px;}
+.cnr-account-heading p{margin:9px 0 0;color:#9c949c;font-size:12px;line-height:1.6;overflow-wrap:anywhere;}
+.cnr-account-avatar{display:grid;width:52px;height:52px;flex:0 0 52px;place-items:center;border:1px solid rgba(255,77,110,.35);border-radius:16px;background:linear-gradient(145deg,rgba(211,18,57,.22),rgba(75,13,32,.2));color:#ff7890;}
+.cnr-account-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:0 0 24px;padding:5px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:#09090d;}
+.cnr-account-tabs button{min-height:42px;border-radius:8px;color:#9b939b;font-size:10px;font-weight:900;letter-spacing:1.1px;transition:background .2s,color .2s;}
+.cnr-account-tabs button.active{background:linear-gradient(100deg,#d8173e,#8f102d);color:#fff;box-shadow:0 5px 16px rgba(201,14,52,.24);}
+.cnr-account-form{display:grid;gap:17px;}
+.cnr-account-form>label{display:block;min-width:0;color:#d9d3d8;font-size:11px;font-weight:800;letter-spacing:.25px;}
+.cnr-account-input{display:block;width:100%;height:49px;margin-top:8px;padding:0 14px;border:1px solid rgba(255,255,255,.12);border-radius:10px;outline:none;background:#09090e;color:#fff;font-size:13px;transition:border-color .2s,box-shadow .2s;}
+.cnr-account-input::placeholder{color:#69636b;}
+.cnr-account-input:focus{border-color:rgba(255,76,111,.75);box-shadow:0 0 0 3px rgba(230,23,63,.1);}
+.cnr-account-field{position:relative;display:block;}
+.cnr-account-field>svg{position:absolute;z-index:1;top:24px;left:14px;color:#827983;pointer-events:none;}
+.cnr-account-field .cnr-account-input{padding-left:42px;}
+.cnr-account-textarea{height:120px;padding:13px 14px;resize:vertical;line-height:1.6;}
+.cnr-account-submit{display:flex;min-height:50px;width:100%;align-items:center;justify-content:center;gap:10px;margin-top:4px;border:1px solid rgba(255,113,139,.25);border-radius:10px;background:linear-gradient(100deg,#df183f,#a10e32);color:#fff;font-size:10px;font-weight:950;letter-spacing:1.35px;box-shadow:0 8px 22px rgba(185,12,48,.2);transition:filter .2s,transform .2s;}
+.cnr-account-submit:hover{filter:brightness(1.12);transform:translateY(-1px);}
+.cnr-account-submit:disabled{opacity:.6;cursor:wait;transform:none;}
+.cnr-account-secure{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:19px;color:#827a83;font-size:10px;}
+.cnr-account-secure svg{color:#d75b75;}
+.cnr-account-logout{display:flex;width:100%;align-items:center;justify-content:center;gap:8px;margin-top:15px;padding:13px;border:1px solid rgba(255,255,255,.1);border-radius:9px;color:#b6adb5;font-size:11px;font-weight:800;}
+.cnr-account-unavailable{text-align:center;padding:48px 8px;}
+.cnr-account-unavailable>svg{margin:0 auto 18px;color:#f3bd62;}
+.cnr-account-unavailable h2{margin:12px 0;font-size:24px;font-weight:900;}
+.cnr-account-unavailable p{color:#aaa1a9;font-size:12px;line-height:1.8;overflow-wrap:anywhere;}
+.cnr-account-alert{display:flex;align-items:flex-start;gap:9px;margin-top:17px;padding:12px;border-radius:9px;font-size:11px;line-height:1.6;overflow-wrap:anywhere;}
+.cnr-account-alert.error{border:1px solid rgba(248,83,103,.22);background:rgba(160,15,38,.13);color:#ffb4bf;}
+.cnr-account-alert.success{border:1px solid rgba(67,196,135,.22);background:rgba(17,125,76,.12);color:#9de6bd;}
+.cnr-account-alert svg{flex:0 0 auto;}
+.cnr-spin{animation:cnrProfileSpin 1s linear infinite;}
+@keyframes cnrProfileSpin{to{transform:rotate(360deg)}}
+@media(max-width:760px){
+ .cnr-profile-page{min-height:auto;padding:20px 14px 88px;}
+ .cnr-profile-shell{grid-template-columns:minmax(0,1fr);gap:15px;width:100%;}
+ .cnr-profile-hero{min-height:0;padding:23px 21px 20px;border-radius:17px;}
+ .cnr-profile-hero-copy{margin-top:34px;}
+ .cnr-profile-hero h1{font-size:clamp(34px,9vw,43px);letter-spacing:-1.2px;}
+ .cnr-profile-hero-copy p{margin-top:14px;font-size:13px;line-height:1.7;}
+ .cnr-profile-benefits{grid-template-columns:1fr;gap:13px;margin-top:25px;}
+ .cnr-profile-benefits small{font-size:9px;}
+ .cnr-profile-hero-foot{padding-top:24px;font-size:7px;letter-spacing:1px;}
+ .cnr-account-card{padding:22px 18px;border-radius:17px;}
+ .cnr-account-heading{margin-bottom:22px;}
+ .cnr-account-heading h2{font-size:25px;}
+}
+@media(min-width:761px) and (max-width:980px){.cnr-profile-shell{grid-template-columns:minmax(0,.85fr) minmax(320px,1.15fr);gap:16px}.cnr-profile-hero{padding:25px;}}
