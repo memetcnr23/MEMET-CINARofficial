@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
-import { ArrowRight, CheckCircle2, CircleUserRound, KeyRound, LoaderCircle, LogOut, Mail, ShieldCheck, Sparkles, UserRound } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleUserRound, KeyRound, LoaderCircle, LogOut, Mail, RefreshCw, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 
 type Profile = { username: string | null; full_name: string; bio: string; role: string; avatar_url: string | null; is_public: boolean };
 type SessionUser = { id: string; email: string | null };
@@ -21,6 +21,7 @@ export default function ProfilePortal() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [configured, setConfigured] = useState(true);
+  const [awaitingVerification, setAwaitingVerification] = useState(false);
 
   async function loadProfile() {
     const response = await fetch("/api/profile", { cache: "no-store" });
@@ -34,6 +35,11 @@ export default function ProfilePortal() {
   }
 
   useEffect(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("auth") === "callback_error") {
+      setError("E-posta doğrulaması tamamlanamadı. Bağlantı süresi dolmuş olabilir veya Supabase yönlendirme adresi izinli olmayabilir. Yeni doğrulama e-postası isteyebilirsin.");
+      setMode("signup");
+      setAwaitingVerification(true);
+    }
     try {
       const supabase = createClient();
       void loadProfile();
@@ -57,13 +63,29 @@ export default function ProfilePortal() {
         });
         if (authError) throw authError;
         if (data.session) await loadProfile();
-        else setMessage("Kayıt alındı. E-posta adresine gelen doğrulama bağlantısına tıkla.");
+        else { setAwaitingVerification(true); setMessage("Kayıt alındı. E-posta adresine gelen doğrulama bağlantısına tıkla."); }
       } else {
         const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
         if (authError) throw authError;
         await loadProfile();
       }
     } catch (e) { setError(e instanceof Error ? e.message : "İşlem tamamlanamadı."); }
+    finally { setBusy(false); }
+  }
+
+  async function resendConfirmation() {
+    if (!email.trim()) { setError("Önce kayıt olduğun e-posta adresini yaz."); return; }
+    setBusy(true); setError(""); setMessage("");
+    try {
+      const supabase = createClient();
+      const { error: resendError } = await supabase.auth.resend({
+        type: "signup",
+        email: email.trim(),
+        options: { emailRedirectTo: "https://cnr-muzik-tv.vercel.app/auth/callback?next=/profil" }
+      });
+      if (resendError) throw resendError;
+      setMessage("Yeni doğrulama bağlantısı e-posta adresine gönderildi. Gelen kutunu ve spam klasörünü kontrol et.");
+    } catch (e) { setError(e instanceof Error ? e.message : "Doğrulama e-postası gönderilemedi."); }
     finally { setBusy(false); }
   }
 
@@ -129,6 +151,7 @@ export default function ProfilePortal() {
         </>}
         {error&&<p role="alert" className="cnr-account-alert error">{error}</p>}
         {message&&<p role="status" className="cnr-account-alert success"><CheckCircle2 size={16}/>{message}</p>}
+        {awaitingVerification&&!user&&<button type="button" onClick={resendConfirmation} disabled={busy} className="cnr-account-resend">{busy?<LoaderCircle className="cnr-spin" size={15}/>:<RefreshCw size={15}/>} YENİ DOĞRULAMA E-POSTASI GÖNDER</button>}
       </section>
     </div>
   </main>;
