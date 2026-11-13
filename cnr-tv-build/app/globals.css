@@ -709,3 +709,20 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
   border-radius:0!important;
   box-shadow:none!important;
 }
+
+
+/* Align the Atatürk animation to the CNR channel logo on the same top baseline. */
+.cnr-permanent-flag{
+  top:58px!important;
+  right:8.2%!important;
+  width:clamp(76px,11%,116px)!important;
+  height:auto!important;
+  aspect-ratio:1/1!important;
+}
+@media(max-width:720px){
+  .cnr-permanent-flag{
+    top:16px!important;
+    right:8.2%!important;
+    width:clamp(54px,15%,82px)!important;
+  }
+}
