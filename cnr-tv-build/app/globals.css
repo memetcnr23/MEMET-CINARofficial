@@ -950,3 +950,34 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
  .cnr-account-heading h2{font-size:27px!important;}
  .cnr-account-form{gap:14px!important;}
 }
+
+
+/* Site-wide finishing pass: consistent focus, touch targets, overflow control and legal information layouts. */
+.tv-app{overflow-x:clip;}
+.page-area,.page-content,.app-frame{min-width:0;}
+:where(a,button,input,textarea,select):focus-visible{outline:2px solid #ff435d!important;outline-offset:3px!important;}
+button:disabled{cursor:not-allowed;opacity:.58;}
+.legal-page{
+  max-width:980px;
+  margin:0 auto;
+  padding:clamp(22px,4vw,42px);
+  border:1px solid rgba(255,255,255,.09);
+  border-top:3px solid #e10f2b;
+  background:linear-gradient(145deg,#151821,#0c0e14 70%);
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+}
+.legal-page h2{margin:27px 0 8px;color:#fff;font:800 clamp(17px,2vw,21px)/1.2 Rajdhani,"Segoe UI",sans-serif;letter-spacing:.04em;}
+.legal-page h2:first-of-type{margin-top:18px;}
+.legal-page p{max-width:78ch;margin:0;color:#aab0bd;font-size:14px;line-height:1.85;}
+.legal-page .legal-updated{color:#f16a80;font-size:10px;font-weight:900;letter-spacing:1.7px;}
+.legal-inline-link{color:#ff637c;text-decoration:underline;text-underline-offset:3px;}
+.footer-legal a{transition:color .18s ease;}
+.footer-legal a:hover{color:#ff536e;}
+@media(max-width:760px){
+ .page-area{padding-bottom:calc(92px + env(safe-area-inset-bottom));}
+ .page-content{padding-left:14px;padding-right:14px;}
+ .legal-page{padding:22px 18px;border-radius:0;}
+ .legal-page p{font-size:13px;line-height:1.8;}
+ .footer-legal{display:flex;flex-wrap:wrap;gap:12px 16px;}
+ .footer-legal a{min-height:32px;display:inline-flex;align-items:center;}
+}
