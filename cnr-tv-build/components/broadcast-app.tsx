@@ -106,6 +106,7 @@ const navItems = [
   { label: "Programlar", href: "/programlar", icon: LayersIcon },
   { label: "Müzik Listeleri", href: "/muzik-listeleri", icon: ListMusic },
   { label: "Sanatçılar", href: "/sanatcilar", icon: Users },
+  { label: "İletişim", href: "/iletisim", icon: Camera },
   { label: "Klip Arşivi", href: "/klip-arsivi", icon: Disc3 },
   { label: "Haberler", href: "/haberler", icon: Newspaper },
   { label: "Hava Durumu", href: "/hava-durumu", icon: CloudSun },
@@ -204,6 +205,10 @@ export default function BroadcastApp() {
   const [nowPlaying, setNowPlaying] = useState<NowPlaying | null>(null);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [directorySearch, setDirectorySearch] = useState("");
+  const [requestName, setRequestName] = useState("");
+  const [requestPhone, setRequestPhone] = useState("");
+  const [requestSong, setRequestSong] = useState("");
+  const [requestMessage, setRequestMessage] = useState("");
   const [artistDetail, setArtistDetail] = useState<Artist | null>(null);
   const [artistError, setArtistError] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
@@ -1150,6 +1155,30 @@ export default function BroadcastApp() {
       {pageHeading("CNR EVENTS", "Etkinlikler", "Özel yayınlar, müzik buluşmaları ve CNR etkinlik takvimi.")}
       <div className="event-banner"><div className="event-sparks">✦　✦　✦</div><span className="eyebrow">CNR ASSOCIATION · CNR MÜZİK YAPIM</span><h2>GALA & MÜZİK ÖDÜLLERİ</h2><p>Özel etkinlik ve yayın duyuruları bu alanda paylaşılacak.</p><button onClick={() => notify("Etkinlik takvimi güncellendiğinde burada duyurulacak.")}>Duyuruları görüntüle <ChevronRight size={16} /></button></div>
       <div className="empty-state compact"><CalendarDays size={32} /><b>Yaklaşan etkinlik bulunmuyor</b><span>Yeni etkinlik tarihleri açıklandığında takvime eklenecek.</span></div>
+    </>;
+  } else if (pathname === "/iletisim") {
+    content = <>
+      {pageHeading("CNR İLETİŞİM", "İletişim / İstek Hattı", "Şarkı isteğini, selamını veya mesajını CNR Müzik TV'ye iletmek için formu doldur.") }
+      <section className="contact-layout">
+        <form className="contact-request-card" onSubmit={(event) => {
+          event.preventDefault();
+          const message = ["CNR MÜZİK TV ŞARKI İSTEĞİ", "Ad Soyad: " + requestName, "Telefon: " + (requestPhone || "Belirtilmedi"), "Şarkı / Sanatçı: " + requestSong, "Mesaj: " + (requestMessage || "—")].join("\\n");
+          void navigator.clipboard?.writeText(message).then(() => notify("İstek metni kopyalandı. Resmî iletişim kanalından iletebilirsin.")).catch(() => notify("İstek metni kopyalanamadı; alanları kontrol edip tekrar dene."));
+        }}>
+          <h2><Music2 /> Şarkı İsteği Formu</h2>
+          <label>Ad Soyad<input required value={requestName} onChange={(event) => setRequestName(event.target.value)} placeholder="Adınız ve soyadınız" /></label>
+          <label>Telefon <span className="contact-optional">İsteğe bağlı</span><input value={requestPhone} onChange={(event) => setRequestPhone(event.target.value)} placeholder="+90 5XX XXX XX XX" /></label>
+          <label>Şarkı / Sanatçı İsteği<input required value={requestSong} onChange={(event) => setRequestSong(event.target.value)} placeholder="Örn: Tarkan – Şımarık" /></label>
+          <label>Mesaj<textarea value={requestMessage} onChange={(event) => setRequestMessage(event.target.value)} placeholder="İsteğinizi, selamlamanızı veya mesajınızı yazın..." rows={4} /></label>
+          <button className="contact-submit" type="submit"><Share2 size={17} /> İSTEĞİ HAZIRLA</button>
+          <p className="contact-form-note">Form, isteğini düzenli bir mesaj olarak hazırlar. Gönderim için CNR'nin resmî iletişim kanallarını kullan.</p>
+        </form>
+        <aside className="contact-side">
+          <section className="contact-info-card"><h2><Radio /> CNR Müzik TV</h2><div className="contact-studio-art"><span>ON AIR</span><b>CANLI MÜZİK YAYINI</b></div><p>Canlı yayını izlemek ve yayın akışını takip etmek için:</p><Link href="/canli-yayin" className="contact-live-link"><Radio size={17}/> CANLI YAYINA KATIL</Link></section>
+          <section className="contact-info-card"><h2><Users /> Bizi Takip Edin</h2><div className="contact-social-links"><a href="https://instagram.com/memetcinarofficial" target="_blank" rel="noreferrer">Instagram</a><a href="https://youtube.com/@memetcinar444" target="_blank" rel="noreferrer">YouTube</a><a href="https://open.spotify.com" target="_blank" rel="noreferrer">Spotify</a></div><small>@memetcinarofficial · @memetcinar444</small></section>
+          <section className="contact-info-card"><h2><Info /> İletişim Bilgisi</h2><p>CNR Müzik TV ile ilgili yayın, iş birliği ve içerik taleplerini resmî sosyal medya hesapları üzerinden iletebilirsin.</p></section>
+        </aside>
+      </section>
     </>;
   } else if (pathname === "/hakkimizda") {
     content = <>
