@@ -586,14 +586,27 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
 @media(max-width:760px){.contact-layout{grid-template-columns:1fr;gap:14px}.contact-request-card{padding:18px}.contact-info-card{padding:17px}}
 
 
-/* Repair: keep the Atatürk + Turkish flag ident visible and gently animated on the TV screen. */
+/* Stable, lightweight Atatürk/flag bug. Avoid transforms on the image itself:
+   this artwork contains an animated WebP and CSS transforms can corrupt frame rendering. */
 .cnr-permanent-flag{
+  position:absolute!important;
+  top:22px!important;
+  right:clamp(14px,3%,38px)!important;
+  width:clamp(64px,9%,104px)!important;
+  aspect-ratio:1/1!important;
   display:block!important;
-  overflow:visible!important;
-  isolation:isolate;
-  animation:cnrAtaturkFrameGlow 5.5s ease-in-out infinite;
+  overflow:hidden!important;
+  z-index:13!important;
+  pointer-events:none!important;
+  background:rgba(4,5,8,.14)!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  border-radius:50%!important;
+  box-shadow:0 3px 16px rgba(0,0,0,.65),0 0 18px rgba(225,24,55,.18)!important;
+  animation:cnrFlagHalo 4s ease-in-out infinite!important;
 }
 .cnr-permanent-flag img{
+  position:absolute!important;
+  inset:0!important;
   display:block!important;
   width:100%!important;
   height:100%!important;
@@ -601,18 +614,15 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
   object-position:center!important;
   opacity:1!important;
   visibility:visible!important;
-  animation:cnrAtaturkPortraitMotion 6s ease-in-out infinite;
-  transform-origin:50% 50%;
-  will-change:transform,filter;
+  transform:none!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
 }
-@keyframes cnrAtaturkPortraitMotion{
-  0%,100%{transform:translate3d(0,0,0) scale(1);filter:drop-shadow(0 2px 5px rgba(255,35,50,.22))}
-  50%{transform:translate3d(0,-3px,0) scale(1.035);filter:drop-shadow(0 3px 12px rgba(255,35,50,.5))}
+@keyframes cnrFlagHalo{
+  0%,100%{box-shadow:0 3px 16px rgba(0,0,0,.65),0 0 12px rgba(225,24,55,.13)}
+  50%{box-shadow:0 3px 20px rgba(0,0,0,.68),0 0 22px rgba(225,24,55,.38)}
 }
-@keyframes cnrAtaturkFrameGlow{
-  0%,100%{filter:drop-shadow(0 2px 8px rgba(0,0,0,.65))}
-  50%{filter:drop-shadow(0 2px 13px rgba(220,25,45,.5))}
+@media(max-width:720px){
+  .cnr-permanent-flag{top:12px!important;right:10px!important;width:clamp(48px,14%,70px)!important;}
 }
-@media(prefers-reduced-motion:reduce){
-  .cnr-permanent-flag,.cnr-permanent-flag img{animation:none!important}
-}
+@media(prefers-reduced-motion:reduce){.cnr-permanent-flag{animation:none!important;}}
