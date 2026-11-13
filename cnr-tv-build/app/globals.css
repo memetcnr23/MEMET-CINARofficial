@@ -561,3 +561,26 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
  .cnr-live-ticker-window{font-size:9px;}
 }
 @media(prefers-reduced-motion:reduce){.cnr-live-ticker-window span{animation:none!important;padding-left:8px;}}
+
+
+/* CNR contact page */
+.contact-layout{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:22px;align-items:start;margin:24px 0 38px}
+.contact-request-card,.contact-info-card{background:linear-gradient(145deg,rgba(34,35,39,.97),rgba(15,16,19,.98));border:1px solid rgba(239,53,61,.42);border-radius:18px;padding:24px;box-shadow:0 12px 34px rgba(0,0,0,.28)}
+.contact-request-card h2,.contact-info-card h2{display:flex;align-items:center;gap:10px;margin:0 0 20px;font-size:clamp(20px,2.2vw,27px)}
+.contact-request-card h2 svg,.contact-info-card h2 svg{color:#f0444c}
+.contact-request-card label{display:block;margin:0 0 15px;font-weight:700;font-size:14px;color:#eee}
+.contact-request-card input,.contact-request-card textarea{display:block;width:100%;margin-top:7px;padding:13px 14px;border-radius:9px;border:1px solid #3b3d42;background:#111216;color:#fff;font:inherit;outline:none}
+.contact-request-card input:focus,.contact-request-card textarea:focus{border-color:#e83a43;box-shadow:0 0 0 3px rgba(232,58,67,.12)}
+.contact-request-card textarea{resize:vertical}
+.contact-optional,.contact-form-note,.contact-info-card small{color:#a9a9ad;font-size:12px;font-weight:400}
+.contact-submit,.contact-live-link{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;border:0;border-radius:10px;background:linear-gradient(90deg,#e52e37,#f0444c);color:white;padding:14px 18px;font-weight:800;text-decoration:none;cursor:pointer}
+.contact-form-note{line-height:1.55;margin:12px 0 0}
+.contact-side{display:grid;gap:16px}
+.contact-info-card{padding:20px}
+.contact-info-card p{color:#c3c3c7;line-height:1.6;margin:12px 0}
+.contact-studio-art{height:155px;border-radius:12px;background:radial-gradient(ellipse at 50% 100%,rgba(220,39,49,.48),transparent 58%),linear-gradient(135deg,#292b30,#090a0c 70%);border:1px solid #34353a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;letter-spacing:.12em}
+.contact-studio-art span{color:#ff555c;font-size:12px;font-weight:900}
+.contact-studio-art b{font-size:clamp(16px,2vw,22px)}
+.contact-social-links{display:flex;flex-wrap:wrap;gap:9px;margin:4px 0 10px}
+.contact-social-links a{padding:9px 13px;border-radius:9px;background:#28292e;border:1px solid #494a50;color:#fff;text-decoration:none;font-weight:700;font-size:13px}
+@media(max-width:760px){.contact-layout{grid-template-columns:1fr;gap:14px}.contact-request-card{padding:18px}.contact-info-card{padding:17px}}
