@@ -688,3 +688,24 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
   line-height:1.2;
 }
 .cnr-permanent-flag .cnr-giphy-credit a{color:#fff;text-decoration:none;}
+
+
+/* Transparent Atatürk sticker: render the GIF directly without GIPHY's iframe chrome or attribution. */
+.cnr-permanent-flag{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  overflow:visible!important;
+}
+.cnr-permanent-flag .cnr-ataturk-gif{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  object-position:center!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
