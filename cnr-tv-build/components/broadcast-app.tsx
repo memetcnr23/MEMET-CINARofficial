@@ -1186,6 +1186,51 @@ export default function BroadcastApp() {
       <div className="about-hero"><Image src={LOGO} alt="CNR Müzik TV" width={340} height={116} unoptimized /><h2>Türkiye'nin Müzik Televizyonu</h2><p>CNR Müzik TV; müzik, eğlence ve sanat dünyasını 7/24 tek ekranda buluşturmayı hedefleyen dijital müzik kanalıdır. Yerli ve ulusal sanatçılara, yeni yeteneklere ve müzik kültürüne destek olmayı amaçlar.</p></div>
       <div className="about-metrics"><div><Radio /><b>7/24</b><span>Yayın hedefi</span></div><div><MonitorPlay /><b>{clips.length || "—"}</b><span>Klip kataloğu</span></div><div><Users /><b>CNR</b><span>Müzik Yapım</span></div><div><Signal /><b>Türkiye</b><span>Dijital yayın</span></div></div>
     </>;
+  } else if (pathname === "/gizlilik-politikasi") {
+    content = <>
+      {pageHeading("CNR MÜZİK TV · ŞEFFAFLIK", "Gizlilik Politikası", "Kişisel verilerin ve hesap bilgilerinin kullanımı hakkında.") }
+      <section className="legal-page">
+        <p className="legal-updated">SON GÜNCELLEME: 13 KASIM 2026</p>
+        <h2>1. Hangi bilgileri kullanıyoruz?</h2><p>Üyelik oluşturduğunda e-posta adresin, hesap bilgilerin ve profilinde paylaşmayı seçtiğin bilgiler işlenebilir. Siteyi çalıştırmak, güvenliği sağlamak ve hataları gidermek için temel teknik kayıtlar da tutulabilir.</p>
+        <h2>2. Bilgileri hangi amaçla kullanıyoruz?</h2><p>Hesap doğrulama, oturum yönetimi, profil özellikleri, yayın hizmetlerinin sunulması, destek taleplerinin yanıtlanması ve platform güvenliğinin korunması amacıyla kullanılır.</p>
+        <h2>3. Üçüncü taraf hizmetler</h2><p>Üyelik işlemleri Supabase, yayın ve video içerikleri ilgili video sağlayıcıları, site barındırma ve dağıtımı ise Vercel altyapısı üzerinden çalışabilir. Bu sağlayıcıların kendi gizlilik koşulları da geçerlidir.</p>
+        <h2>4. Güvenlik ve saklama</h2><p>Bilgilerin korunması için makul teknik ve idari önlemler uygulanır. İnternet üzerinden hiçbir aktarım yöntemi mutlak güvenlik garantisi vermez. Veriler, hizmetin sunulması ve yasal yükümlülükler için gerekli süre boyunca saklanır.</p>
+        <h2>5. Hakların ve iletişim</h2><p>Kişisel verilerine ilişkin taleplerini CNR Müzik TV'nin resmî iletişim kanallarından iletebilirsin. Talebin niteliğine göre kimlik doğrulaması istenebilir.</p>
+      </section>
+    </>;
+  } else if (pathname === "/cerez-politikasi") {
+    content = <>
+      {pageHeading("CNR MÜZİK TV · ÇEREZLER", "Çerez Politikası", "Site deneyimini ve güvenli oturumları destekleyen teknolojiler.") }
+      <section className="legal-page">
+        <p className="legal-updated">SON GÜNCELLEME: 13 KASIM 2026</p>
+        <h2>1. Çerez nedir?</h2><p>Çerezler ve benzer tarayıcı depolama teknolojileri, tercihleri hatırlamak ve sitenin temel işlevlerini çalıştırmak için kullanılan küçük veri kayıtlarıdır.</p>
+        <h2>2. Kullanım amaçları</h2><p>Oturum ve hesap güvenliği, oynatıcı tercihleri, yayın deneyimi, performans ölçümü ve hata ayıklama için gerekli depolama teknolojileri kullanılabilir.</p>
+        <h2>3. Tercihlerini yönetme</h2><p>Tarayıcı ayarlarından çerezleri silebilir veya engelleyebilirsin. Zorunlu çerezleri engellemek oturum açma ve bazı site özelliklerinin çalışmasını etkileyebilir.</p>
+        <h2>4. Üçüncü taraf içerikler</h2><p>YouTube gibi harici içerik sağlayıcıları kendi çerezlerini veya benzer teknolojilerini kullanabilir. Bu içerikleri oynattığında ilgili sağlayıcının politikaları geçerli olur.</p>
+      </section>
+    </>;
+  } else if (pathname === "/kullanim-kosullari") {
+    content = <>
+      {pageHeading("CNR MÜZİK TV · KULLANIM", "Kullanım Koşulları", "CNR Müzik TV dijital platformunu kullanırken geçerli temel kurallar.") }
+      <section className="legal-page">
+        <p className="legal-updated">SON GÜNCELLEME: 13 KASIM 2026</p>
+        <h2>1. Platformun kullanımı</h2><p>Platformu yürürlükteki mevzuata, üçüncü kişilerin haklarına ve diğer kullanıcıların güvenliğine saygılı biçimde kullanmalısın.</p>
+        <h2>2. Üyelik ve hesap güvenliği</h2><p>Hesap bilgilerini doğru tutmak ve şifreni korumak senin sorumluluğundadır. Başkasına ait hesapları izinsiz kullanamaz veya platformun güvenliğini bozmaya çalışamazsın.</p>
+        <h2>3. İçerik ve telif hakları</h2><p>Platformda görüntülenen müzik ve video içeriklerinin hakları ilgili sanatçı, yapımcı, yayıncı veya hak sahiplerine aittir. İçerikleri izinsiz indirmek, çoğaltmak veya yeniden yayımlamak yasaktır.</p>
+        <h2>4. Hizmetin sürekliliği</h2><p>Yayın ve site özellikleri bakım, teknik arıza veya üçüncü taraf hizmet kesintileri nedeniyle geçici olarak durabilir. Kesintisiz hizmet garantisi verilmez.</p>
+        <h2>5. Koşullardaki değişiklikler</h2><p>Koşullar güncellendiğinde bu sayfada yayımlanır. Platformu kullanmaya devam etmen güncel koşulları incelemen gerektiği anlamına gelir.</p>
+      </section>
+    </>;
+  } else if (pathname === "/reklam-ve-gelir") {
+    content = <>
+      {pageHeading("CNR MÜZİK TV · İŞ BİRLİĞİ", "Reklam & Gelir", "Markalar, sponsorlar ve içerik ortakları için bilgilendirme.") }
+      <section className="legal-page">
+        <p className="legal-updated">CNR MÜZİK YAPIM® · TİCARİ İŞ BİRLİKLERİ</p>
+        <h2>Reklam ve sponsorluk</h2><p>CNR Müzik TV; uygun içeriklerde reklam, sponsorluk, program ortaklığı ve tanıtım iş birlikleri değerlendirebilir. Ücretli tanıtım veya sponsorlu içerikler yayımlandığında mümkün olduğu ölçüde açıkça belirtilir.</p>
+        <h2>İçerik yerleşimleri</h2><p>Reklam alanları yayın akışından, editoryal içerikten ve kullanıcı arayüzü öğelerinden ayırt edilecek şekilde sunulmalıdır. Reklam verenler kullanıcıların hesap bilgilerine erişemez.</p>
+        <h2>İş birliği başvurusu</h2><p>Marka, sanatçı, yapımcı ve etkinlik iş birlikleri için <Link href="/iletisim" className="legal-inline-link">İletişim / İstek Hattı</Link> sayfasını kullanarak talebini iletebilirsin.</p>
+      </section>
+    </>;
   } else if (pathname === "/profil") {
     content = <ProfilePortal />;
   } else {
