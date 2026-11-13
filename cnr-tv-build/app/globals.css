@@ -657,3 +657,34 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
     width:clamp(76px,20%,112px)!important;
   }
 }
+
+
+/* Match the supplied GIPHY embed snippet exactly while keeping its attribution inside the TV bug. */
+.cnr-permanent-flag .cnr-giphy-embed{
+  width:100%;
+  height:0;
+  padding-bottom:100%;
+  position:relative;
+}
+.cnr-permanent-flag .cnr-giphy-embed iframe{
+  position:absolute!important;
+  inset:0!important;
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  border:0!important;
+}
+.cnr-permanent-flag .cnr-giphy-credit{
+  position:absolute;
+  z-index:2;
+  left:0;
+  right:0;
+  bottom:0;
+  margin:0;
+  padding:2px 4px;
+  background:rgba(0,0,0,.48);
+  text-align:right;
+  font-size:8px;
+  line-height:1.2;
+}
+.cnr-permanent-flag .cnr-giphy-credit a{color:#fff;text-decoration:none;}
