@@ -858,3 +858,95 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
  .cnr-account-heading h2{font-size:25px;}
 }
 @media(min-width:761px) and (max-width:980px){.cnr-profile-shell{grid-template-columns:minmax(0,.85fr) minmax(320px,1.15fr);gap:16px}.cnr-profile-hero{padding:25px;}}
+
+
+/* Profile page visual language matched to the supplied CNR reference: Rajdhani, angular panels, compact red broadcast accents. */
+.cnr-profile-page{
+  font-family:Rajdhani,"Segoe UI",system-ui,sans-serif!important;
+  background:radial-gradient(900px 500px at 85% -5%,rgba(225,15,43,.13),transparent 62%),#07080c!important;
+  padding-top:28px!important;
+}
+.cnr-profile-shell{max-width:1120px!important;gap:18px!important;}
+.cnr-profile-hero{
+  min-height:520px!important;
+  border:1px solid #262b38!important;
+  border-left:3px solid #e10f2b!important;
+  border-radius:0!important;
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)!important;
+  background:linear-gradient(160deg,#161a24,#0e1016 72%,#090a0e)!important;
+  box-shadow:none!important;
+}
+.cnr-profile-hero:after{color:rgba(255,255,255,.025)!important;}
+.cnr-profile-brand{font-size:14px!important;letter-spacing:1.7px!important;}
+.cnr-profile-brand-icon{border-radius:0!important;background:#e10f2b!important;border:0!important;color:white!important;}
+.cnr-profile-brand i{font-size:9px!important;letter-spacing:2px!important;}
+.cnr-profile-eyebrow{font-size:12px!important;letter-spacing:2.5px!important;color:#f05a70!important;}
+.cnr-profile-hero h1{
+  font-size:clamp(38px,5.2vw,62px)!important;
+  font-weight:800!important;
+  line-height:.98!important;
+  letter-spacing:.025em!important;
+  text-transform:uppercase!important;
+}
+.cnr-profile-hero h1 em{color:#e10f2b!important;}
+.cnr-profile-hero-copy p{font-size:17px!important;line-height:1.55!important;color:#9aa3b8!important;}
+.cnr-profile-benefits{gap:13px!important;}
+.cnr-profile-benefits>div{gap:12px!important;}
+.cnr-profile-benefits svg{color:#e10f2b!important;}
+.cnr-profile-benefits b{font-size:15px!important;letter-spacing:.03em!important;}
+.cnr-profile-benefits small{font-size:12px!important;color:#9aa3b8!important;}
+.cnr-profile-hero-foot{font-size:10px!important;color:#9aa3b8!important;}
+.cnr-profile-live-dot{background:#e10f2b!important;box-shadow:0 0 10px #e10f2b!important;}
+.cnr-account-card{
+  border:1px solid #262b38!important;
+  border-top:3px solid #e10f2b!important;
+  border-radius:0!important;
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)!important;
+  background:linear-gradient(160deg,#161a24,#0e1016 72%,#090a0e)!important;
+  box-shadow:none!important;
+}
+.cnr-account-heading h2{font-size:clamp(26px,3.2vw,36px)!important;text-transform:uppercase!important;letter-spacing:.035em!important;}
+.cnr-account-heading p{font-size:14px!important;color:#9aa3b8!important;}
+.cnr-account-avatar{border-radius:0!important;background:#e10f2b!important;border:0!important;color:#fff!important;}
+.cnr-account-tabs{border-radius:0!important;background:#07080c!important;border-color:#262b38!important;}
+.cnr-account-tabs button{border-radius:0!important;font-family:Rajdhani,"Segoe UI",sans-serif!important;font-size:13px!important;letter-spacing:1.4px!important;}
+.cnr-account-tabs button.active{background:#e10f2b!important;box-shadow:none!important;}
+.cnr-account-form>label{font-family:Rajdhani,"Segoe UI",sans-serif!important;font-size:14px!important;letter-spacing:.04em!important;text-transform:uppercase!important;}
+.cnr-account-input{
+  height:50px!important;
+  border:1px solid #262b38!important;
+  border-radius:0!important;
+  background:#161a24!important;
+  font:600 17px/1.2 Rajdhani,"Segoe UI",sans-serif!important;
+  max-width:none!important;
+}
+.cnr-account-input:focus{border-color:#e10f2b!important;box-shadow:0 0 0 2px #e10f2b22!important;}
+.cnr-account-field>svg{top:25px!important;color:#9aa3b8!important;}
+.cnr-account-submit{
+  min-height:48px!important;
+  border:0!important;
+  border-radius:0!important;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)!important;
+  background:#e10f2b!important;
+  font:800 15px/1 Rajdhani,"Segoe UI",sans-serif!important;
+  letter-spacing:1.8px!important;
+  box-shadow:none!important;
+}
+.cnr-account-secure{font-size:12px!important;color:#9aa3b8!important;}
+.cnr-account-logout{border-radius:0!important;font-family:Rajdhani,"Segoe UI",sans-serif!important;}
+.cnr-account-alert{border-radius:0!important;font-size:13px!important;}
+@media(max-width:760px){
+ .cnr-profile-page{padding:18px 14px 92px!important;}
+ .cnr-profile-shell{gap:14px!important;}
+ .cnr-profile-hero{min-height:0!important;padding:23px 20px 20px!important;}
+ .cnr-profile-hero-copy{margin-top:30px!important;}
+ .cnr-profile-hero h1{font-size:clamp(36px,10vw,48px)!important;line-height:1.02!important;}
+ .cnr-profile-hero-copy p{font-size:16px!important;}
+ .cnr-profile-benefits{margin-top:24px!important;}
+ .cnr-profile-benefits b{font-size:14px!important;}
+ .cnr-profile-benefits small{font-size:11px!important;}
+ .cnr-profile-hero-foot{padding-top:24px!important;}
+ .cnr-account-card{padding:22px 18px!important;}
+ .cnr-account-heading h2{font-size:27px!important;}
+ .cnr-account-form{gap:14px!important;}
+}
