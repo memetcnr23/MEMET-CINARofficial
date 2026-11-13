@@ -246,6 +246,12 @@ export default function BroadcastApp() {
   nowRef.current = nowPlaying;
 
   useEffect(() => {
+    if (!current) { setLowerActive(false); return; }
+    setLowerActive(true);
+    setLowerKey((value) => value + 1);
+  }, [current?.id, current?.title, current?.artist]);
+
+  useEffect(() => {
     try {
       const key = "cnr-tv-analytics-v1";
       const raw = localStorage.getItem(key);
@@ -953,14 +959,14 @@ export default function BroadcastApp() {
         <div className="live-primary">
           <div className="live-screen">
             <div className="screen-top"><span className="live-dot"><i /> CANLI</span><span className="screen-quality">CNR MÜZİK TV · HD</span></div>
-            {activeNationalDay && <div className="special-day-bug" role="img" aria-label={activeNationalDay.label}>
+            <div className="special-day-bug cnr-permanent-flag" role="img" aria-label="Atatürk ve Türk bayrağı">
               <img
                 src="https://media.giphy.com/media/Sqs3q0jJuafiJ6FAUn/giphy.gif"
                 alt=""
                 aria-hidden="true"
                 draggable={false}
               />
-            </div>}
+            </div>
             {currentHlsUrl ? <video ref={hlsVideoRef} className="cnr-hls-video" autoPlay muted={muted} playsInline crossOrigin="anonymous" preload="auto" onPlaying={() => setPlayerPlaying(true)} onPause={() => setPlayerPlaying(false)} onCanPlay={() => setPlayerReady(true)} onWaiting={() => setPlayerPlaying(false)} /> : <div id="cnr-live-player" className="youtube-video-host" />}
             <div className={"cnr-video-transition " + (videoTransitioning ? "is-active" : "")} aria-hidden="true" />
             {(!current || (Boolean(catalogError) && !playerPlaying)) && <div className="broadcast-empty-overlay" role="status" aria-live="polite"><Radio size={32} /><b>YAKINDA YAYINDAYIZ</b><span>CNR Müzik TV yayın akışı hazırlanıyor.</span><small>Klipler yeniden yüklendiğinde yayın otomatik başlayacak.</small><strong>ÇOK YAKINDA · CNR MÜZİK TV</strong></div>}
@@ -976,6 +982,10 @@ export default function BroadcastApp() {
             </div>
             {current && !playerPlaying && (currentHlsUrl || !HLS_ONLY) && <button className="screen-start" onClick={startWithSound}><Play fill="currentColor" size={19} /> YAYINI BAŞLAT</button>}
             <div className="screen-bottom"><span>● {currentHlsUrl ? "CNR HLS YAYINI" : HLS_ONLY ? "HLS KAYNAĞI BEKLENİYOR" : "YOUTUBE YEDEK YAYIN"}</span><span>{h}</span></div>
+            <div className="cnr-live-ticker" aria-live="off">
+              <span className="cnr-live-ticker-label"><i /> CNR MÜZİK TV</span>
+              <div className="cnr-live-ticker-window"><span>{current ? `ŞİMDİ ÇALIYOR · ${current.title} · ${current.artist}` : "KESİNTİSİZ MÜZİK YAYINI"}</span></div>
+            </div>
             <div className={"cnr-lower-third " + (lowerActive ? "show" : "")} key={lowerKey} aria-live="polite">
               <div className="cnr-lt-logo">
                 <span className="cnr-lt-logo-frame" aria-hidden="true" />
