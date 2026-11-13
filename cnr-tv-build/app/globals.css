@@ -626,3 +626,34 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ff52
   .cnr-permanent-flag{top:12px!important;right:10px!important;width:clamp(48px,14%,70px)!important;}
 }
 @media(prefers-reduced-motion:reduce){.cnr-permanent-flag{animation:none!important;}}
+
+
+/* Requested GIPHY Atatürk animation: no circular frame, border, or badge. */
+.cnr-permanent-flag{
+  top:18px!important;
+  right:clamp(14px,3%,38px)!important;
+  width:clamp(92px,12%,142px)!important;
+  aspect-ratio:1/1!important;
+  overflow:hidden!important;
+  display:block!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  animation:none!important;
+}
+.cnr-permanent-flag .cnr-ataturk-giphy{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+}
+@media(max-width:720px){
+  .cnr-permanent-flag{
+    top:12px!important;
+    right:10px!important;
+    width:clamp(76px,20%,112px)!important;
+  }
+}
