@@ -961,7 +961,7 @@ export default function BroadcastApp() {
             <div className="screen-top"><span className="live-dot"><i /> CANLI</span><span className="screen-quality">CNR MÜZİK TV · HD</span></div>
             <div className="special-day-bug cnr-permanent-flag" role="img" aria-label="Atatürk ve Türk bayrağı">
               <img
-                src="https://media.giphy.com/media/Sqs3q0jJuafiJ6FAUn/giphy.gif"
+                src="/ataturk-flag.webp"
                 alt=""
                 aria-hidden="true"
                 draggable={false}
