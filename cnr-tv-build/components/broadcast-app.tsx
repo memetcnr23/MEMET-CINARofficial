@@ -176,7 +176,8 @@ function pageTitle(path: string) {
   const match = navItems.find((item) => item.href === path);
   if (match) return match.label;
   if (path.startsWith("/sanatci/")) return "Sanatçı Profili";
-  return "CNR Müzik TV";
+  const legalTitles: Record<string,string> = { "/gizlilik-politikasi":"Gizlilik Politikası", "/cerez-politikasi":"Çerez Politikası", "/kullanim-kosullari":"Kullanım Koşulları", "/reklam-ve-gelir":"Reklam & Gelir" };
+  return legalTitles[path] || "CNR Müzik TV";
 }
 function getProgramName(category: string) {
   if (category === "Rap & Trap") return "CNR Rap & Trap";
